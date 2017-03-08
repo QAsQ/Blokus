@@ -144,7 +144,7 @@ function createChess() {
         chess.attr({
             "width": cellSize * 5,
             "height": cellSize * 5,
-            "style": "position:absolute;top:" + (dx * (index % 5)) + "px;left:" + (dy * (index / 5) + boardSize) + "px;z-index:2;opacity:" + initp,
+            "style": "position:absolute;top:" + (dx * (index % 5)) + "px;left:" + (dy * Math.floor(index / 5) + boardSize) + "px;z-index:2;opacity:" + initp,
             "name": "chess"
         });
         //todo
