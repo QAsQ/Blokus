@@ -4,7 +4,6 @@
 function init(x) {
     owner = x;
     round = 0;
-    isHide = new Array;
     initColorTheme();
     clearFace();
     initSize();
@@ -144,7 +143,7 @@ function createChess() {
         chess.attr({
             "width": cellSize * 5,
             "height": cellSize * 5,
-            "style": "position:absolute;top:" + (dx * (index % 5)) + "px;left:" + (dy * Math.floor(index / 5) + boardSize) + "px;z-index:2;opacity:" + initp,
+            "style": "position:absolute;top:" + (dy * (index % 5)) + "px;left:" + (dx + dx * Math.floor(index / 5) + boardSize) + "px;z-index:2;opacity:" + initp,
             "name": "chess"
         });
         //todo
@@ -179,6 +178,7 @@ function clearFace() {
         , con(1, -1, 20)
         , con(2, 20, 20)
         , con(3, 20, -1));
+    isHide = new Array;
 }
 function drawLine(e) {
     e.lineWidth = 1;
