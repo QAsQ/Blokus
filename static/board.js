@@ -152,6 +152,7 @@ function createChess() {
 function initColorTheme(theme) {
     if (theme === undefined) {
         colorTheme = {
+            horn: "#a5a7a5",
             legal: "#6f645e",
             rim: "#875f5f",
             unlegal: "#c3bba8",
