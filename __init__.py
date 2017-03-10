@@ -1,6 +1,6 @@
 from flask import Flask, render_template,redirect
 from flask_socketio import SocketIO,send,emit
-from flaskext.login import login_user,logout_user,current_user ,login_required
+#from flaskext.login import login_user,logout_user,current_user ,login_required
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -13,22 +13,8 @@ def handle_on(message):
 def handle_battle(Sta):
     emit('battle',Sta,broadcast=True);
 
-@socketio.on('login')
-def handle_login(_user):
-    if current_user.is_authenticated():
-        return redirect(url_for('index'));
-    cuser = user(_user["name"]);
-    login_user(cuser);
-
-    if cuser and user.is_active() :
-        login_user(cuser);
-        return  ;
-
-    return  run
-
-
-@app.route('/')
-def index():
+@app.route('/<ind>')
+def index(ind):
     return render_template('index.html',player=ind);
 
 
