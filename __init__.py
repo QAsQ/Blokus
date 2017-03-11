@@ -41,6 +41,11 @@ def handle_query(ind):
 def index():
     return render_template('index.html',sta=rom.v);
 
+@app.route("/clear")
+def clear():
+    rom.v = 0;
+    return "Succ";
+
 
 if __name__ == '__main__':
     socketio.run(app,host='0.0.0.0',port=80,debug=True);
