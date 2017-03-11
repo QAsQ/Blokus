@@ -18,9 +18,7 @@ function initSize() {
 }
 function initSocket(){
     socket = io.connect('http://' + document.domain + ':' + location.port);
-    socket.on('connect',function() {
-        socket.emit('login',{o:owner});
-    });
+    socket.on('connect',function() { });
     socket.on('battle',function(Sta){
         if(Sta.o === owner) return;
 
@@ -80,6 +78,7 @@ function init(x) {
         refreshBoard();
         refreshChess();
     })
+    socket.emit('login',{o:owner});
 }
 function initAction() {
     function getID(cx, cy) {
