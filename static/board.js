@@ -26,7 +26,7 @@ function initCorner() {
             position:"absolute",
             "z-index":"2",
         });
-        drawCell(xy(0,0),colorTheme.corner(i),getE("corn_"+i));
+        drawCell(xy(0,0),colorTheme.corner(cornerState[i]),getE("corn_"+i));
         //todo triangle
     }
     $("#corn_"+(round%4)).css("opacity",1);
@@ -36,21 +36,21 @@ function nextRound() {
     round++;
     $("#corn_"+(round%4)).css("opacity",1);
 }
-function changeState() {
-    
-}
 
 	    //{o:owner,sta:chessState[highlight],x:pox,y:poy,id:highlight}
+function changeStaTo(_sta, chs) {
+    var sta = 0;
+    if (_sta & 1) sta = flipChessShape(chs, sta);
+    while (sta !== _sta) {
+        sta = rotateChessShape(chs, sta, true);
+    }
+}
 function AddChess(Sta) {
     var chs = new Array;
     for(var i in sCS[Sta.id]){
         chs = chs.concat(oxy(Sta.o,sCS[Sta.id][i].x,sCS[Sta.id][i].y));
     }
-    var sta = 0;
-    if(Sta.sta & 1) sta = flipChessShape(chs,sta);
-    while(sta !== Sta.sta){
-        sta = rotateChessShape(chs,sta,true);
-    }
+    changeStaTo(Sta.sta, chs);
 
     chs = chs.map(upd(Sta.x,Sta.y));
 
@@ -153,7 +153,6 @@ function availableCell() {
 }
 
 function inBoard(arrs,ofx,ofy) {
-    console.log(arrs);
     var cells = arrs.map(function (cell) {
         return oxy(owner, ofx + cell.x, ofy + cell.y);
     });
@@ -176,7 +175,6 @@ function inMask(ind, ofx, ofy) {
     e = getE("mask");
     e.clearRect(0, 0, boardSize, boardSize);
     var status = inBoard(chessShape[ind],ofx,ofy);
-    console.log(status);
     if(status === "outofrange"){
         e.strokeStyle = colorTheme.rim;
         e.lineWidth = 5;
@@ -197,4 +195,24 @@ function inMask(ind, ofx, ofy) {
     for (var index in cells) {
         drawCell(cells[index], color, e);
     }
+}
+function availableRound() {
+    for(var ind in sCS){
+        console.log(isHide[ind],ind);
+        if(isHide[ind] === true) continue;
+        for(var sta = 0 ; sta < 8 ; sta ++){
+            var chs = chessShape[ind].map(function (cells) {
+                return oxy(owner,cells.x, cells.y);
+            });
+            changeStaTo(sta,chs);
+            for(var x = -4 ; x < 20 ; x ++){
+                for(var y = -4 ; y < 20 ; y ++){
+                    if(inBoard(chs,x,y) === "legal")
+                        return true;
+                        //return {o:owner,sta:sta,x:x,y:y,id:ind};
+                }
+            }
+        }
+    }
+    return false;
 }

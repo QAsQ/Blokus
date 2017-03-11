@@ -23,8 +23,28 @@ function initSocket(){
     });
     socket.on('battle',function(Sta){
         if(Sta.o != owner){
-            nextRound();
-            AddChess(Sta);
+            if(Sta.sta === -1){
+                cornerState[Sta.o] = -1;
+                if(count(cornerState,-1) === 4){
+                    alert("over!");
+                }
+                else{
+                    nextRound();
+                    initCorner();
+                }
+            }
+            else {
+                AddChess(Sta);
+                nextRound();
+                if (round % 4 === owner) {
+                    if(cornerState[owner] !== -1 || availableRound() === false){
+                        nextRound();
+                        cornerState[owner] = -1;
+                        initCorner();
+                        socket.emit('battle',  {o:owner,sta:-1,x:-1,y:-1,id:-1});
+                    }
+                }
+            }
         }
     });
 }
@@ -56,7 +76,7 @@ function init(x) {
 function initAction() {
     function getID(cx, cy) {
         for (var i in chessLocate) {
-            if (isHide[i]) continue;
+            if (isHide[i] === true) continue;
             var offx = chessLocate[i].x;
             var offy = chessLocate[i].y;
             for (var j in chessShape[i]) {
@@ -136,6 +156,7 @@ function initAction() {
     $(window).mouseup(function (e) {
         if (select != -1 && inBoard(chessShape[select], pox, poy) === "legal") {
             if(round % 4 === owner){
+                isHide[select] = true;
                 chessIn(select, pox, poy);
                 nextRound();
             }
@@ -189,6 +210,7 @@ function initColorTheme(theme) {
             },
             corner: function (o) {
                 switch (o) {
+                    case -1: return "#ffffff";
                     case 0: return "#de2c2e";
                     case 1: return "#24c124";
                     case 2: return "#42bfe1";

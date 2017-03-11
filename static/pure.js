@@ -1,6 +1,13 @@
 /**
  * Created by QAQ on 2017/3/11.
  */
+function count(arrs,x) {
+    var ret = 0;
+    for(var ind in arrs)
+        if(arrs[ind]===x)
+            ret++;
+    return ret;
+}
 function drawCell(cell, color, e) {
     e.fillStyle = color;
     e.fillRect(cellSize * cell.x, cellSize * cell.y, cellSize, cellSize);
