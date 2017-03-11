@@ -67,12 +67,11 @@ function chessIn(ind, ofx, ofy) {
     refreshBoard();
 }
 function initBoard() {
+    var dxy = cellSize * 5;
     $("#board").attr({
         "width": boardSize,
         "height": boardSize,
-    });
-    var dxy = cellSize * 5;
-    $("#board").css({
+    }).css({
         position:"absolute",
         top:dxy + "px",
         left:dxy + "px",
@@ -82,8 +81,7 @@ function initBoard() {
     $("#mask").attr({
         "width": boardSize,
         "height": boardSize,
-    });
-    $("#mask").css({
+    }).css({
         position:"absolute",
         top:dxy + "px",
         left:dxy + "px",

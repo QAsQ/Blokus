@@ -22,27 +22,24 @@ function initSocket(){
         socket.emit('on',{o:owner});
     });
     socket.on('battle',function(Sta){
-        if(Sta.o != owner){
-            if(Sta.sta === -1){
-                cornerState[Sta.o] = -1;
-                if(count(cornerState,-1) === 4){
-                    alert("over!");
-                }
-                else{
+        if(Sta.o === owner) return;
+
+        nextRound();
+        if(Sta.sta === -1){
+            cornerState[Sta.o] = -1;
+            initCorner();
+            if(count(cornerState,-1) === 4)
+                alert("over!");
+        }
+        else {
+            AddChess(Sta);
+            console.log(cornerState);
+            if (round % 4 === owner) {
+                if(cornerState[owner] === -1 || availableRound() === false){
                     nextRound();
+                    cornerState[owner] = -1;
                     initCorner();
-                }
-            }
-            else {
-                AddChess(Sta);
-                nextRound();
-                if (round % 4 === owner) {
-                    if(cornerState[owner] !== -1 || availableRound() === false){
-                        nextRound();
-                        cornerState[owner] = -1;
-                        initCorner();
-                        socket.emit('battle',  {o:owner,sta:-1,x:-1,y:-1,id:-1});
-                    }
+                    socket.emit('battle',  {o:owner,sta:-1,x:-1,y:-1,id:-1});
                 }
             }
         }
