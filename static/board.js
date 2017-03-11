@@ -194,23 +194,51 @@ function inMask(ind, ofx, ofy) {
         drawCell(cells[index], color, e);
     }
 }
+
 function availableRound() {
+    var bst = new Array;
+    for(var i = 0 ; i < 20 ; i ++){
+        bst[i] = new Array;
+        for(var j = 0 ; j < 20 ; j ++){
+            bst[i][j] = 0;
+        }
+    }
+    var owners = boardFace.filter(function (cell) {
+        return cell.o === owner;
+    });
+    var horn = owners.map(upd(1, 1)).concat(owners.map(upd(-1, 1))).concat(owners.map(upd(1, -1))).concat(owners.map(upd(-1, -1))).filter(inbod);
+    var crash = owners.map(upd(0, 1)).concat(owners.map(upd(1, 0))).concat(owners.map(upd(0, -1))).concat(owners.map(upd(-1, 0)));
+    crash = crash.concat(boardFace).filter(inbod);
+    for(var ind in horn){
+        bst[horn[ind].x][horn[ind].y] = 1;
+    }
+    for(var ind in crash){
+        bst[crash[ind].x][crash[ind].y] = -1;
+    }
+
     for(var ind in sCS){
-        console.log(isHide[ind],ind);
         if(isHide[ind] === true) continue;
+        var chs = chessShape[ind].map(function (cells) {
+            return xy(cells.x, cells.y);
+        });
         for(var sta = 0 ; sta < 8 ; sta ++){
-            var chs = chessShape[ind].map(function (cells) {
-                return oxy(owner,cells.x, cells.y);
-            });
-            changeStaTo(sta,chs);
+            if(sta === 4) flipChessShape(chs,0);
+            rotateChessShape(chs,0,true);
             for(var x = -4 ; x < 20 ; x ++){
                 for(var y = -4 ; y < 20 ; y ++){
-                    if(inBoard(chs,x,y) === "legal")
-                        return true;
-                        //return {o:owner,sta:sta,x:x,y:y,id:ind};
+                    if(cheavi(chs,bst,x,y) === true) return true;
                 }
             }
         }
     }
     return false;
+}
+function cheavi(arrs,bst,x,y) {
+    var ret = 0;
+    for(var i in arrs){
+        if(!inbod(xy(arrs[i].x+x,arrs[i].y+y))) return false;
+        if(bst[arrs[i].x + x][arrs[i].y + y] === -1) return false;
+        ret += bst[arrs[i].x + x][arrs[i].y + y];
+    }
+    return ret > 0;
 }
