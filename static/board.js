@@ -151,14 +151,33 @@ function availableCell() {
     crash = crash.concat(boardFace);
     return ret.filter(ninThe(crash)).filter(inbod);
 }
-function tryInBoard(ind, ofx, ofy) {
-    var cells = chessShape[ind].map(function (cell) {
+
+function inBoard(arrs,ofx,ofy) {
+    console.log(arrs);
+    var cells = arrs.map(function (cell) {
         return oxy(owner, ofx + cell.x, ofy + cell.y);
     });
+    //cell outRange
+    if (indexof(cells.map(inbod), false).length !== 0) return "outofrange";
+    var owners = boardFace.filter(function (cell) {
+        return cell.o === owner;
+    });
+    var edgeCrash = owners.map(upd(1, 0))
+        .concat(owners.map(upd(0, 1)))
+        .concat(owners.map(upd(-1, 0)))
+        .concat(owners.map(upd(0, -1)));
+    var crash = indexof(cells.map(inThe(boardFace.concat(edgeCrash))), true);
+    var touch = indexof(cells.map(inThe(availableCell())), true).length;
+    if (crash.length !== 0 || touch === 0) return "unlegal";
+    return "legal";
+}
+
+function inMask(ind, ofx, ofy) {
     e = getE("mask");
     e.clearRect(0, 0, boardSize, boardSize);
-    //cell outRange
-    if (indexof(cells.map(inbod), false).length !== 0) {
+    var status = inBoard(chessShape[ind],ofx,ofy);
+    console.log(status);
+    if(status === "outofrange"){
         e.strokeStyle = colorTheme.rim;
         e.lineWidth = 5;
         e.beginPath();
@@ -166,24 +185,16 @@ function tryInBoard(ind, ofx, ofy) {
         e.lineTo(boardSize, 0), e.lineTo(boardSize, boardSize);
         e.lineTo(0, boardSize), e.lineTo(0, 0);
         e.stroke();
-        return false;
     }
-    cor = colorTheme.legal;
-    var owners = boardFace.filter(function (cell) {
-        return cell.o === owner;
+    var color;
+    if(status === "unlegal")
+        color = colorTheme.unlegal;
+    if(status === "legal")
+        color = colorTheme.legal;
+    var cells = chessShape[ind].map(function (cell) {
+        return oxy(owner, ofx + cell.x, ofy + cell.y);
     });
-    //edge samecolor
-    var edgeCrash = owners.map(upd(1, 0))
-        .concat(owners.map(upd(0, 1)))
-        .concat(owners.map(upd(-1, 0)))
-        .concat(owners.map(upd(0, -1)));
-    var crash = indexof(cells.map(inThe(boardFace.concat(edgeCrash))), true);
-
-    var touch = indexof(cells.map(inThe(availableCell())), true).length;
-    if (crash.length !== 0 || touch === 0) cor = colorTheme.unlegal;
     for (var index in cells) {
-        if (crash.indexOf(index) === -1)
-            drawCell(cells[index], cor, e);
+        drawCell(cells[index], color, e);
     }
-    return cor === colorTheme.legal;
 }

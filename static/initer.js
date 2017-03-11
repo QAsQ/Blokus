@@ -24,7 +24,6 @@ function initSocket(){
     socket.on('battle',function(Sta){
         if(Sta.o != owner){
             nextRound();
-            console.log(round);
             AddChess(Sta);
         }
     });
@@ -76,9 +75,8 @@ function initAction() {
         , chsx, chsy //chesslocation
         , pox, poy //mouse index in board
         , centx,centy;//select chess center
-    function updHighlight(x) {
+    function updSelect(x) {
         if (select != -1) $("#chs_" + select).css("opacity", initp);
-        console.log(x);
         select = x;
         if (select != -1) $("#chs_" + select).css("opacity", highp);
     }
@@ -111,7 +109,7 @@ function initAction() {
         chessState[select] = flipChessShape(chessShape[select],chessState[select]);
         refreshChess(select);
         getPo();
-        tryInBoard(select, pox, poy);
+        inMask(select, pox, poy);
     }
     function rotateChess(ind, clix, cliy, clock) {
         getCent();
@@ -124,19 +122,19 @@ function initAction() {
 
         refreshChess(select);
         getPo();
-        tryInBoard(select, pox, poy);
+        inMask(select, pox, poy);
     }
 
     $(window).mousedown(function (e) {
         mouseDown = true;
         clix = e.clientX, cliy = e.clientY;
         getE("mask").clearRect(0, 0, boardSize, boardSize);
-        updHighlight(getID(clix, cliy));
+        updSelect(getID(clix, cliy));
         if (select !== -1)
-            getPo(), tryInBoard(select, pox, poy);
+            getPo(), inMask(select, pox, poy);
     });
     $(window).mouseup(function (e) {
-        if (select != -1 && tryInBoard(select, pox, poy)) {
+        if (select != -1 && inBoard(chessShape[select], pox, poy) === "legal") {
             if(round % 4 === owner){
                 chessIn(select, pox, poy);
                 nextRound();
@@ -149,7 +147,7 @@ function initAction() {
         if (mouseDown === true && select !== -1) {
             getPo();
             moveChess(e);
-            tryInBoard(select, pox, poy);
+            inMask(select, pox, poy);
         }
         clix = e.clientX, cliy = e.clientY;
     });
