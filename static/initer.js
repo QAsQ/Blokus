@@ -19,7 +19,7 @@ function initSize() {
 function initSocket(){
     socket = io.connect('http://' + document.domain + ':' + location.port);
     socket.on('connect',function() {
-        socket.emit('on',{o:owner});
+        socket.emit('login',{o:owner});
     });
     socket.on('battle',function(Sta){
         if(Sta.o === owner) return;
@@ -44,10 +44,21 @@ function initSocket(){
             }
         }
     });
+    socket.on('romsta',function (online) {
+        for(var i = 0 ; i < 4 ; i ++){
+            if((online.o >> i ) & 1) cornerState[i] = i;
+            else cornerState[i] = -1;
+        }
+        if(online.o === 15){
+            alert("Game Start!");
+            nextRound();
+        }
+        initCorner();
+    });
 }
 function init(x) {
     owner = x;
-    round = 0;
+    round = -1;
     initColorTheme();
     clearFace();
     initSize();
@@ -93,6 +104,7 @@ function initAction() {
         , pox, poy //mouse index in board
         , centx,centy;//select chess center
     function updSelect(x) {
+        console.log(x);
         if (select != -1) $("#chs_" + select).css("opacity", initp);
         select = x;
         if (select != -1) $("#chs_" + select).css("opacity", highp);

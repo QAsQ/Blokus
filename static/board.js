@@ -9,7 +9,7 @@ function createCorner() {
     cornerState = new Array;
     for(var i = 0 ; i < 4 ; i ++){
         var corner = $("<canvas id = \"corn_" + i + "\"></canvas>");
-        cornerState[i] = i;
+        cornerState[i] = -1;
         $("#playGround").append(corner);
         corner.css("opacity",ncor);
     }
@@ -29,10 +29,10 @@ function initCorner() {
         drawCell(xy(0,0),colorTheme.corner(cornerState[i]),getE("corn_"+i));
         //todo triangle
     }
-    $("#corn_"+(round%4)).css("opacity",1);
+    if(round !== -1) $("#corn_"+(round%4)).css("opacity",1);
 }
 function nextRound() {
-    $("#corn_"+(round%4)).css("opacity",ncor);
+    if(round !== -1) $("#corn_"+(round%4)).css("opacity",ncor);
     round++;
     $("#corn_"+(round%4)).css("opacity",1);
 }

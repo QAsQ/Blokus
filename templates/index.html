@@ -1,17 +1,25 @@
-<html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-    <script src="static/jquery.min.js"> </script>
-	<script src="static/socket.io.min.js"></script>
-    <script src="static/pure.js"></script>
-    <script src="static/board.js"></script>
-    <script src="static/chess.js"></script>
-    <script src="static/initer.js"></script>
-    <title>main</title>
+    <script src = "static/socket.io.min.js"></script>
+    <script src = "static/jquery.min.js"></script>
+    <script src = "static/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="static/bootstrap.min.css" type="text/css" />
+    <title>login</title>
 </head>
-<body onload="init({{player}})">
-    <div id="playGround">
-        <canvas id="mask"></canvas>
-        <canvas id="board"></canvas>
-    </div>
+<body>
+    <button id = "but0" type="button" class="btn btn-primary" onclick="login(0)"> log Red</button>
+    <button id = "but1" type="button" class="btn btn-primary" onclick="login(1)"> log Green</button>
+    <button id = "but2" type="button" class="btn btn-primary" onclick="login(2)"> log Blue</button>
+    <button id = "but3" type="button" class="btn btn-primary" onclick="login(3)"> log Yellow</button>
+    <script>
+        for(var i  = 0 ; i < 4 ; i ++){
+            if(({{sta}}>>i) & 1) $("#but"+i).hide();
+        }
+        function login(x) {
+            window.location.href = 'http://' + document.domain + ':' + location.port + '/ask/' + x;
+        }
+    </script>
 </body>
 </html>

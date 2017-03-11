@@ -1,0 +1,17 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <script src="{{url_for('static',filename='jquery.min.js')}}"></script>
+    <script src="{{url_for('static',filename='socket.io.min.js')}}"></script>
+    <script src="{{url_for('static',filename='pure.js')}}"></script>
+    <script src="{{url_for('static',filename='board.js')}}"></script>
+    <script src="{{url_for('static',filename='chess.js')}}"></script>
+    <script src="{{url_for('static',filename='initer.js')}}"></script>
+    <title>main</title>
+</head>
+<body onload="init({{play}})">
+    <div id="playGround">
+        <canvas id="mask"></canvas>
+        <canvas id="board"></canvas>
+    </div>
+</body>
+</html>
