@@ -2,7 +2,60 @@
  * Created by QAQ on 2017/3/3.
  */
 
+var boardFace;
+var colorTheme;
+var cornerState;
+function createCorner() {
+    cornerState = new Array;
+    for(var i = 0 ; i < 4 ; i ++){
+        var corner = $("<canvas id = \"corn_" + i + "\"></canvas>");
+        cornerState[i] = i;
+        $("#playGround").append(corner);
+    }
+}
+function initCorner() {
+    var locate = [xy(4,4),xy(4,25),xy(25,25),xy(25,4)];
+    for(var i = 0 ; i < 4 ; i ++) {
+        $("#corn_" + i).attr({
+            "width": cellSize,
+            "heitht": cellSize,
+        }).css({
+            left:locate[i].x * cellSize +"px",
+            top:locate[i].y * cellSize +"px",
+            position:"absolute",
+            "z-index":"2",
+            opacity:highp
+        });
+        drawCell(xy(0,0),colorTheme.player(i),getE("corn_"+i));
+    }
+    //todo triangle
+}
+function nextRound() {
+
+    round++;
+    
+}
+function changeState() {
+    
+}
+
 	    //{o:owner,sta:chessState[highlight],x:pox,y:poy,id:highlight}
+function AddChess(Sta) {
+    var chs = new Array;
+    for(var i in sCS[Sta.id]){
+        chs = chs.concat(oxy(Sta.o,sCS[Sta.id][i].x,sCS[Sta.id][i].y));
+    }
+    var sta = 0;
+    if(Sta.sta & 1) sta = flipChessShape(chs,sta);
+    while(sta !== Sta.sta){
+        sta = rotateChessShape(chs,sta,true);
+    }
+
+    chs = chs.map(upd(Sta.x,Sta.y));
+
+    boardFace = boardFace.concat(chs);
+    refreshBoard();
+}
 function chessIn(ind, ofx, ofy) {
     var cells = chessShape[ind].map(function (cell) {
         return oxy(owner, ofx + cell.x, ofy + cell.y);
@@ -33,7 +86,7 @@ function initBoard() {
         position:"absolute",
         top:dxy + "px",
         left:dxy + "px",
-        "z-index":"0",
+        "z-index":"1",
         opacity: 0.7
     });
 }

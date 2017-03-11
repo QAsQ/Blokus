@@ -1,8 +1,8 @@
 /**
  * Created by QAQ on 2017/3/10.
  */
-var chessShape, chessState,chessLocate;
-var isHide;
+var chessShape, chessState,chessLocate, isHide;
+var initp = 0.5, highp = 0.8;
 function initChess() {
     for (var index in chessShape) {
         $("#chs_" + index).attr({
@@ -114,4 +114,5 @@ var sCS = [
     [xy(0, 0), xy(0, 1), xy(1, 1), xy(1, 2), xy(2, 1)],//1+3+1
     [xy(1, 0), xy(1, 1), xy(1, 2), xy(0, 1), xy(2, 1)],//10
     [xy(0, 0), xy(0, 1), xy(0, 2), xy(0, 3), xy(1, 1)]//4+1
+
 ];

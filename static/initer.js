@@ -1,9 +1,6 @@
 /**
  * Created by QAQ on 2017/3/11.
  */
-var boardFace;
-var initp = 0.3, highp = 0.8
-var colorTheme;
 var socket;
 var round;
 var ratiox,ratioy,bw,bh;
@@ -26,7 +23,8 @@ function initSocket(){
     });
     socket.on('battle',function(Sta){
         if(Sta.o != owner){
-            round ++;
+            nextRound();
+            console.log(round);
             AddChess(Sta);
         }
     });
@@ -40,6 +38,8 @@ function init(x) {
     initBoard();
     initChess();
     createChess();
+    createCorner();
+    initCorner();
     refreshBoard();
     refreshChess();
     initAction();
@@ -49,6 +49,7 @@ function init(x) {
         scaleChess();
         initBoard();
         initChess();
+        initCorner();
         refreshBoard();
         refreshChess();
     })
