@@ -4,13 +4,14 @@
 
 var boardFace;
 var colorTheme;
-var cornerState;
+var cornerState,ncor = 0.3;
 function createCorner() {
     cornerState = new Array;
     for(var i = 0 ; i < 4 ; i ++){
         var corner = $("<canvas id = \"corn_" + i + "\"></canvas>");
         cornerState[i] = i;
         $("#playGround").append(corner);
+        corner.css("opacity",ncor);
     }
 }
 function initCorner() {
@@ -24,16 +25,16 @@ function initCorner() {
             top:locate[i].y * cellSize +"px",
             position:"absolute",
             "z-index":"2",
-            opacity:highp
         });
-        drawCell(xy(0,0),colorTheme.player(i),getE("corn_"+i));
+        drawCell(xy(0,0),colorTheme.corner(i),getE("corn_"+i));
+        //todo triangle
     }
-    //todo triangle
+    $("#corn_"+(round%4)).css("opacity",1);
 }
 function nextRound() {
-
+    $("#corn_"+(round%4)).css("opacity",ncor);
     round++;
-    
+    $("#corn_"+(round%4)).css("opacity",1);
 }
 function changeState() {
     

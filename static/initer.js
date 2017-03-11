@@ -139,7 +139,7 @@ function initAction() {
         if (select != -1 && tryInBoard(select, pox, poy)) {
             if(round % 4 === owner){
                 chessIn(select, pox, poy);
-                round ++;
+                nextRound();
             }
             getE("mask").clearRect(0, 0, boardSize, boardSize);
         }
@@ -186,6 +186,15 @@ function initColorTheme(theme) {
                     case 1: return "#7cb661";
                     case 2: return "#83c6d3";
                     case 3: return "#e2dd5a";
+                }
+                return undefined;
+            },
+            corner: function (o) {
+                switch (o) {
+                    case 0: return "#de2c2e";
+                    case 1: return "#24c124";
+                    case 2: return "#42bfe1";
+                    case 3: return "#c3c536";
                 }
                 return undefined;
             }
