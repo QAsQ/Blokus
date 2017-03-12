@@ -20,10 +20,12 @@ class User(UserMixin):
 class Rooms():
     def __init__(self):
         self.roomInfo = dict();
+        self.boardface = dict();
 
     def state(self,room):
         if (room in self.roomInfo) == False:
             self.roomInfo[room] = 0;
+            self.boardface[room] = list();
         return self.roomInfo[room];
 
     def tryJoinRoom(self,room,x):
@@ -43,6 +45,7 @@ def load_user(userid):
 @socketio.on('battle')
 def handle_battle(Sta):
     room = current_user.id.split(' ')[0];
+    rooms.boardface[room].append(Sta);
     emit('battle',Sta,room = room);
 
 @socketio.on('login')
@@ -51,7 +54,11 @@ def login(val):
     join_room(room);
     emit('romsta',{"o":rooms.state(room)},room=room);
 
-
+@socketio.on('wantFace')
+def giveFace(use):
+    room = current_user.id.split(' ')[0];
+    print str(rooms.boardface[room]);
+    emit('loadSta',rooms.boardface[room]);
 
 @app.route("/index")
 def index():

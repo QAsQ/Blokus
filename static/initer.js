@@ -42,17 +42,38 @@ function initSocket(){
             }
         }
     });
+    socket.on('disconnect',function (){
+        socket.emit("wantFace",{o:owner});
+    });
+    socket.on('loadsta', function (val){
+        console.log(val);
+        clearFace();
+        round = val.length;
+        for(var ind in val){
+            if(val[ind].sta === -1)
+                cornerState[val[ind].o] = -1;
+            else
+                AddChess(val[ind]);
+        }
+        refreshBoard();
+        refreshChess();
+        initCorner();
+    }
     socket.on('romsta',function (online) {
         for(var i = 0 ; i < 4 ; i ++){
             if((online.o >> i ) & 1) cornerState[i] = i;
             else cornerState[i] = -1;
         }
-        if(online.o === 15){
+        if(online.o === 15 && round === -1){
             alert("Game Start!");
             nextRound();
         }
         initCorner();
     });
+    socket.on()
+}
+function fuck(){
+    socket.emit("wantFace",{o:owner});
 }
 function init(x) {
     owner = x;
