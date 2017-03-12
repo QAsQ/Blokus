@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src = "static/jquery.min.js"></script>
+    <script src = "static/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="static/bootstrap.min.css" type="text/css" />
+    <title>login</title>
+</head>
+<body>
+    <h1>Room is {{room}}</h1> <br/>
+    <h2 id ="warn"></h2>
+    <button id = "but_0" type="button" class="btn btn-primary" onclick="login(0)"> log Red</button> <br/>
+    <button id = "but_1" type="button" class="btn btn-primary" onclick="login(1)"> log Green</button> <br/>
+    <button id = "but_2" type="button" class="btn btn-primary" onclick="login(2)"> log Blue</button> <br/>
+    <button id = "but_3" type="button" class="btn btn-primary" onclick="login(3)"> log Yellow</button> <br/>
+    <script>
+        for(var i  = 0 ; i < 4 ; i ++){
+            if(({{sta}}>>i) & 1) $("#but_"+i).hide();
+        }
+        function login(x) {
+            window.location.href = 'http://' + document.domain + ':' + location.port + '/{{room}}/play/' + x;
+        }
+        if({{sta}} === 15){
+            $("#warn").text("this room is used,please try other room");
+        }
+    </script>
+</body>
+</html>

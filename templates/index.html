@@ -8,18 +8,23 @@
     <title>login</title>
 </head>
 <body>
-    <h1>Room is {{room}}</h1> <br/>
-    <but_ton id = "but_0" type="but_ton" class="btn btn-primary" onclick="login(0)"> log Red</but_ton> <br/>
-    <but_ton id = "but_1" type="but_ton" class="btn btn-primary" onclick="login(1)"> log Green</but_ton> <br/>
-    <but_ton id = "but_2" type="but_ton" class="btn btn-primary" onclick="login(2)"> log Blue</but_ton> <br/>
-    <but_ton id = "but_3" type="but_ton" class="btn btn-primary" onclick="login(3)"> log Yellow</but_ton> <br/>
+    <h1>Please choice a room</h1> <br/>
+    <div class="col-lg-6">
+            <div class="input-group"  style="width:30%">
+                <input id = "input" type="text" class="form-control">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" onclick="tryrom()">
+                        Go!
+                    </button>
+                </span>
+            </div>
+    </div>
+
     <script>
-        for(var i  = 0 ; i < 4 ; i ++){
-            if(({{sta}}>>i) & 1) $("#but_"+i).hide();
-        }
-        function login(x) {
-            window.location.href = 'http://' + document.domain + ':' + location.port + '/{{room}}/play/' + x;
+        function tryrom() {
+            window.location.href = 'http://' + document.domain + ':' + location.port + '/' + $("#input").val();
         }
     </script>
 </body>
 </html>
+

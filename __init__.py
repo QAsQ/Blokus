@@ -53,6 +53,14 @@ def login(val):
 
 
 
+@app.route("/index")
+def index():
+    return render_template('index.html');
+
+@app.route("/<room>")
+def roomIndex(room):
+    return render_template('room.html',sta=str(rooms.state(room)),room=room);
+
 @app.route("/<room>/play/<_ind>")
 def handle_query(room,_ind):
     ind = int(_ind);
@@ -61,11 +69,6 @@ def handle_query(room,_ind):
         return render_template("playGround.html",play = ind)
     else:
         return redirect("/%s" % (room,));
-
-
-@app.route("/<room>")
-def roomIndex(room):
-    return render_template('index.html',sta=str(rooms.state(room)),room=room);
 
 if __name__ == '__main__':
     socketio.run(app,host='0.0.0.0',port=80);
