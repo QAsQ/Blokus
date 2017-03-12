@@ -45,7 +45,7 @@ function initSocket(){
     socket.on('disconnect',function (){
         socket.emit("wantFace",{o:owner});
     });
-    socket.on('loadsta', function (val){
+    socket.on('loadSta', function (val){
         console.log(val);
         clearFace();
         round = val.length;
@@ -58,7 +58,7 @@ function initSocket(){
         refreshBoard();
         refreshChess();
         initCorner();
-    }
+    })
     socket.on('romsta',function (online) {
         for(var i = 0 ; i < 4 ; i ++){
             if((online.o >> i ) & 1) cornerState[i] = i;
@@ -70,7 +70,6 @@ function initSocket(){
         }
         initCorner();
     });
-    socket.on()
 }
 function fuck(){
     socket.emit("wantFace",{o:owner});
