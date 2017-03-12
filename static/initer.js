@@ -54,6 +54,12 @@ function initSocket(){
                 cornerState[val[ind].o] = -1;
             else
                 AddChess(val[ind]);
+            //todo
+        }
+        if(round % 4 === 0 && availableCell() === false){
+            nextRound();
+            cornerState[owner] = -1;
+            socket.emit('battle',  {o:owner,sta:-1,x:-1,y:-1,id:-1});
         }
         refreshBoard();
         refreshChess();
