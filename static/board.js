@@ -4,6 +4,7 @@
 
 var boardFace;
 var colorTheme;
+var lastStep;
 var cornerState,ncor = 0.3;
 function createCorner() {
     cornerState = new Array;
@@ -60,8 +61,21 @@ function AddChess(Sta) {
     chs = chs.map(upd(Sta.x,Sta.y));
 
     boardFace = boardFace.concat(chs);
+    lastStep = chs;
+    drawLast();
     refreshBoard();
 }
+function drawLast() {
+    var e = getE("last");
+    e.clearRect(0,0,boardSize,boardSize);
+    for(var ind in lastStep){
+        drawCell(lastStep[ind],colorTheme.corner(lastStep[ind].o),e);
+    }
+    for(var ind in lastStep){
+        drawFrame(lastStep[ind],colorTheme.rim,e);
+    }
+}
+
 function chessIn(ind, ofx, ofy) {
     var cells = chessShape[ind].map(function (cell) {
         return oxy(owner, ofx + cell.x, ofy + cell.y);
@@ -69,7 +83,9 @@ function chessIn(ind, ofx, ofy) {
     socket.emit('battle',{o:owner,sta:chessState[ind],x:ofx,y:ofy,id:ind});
     $("#chs_" + ind).hide();
     boardFace = boardFace.concat(cells);
+    lastStep = cells;
     refreshBoard();
+    drawLast();
 }
 function initBoard() {
     var dxy = cellSize * 5;
@@ -93,6 +109,16 @@ function initBoard() {
         "z-index":"1",
         opacity: 0.7
     });
+    $("#last").attr({
+        "width": boardSize,
+        "height": boardSize,
+    }).css({
+        position:"absolute",
+        top:dxy + "px",
+        left:dxy + "px",
+        "z-index":"2",
+        opacity: 1
+    });
 }
 function clearFace() {
     boardFace = new Array;
@@ -101,6 +127,7 @@ function clearFace() {
         , oxy(2, 20, 20)
         , oxy(3, 20, -1));
     isHide = new Array;
+    lastStep = new Array;
 }
 function drawLine(e) {
     e.lineWidth = 1;
@@ -127,10 +154,13 @@ function drawAvailable(e) {
         }
     }
 }
-function drawHorn(e) {
+function drawHornAndCell(e) {
     var drawable = boardFace.filter(inbod);
     for (var index in drawable) {
         drawCell(drawable[index], colorTheme.player(drawable[index].o), e);
+    }
+    for (var index in drawable) {
+        drawFrame(drawable[index], colorTheme.frameColor, e);
     }
     var horn = availableCell();
     for (var i in horn) {
@@ -141,8 +171,9 @@ function refreshBoard() {
     var e = getE("board");
     e.clearRect(0, 0, boardSize, boardSize);
     drawAvailable(e);
-    drawHorn(e);
     drawLine(e);
+    drawHornAndCell(e);
+    drawLast(e);
 }
 function availableCell() {
     var owners = boardFace.filter(function (cell) {

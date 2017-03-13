@@ -54,6 +54,7 @@ function refreshChess(index) {
     e.clearRect(0, 0, cellSize * 5, cellSize * 5);
     for (var ind in chessShape[index]) {
         drawCell(chessShape[index][ind], colorTheme.player(owner), e);
+        drawFrame(chessShape[index][ind], colorTheme.frameColor, e);
     }
 }
 function moveChessTo(x, y, ind) {

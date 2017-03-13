@@ -218,22 +218,23 @@ function initColorTheme(theme) {
             rim: "#875f5f",
             unlegal: "#c3bba8",
             can: "#f9f9f9",
+            frameColor : "#ffffff",
             player: function (o) {
                 switch (o) {
-                    case 0: return "#b53d1b";
-                    case 1: return "#7cb661";
-                    case 2: return "#83c6d3";
-                    case 3: return "#e2dd5a";
+                    case 0: return "#ed1c24";
+                    case 1: return "#23b14d";
+                    case 2: return "#00a2e8";
+                    case 3: return "#ffc90d";
                 }
                 return undefined;
             },
             corner: function (o) {
                 switch (o) {
                     case -1: return "#ffffff";
-                    case 0: return "#de2c2e";
-                    case 1: return "#24c124";
-                    case 2: return "#42bfe1";
-                    case 3: return "#c3c536";
+                    case 0: return "#cf1b24";
+                    case 1: return "#239546";
+                    case 2: return "#0091cf";
+                    case 3: return "#ebb60d";
                 }
                 return undefined;
             }

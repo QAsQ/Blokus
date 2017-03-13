@@ -8,18 +8,22 @@ function count(arrs,x) {
             ret++;
     return ret;
 }
+function drawFrame(cell,color,e) {
+    e.strokeStyle = color;
+    var ox = cellSize * cell.x;
+    var oy = cellSize * cell.y;
+    e.lineWidth = 1;
+    e.beginPath();
+    e.moveTo(ox, oy);
+    e.lineTo(cellSize + ox, oy), e.lineTo(cellSize + ox, cellSize + oy);
+    e.lineTo(ox, cellSize + oy), e.lineTo(ox, oy);
+    e.stroke();
+}
 function drawCell(cell, color, e) {
     e.fillStyle = color;
     var ox = cellSize * cell.x;
     var oy = cellSize * cell.y;
     e.fillRect(ox , oy , cellSize, cellSize);
-    e.strokeStyle = colorTheme.corner(-1);
-    e.lineWidth = 1;
-    e.beginPath();
-    e.moveTo(ox, oy);
-    e.lineTo(cellSize + ox, oy), e.lineTo(cellSize + ox, cellSize + oy);
-    e.lineTo(ox, cellSize + oy), e.lineTo(ox , oy);
-    e.stroke();
 }
 function getE(name) {
     return document.getElementById(name).getContext("2d");
