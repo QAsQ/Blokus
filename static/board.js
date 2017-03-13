@@ -16,19 +16,26 @@ function createCorner() {
     }
 }
 function initCorner() {
-    var locate = [xy(4,4),xy(4,25),xy(25,25),xy(25,4)];
+    var locate = [xy(3,3),xy(3,25),xy(25,25),xy(25,3)];
+    var square = [xy(1,1),xy(1,0),xy(0,0),xy(0,1)];
     for(var i = 0 ; i < 4 ; i ++) {
         $("#corn_" + i).attr({
-            "width": cellSize,
-            "heitht": cellSize,
+            "width": cellSize*2,
+            "heitht": cellSize*2,
         }).css({
             left:locate[i].x * cellSize +"px",
             top:locate[i].y * cellSize +"px",
             position:"absolute",
             "z-index":"2",
         });
-        drawCell(xy(0,0),colorTheme.corner(cornerState[i]),getE("corn_"+i));
-        //todo triangle
+        var e = getE("corn_"+i);
+        e.beginPath();
+        e.fillStyle = colorTheme.corner(cornerState[i]);
+        e.arc(cellSize,cellSize,cellSize,0,Math.PI * 2,true);
+        e.closePath();
+        e.fill();
+
+        drawCell(square[i],colorTheme.corner(cornerState[i]),e);
     }
     if(round !== -1) $("#corn_"+(round%4)).css("opacity",1);
 }
