@@ -75,6 +75,9 @@ body {
 .icon-blue:before {
 	content: url("./static/pic/blue.png");
 }
+.icon-gray:before {
+	content: url("./static/pic/gray.png");
+}
 @keyframes moveF_Right {
   0% {
         transform: translateX(100%);
@@ -108,25 +111,23 @@ body {
 </div>
 	<section class="room">
 		<ul class="icon-items-2 clearfix">
-			<li id = "l_0" data="RED" onclick="login(0)">
-				<i class="icon-red"></i>
+			<li id = "l_0" data="RED" onclick="login(0)"> <i class="icon-red"></i>
 				</a>
 			</li>
-			<li id = "l_1" data="YELLOW" onclick="login(3)">
-				<i class="icon-yellow"></i>
-			</li>
-			<li id = "l_2" data="GREEN" onclick="login(1)">
-				<i class="icon-green"></i>
-			</li>
-			<li id = "l_3" data="BLUE" onclick="login(2)">
-				<i class="icon-blue"></i>
-			</li>
+			<li id = "g_0" data="RED"> <i class="icon-gray"></i> </li>
+			<li id = "l_3" data="YELLOW" onclick="login(3)"> <i class="icon-yellow"></i> </li>
+			<li id = "g_3" data="YELLOW"> <i class="icon-gray"></i> </li>
+			<li id = "l_1" data="GREEN" onclick="login(1)"> <i class="icon-green"></i> </li>
+			<li id = "g_1" data="GREEN"> <i class="icon-gray"></i> </li>
+			<li id = "l_2" data="BLUE" onclick="login(2)"> <i class="icon-blue"></i> </li>
+			<li id = "g_2" data="BLUE"> <i class="icon-gray"></i> </li>
 		</ul>
 	</section>
 </div>
 <script>
         for(var i  = 0 ; i < 4 ; i ++){
             if(({{sta}}>>i) & 1) $("#l_"+i).hide();
+            else $("#g_"+i).hide();
         }
         function login(x) {
             window.location.href = 'http://' + document.domain + ':' + location.port + '/{{room}}/play/' + x;
