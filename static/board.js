@@ -46,6 +46,11 @@ function changeStaTo(_sta, chs) {
     }
 }
 function AddChess(Sta) {
+    if(Sta.sta === -1){
+        cornerState[Sta.o] = -1;
+        initCorner();
+        return;
+    }
     var chs = new Array;
     for(var i in sCS[Sta.id]){
         chs = chs.concat(oxy(Sta.o,sCS[Sta.id][i].x,sCS[Sta.id][i].y));

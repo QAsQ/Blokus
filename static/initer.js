@@ -19,29 +19,6 @@ function initSize() {
 function initSocket(){
     socket = io.connect('http://' + document.domain + ':' + location.port);
     socket.on('connect',function() { });
-    socket.on('battle',function(Sta){
-        if(Sta.o === owner) return;
-
-        nextRound();
-        if(Sta.sta === -1){
-            cornerState[Sta.o] = -1;
-            initCorner();
-            if(count(cornerState,-1) === 4)
-                alert("over!");
-        }
-        else {
-            AddChess(Sta);
-            console.log(cornerState);
-            if (round % 4 === owner) {
-                if(cornerState[owner] === -1 || availableRound() === false){
-                    nextRound();
-                    cornerState[owner] = -1;
-                    initCorner();
-                    socket.emit('battle',  {o:owner,sta:-1,x:-1,y:-1,id:-1});
-                }
-            }
-        }
-    });
     socket.on('disconnect',function (){
         socket.emit("wantFace",{o:owner});
     });
@@ -50,21 +27,19 @@ function initSocket(){
         clearFace();
         round = val.length;
         for(var ind in val){
-            if(val[ind].sta === -1)
-                cornerState[val[ind].o] = -1;
-            else
-                AddChess(val[ind]);
-            //todo
+            AddChess(val[ind]);
         }
-        if(round % 4 === 0 && availableCell() === false){
-            nextRound();
-            cornerState[owner] = -1;
-            socket.emit('battle',  {o:owner,sta:-1,x:-1,y:-1,id:-1});
-        }
+        checkMyRound();
+
         refreshBoard();
         refreshChess();
-        initCorner();
     })
+    socket.on('battle',function(Sta){
+        if(Sta.o === owner) return;
+        nextRound();
+        AddChess(Sta);
+        checkMyRound();
+    });
     socket.on('romsta',function (online) {
         for(var i = 0 ; i < 4 ; i ++){
             if((online.o >> i ) & 1) cornerState[i] = i;
@@ -76,6 +51,16 @@ function initSocket(){
         }
         initCorner();
     });
+}
+function checkMyRound() {
+    if (round % 4 === owner) {
+        if(availableRound() === false){
+            nextRound();
+            cornerState[owner] = -1;
+            initCorner();
+            socket.emit('battle',  {o:owner,sta:-1,x:-1,y:-1,id:-1});
+        }
+    }
 }
 function fuck(){
     socket.emit("wantFace",{o:owner});
