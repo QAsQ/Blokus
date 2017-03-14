@@ -41,8 +41,7 @@ def index():
 
 @app.route("/login")
 def login():
-    login_user(User("test"));
-    return "Succ";
+    return render_template("login.html");
 
 
 @app.route("/room/<room>")
