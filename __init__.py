@@ -1,4 +1,4 @@
-from flask import Flask, render_template,g,request,redirect
+from flask import Flask, render_template,g,request,redirect,url_for
 from flask_socketio import SocketIO,send,emit,join_room,leave_room
 from flask_login import login_user,logout_user,current_user ,login_required,login_manager,LoginManager
 from models import User,checkUser,Infos
@@ -39,15 +39,21 @@ def giveFace(use):
 def index():
     return render_template('index.html');
 
-@app.route("/login")
+@app.route("/login",methods = ['GET','POST'])
 def login():
-    return render_template("login.html");
+    username = request.form.get("u","");
+    password = request.form.get("p","");
+    if username != "" and password != "" and checkUser(username,password):
+        user = User(username);
+        login_user(user);
+        return redirect(request.args.get('next','index'));
+    else:
+        return render_template("login.html");
 
 
 @app.route("/room/<room>")
 @login_required
 def roomIndex(room):
-    #print "room is " + room;todo
     infos.setRoom(current_user.id,room);
     print str(infos.userState(current_user.id));
     return render_template('room.html', sta=str(infos.roomState(room)), room=room);
