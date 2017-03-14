@@ -23,6 +23,9 @@ function initSocket(){
         socket.emit("wantFace",{o:owner});
     });
     socket.on('loadSta', function (val){
+        for(var i = 0 ; i < 4 ; i ++){
+            cornerState[i] = i;
+        }
         clearFace();
         round = val.length;
         for(var ind in val){
@@ -32,6 +35,7 @@ function initSocket(){
 
         refreshBoard();
         refreshChess();
+        initCorner();
     })
     socket.on('battle',function(Sta){
         if(Sta.o === owner) return;
@@ -44,11 +48,11 @@ function initSocket(){
             if((online.o >> i ) & 1) cornerState[i] = i;
             else cornerState[i] = -1;
         }
+        initCorner();
         if(online.o === 15 && round === -1){
             alert("Game Start!");
             nextRound();
         }
-        initCorner();
     });
 }
 function checkMyRound() {

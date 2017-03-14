@@ -20,7 +20,7 @@ def load_user(userid):
 
 @socketio.on('battle')
 def handle_battle(Sta):
-    room = infos.userInfo(current_user.id)[1];
+    room = infos.userState(current_user.id)[1];
     infos.addSta(room,Sta);
     emit('battle',Sta,room = room);
 
@@ -34,6 +34,7 @@ def login(val):
 @socketio.on('wantFace')
 def giveFace(use):
     room = infos.userState(current_user.id)[1];
+    join_room(room);
     emit('loadSta', infos.boardface[room]);
 
 @app.route("/index")
@@ -56,7 +57,6 @@ def login():
 @login_required
 def roomIndex(room):
     infos.setRoom(current_user.id,room);
-    print str(infos.userState(current_user.id));
     return render_template('room.html', sta=str(infos.roomState(room)), room=room);
 
 @app.route("/room/<room>/play/<_ind>")
@@ -64,14 +64,13 @@ def roomIndex(room):
 def handle_query(room,_ind):
     info = infos.userState(current_user.id);
     ind = int(_ind);
-    print str(info);
     if info[0] == True and info[2] != -1:
         return render_template("playGround.html",play = info[2],first="false");
 
     if infos.tryJoinRoom(current_user.id, room, ind):
         return render_template("playGround.html",play = ind,first="true")
     else:
-        return redirect("/%s" % (room,));
+        return redirect("/room/%s" % (room,));
 
 
 if __name__ == '__main__':
