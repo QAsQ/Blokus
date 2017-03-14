@@ -42,6 +42,7 @@ function initCorner() {
 function nextRound() {
     if(round !== -1) $("#corn_"+(round%4)).css("opacity",ncor);
     round++;
+
     $("#corn_"+(round%4)).css("opacity",1);
 }
 
@@ -264,17 +265,22 @@ function availableRound() {
         var chs = chessShape[ind].map(function (cells) {
             return xy(cells.x, cells.y);
         });
+        var s = 0;
         for(var sta = 0 ; sta < 8 ; sta ++){
-            if(sta === 4) flipChessShape(chs,0);
-            rotateChessShape(chs,0,true);
+            if(sta === 4){
+                s = flipChessShape(chs,s);
+            }
+            s = rotateChessShape(chs,s,true);
             for(var x = -4 ; x < 20 ; x ++){
                 for(var y = -4 ; y < 20 ; y ++){
-                    if(cheavi(chs,bst,x,y) === true) return true;
+                    //if(cheavi(chs,bst,x,y) === true) return true;
+                    if(cheavi(chs,bst,x,y) === true)
+                        return {sta:s,x:x,y:y,id:ind,o:owner};
                 }
             }
         }
     }
-    return false;
+    return {sta:-1,x:-1,y:-1,id:-1,o:owner};
 }
 function cheavi(arrs,bst,x,y) {
     var ret = 0;

@@ -58,14 +58,33 @@ function initSocket(){
             nextRound();
         }
     });
+    socket.on("gameover",function () {
+        console.log("Over");
+        var counter = [89,89,89,89];
+        for(var ind in boardFace){
+            if(inbod(boardFace[ind]))
+                counter[boardFace[ind].o]--;
+        }
+        alert(counter);
+    });
 }
 function checkMyRound() {
     if (round % 4 === owner) {
-        if(availableRound() === false){
+        var Sta = availableRound();
+        if(Sta.sta === -1){
             nextRound();
             cornerState[owner] = -1;
             initCorner();
-            socket.emit('battle',  {o:owner,sta:-1,x:-1,y:-1,id:-1});
+            socket.emit('battle',Sta);
+        }
+        else{
+            if(round > 4){
+                socket.emit('battle',Sta);
+                nextRound();
+                AddChess(Sta);
+                isHide[Sta.id] = true;
+                $("#chs_"+Sta.id).hide();
+            }
         }
     }
 }

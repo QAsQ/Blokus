@@ -21,8 +21,13 @@ def load_user(userid):
 @socketio.on('battle')
 def handle_battle(Sta):
     room = infos.userState(current_user.id)[1];
+    if(len(infos.boardface[room]) == 84):
+        return ;
+    print "sta in " + str(len(infos.boardface[room]) );
     infos.addSta(room,Sta);
     emit('battle',Sta,room = room);
+    if(len(infos.boardface[room]) == 84):
+        emit('gameover',{},room=room);
 
 @socketio.on('loginRoom')
 def login(val):
