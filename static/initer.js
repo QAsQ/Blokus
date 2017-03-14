@@ -88,7 +88,7 @@ function init(x,first) {
         refreshBoard();
         refreshChess();
     })
-    if(first) socket.emit('loginroom',{o:owner});
+    if(first) socket.emit('loginRoom',{o:owner});
     else socket.emit("wantFace",{o:owner});
 }
 function initAction() {

@@ -24,15 +24,16 @@ def handle_battle(Sta):
     infos.addSta(room,Sta);
     emit('battle',Sta,room = room);
 
-@socketio.on('loginroom')
+@socketio.on('loginRoom')
 def login(val):
     room = infos.userState(current_user.id)[1];
+    join_room(room);
     emit('romsta', {"o":infos.roomState(room)}, room=room);
 
 
 @socketio.on('wantFace')
 def giveFace(use):
-    room = infos.userState(current_user.id)[1]
+    room = infos.userState(current_user.id)[1];
     emit('loadSta', infos.boardface[room]);
 
 @app.route("/index")
