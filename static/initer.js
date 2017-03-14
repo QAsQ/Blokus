@@ -23,7 +23,6 @@ function initSocket(){
         socket.emit("wantFace",{o:owner});
     });
     socket.on('loadSta', function (val){
-        console.log(val);
         clearFace();
         round = val.length;
         for(var ind in val){
@@ -65,7 +64,7 @@ function checkMyRound() {
 function fuck(){
     socket.emit("wantFace",{o:owner});
 }
-function init(x) {
+function init(x,first) {
     owner = x;
     round = -1;
     initColorTheme();
@@ -89,7 +88,8 @@ function init(x) {
         refreshBoard();
         refreshChess();
     })
-    socket.emit('login',{o:owner});
+    if(first) socket.emit('loginroom',{o:owner});
+    else socket.emit("wantFace",{o:owner});
 }
 function initAction() {
     function getID(cx, cy) {
@@ -114,7 +114,6 @@ function initAction() {
         , pox, poy //mouse index in board
         , centx,centy;//select chess center
     function updSelect(x) {
-        console.log(x);
         if (select != -1) $("#chs_" + select).css("opacity", initp);
         select = x;
         if (select != -1) $("#chs_" + select).css("opacity", highp);

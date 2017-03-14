@@ -1,42 +1,18 @@
 from flask import Flask, render_template,g,request,redirect
 from flask_socketio import SocketIO,send,emit,join_room,leave_room
-from flask_login import login_user,logout_user,current_user ,login_required,UserMixin,login_manager,LoginManager
+from flask_login import login_user,logout_user,current_user ,login_required,login_manager,LoginManager
+from models import User,checkUser,Infos
 
 app = Flask(__name__)
 socketio = SocketIO(app)
 
 login_manager = LoginManager()
+login_manager.login_view = "login"
 login_manager.init_app(app)
 
 app.secret_key = 'OrzQAQ'
-class User(UserMixin):
-    def __init__(self,id):
-        self.id = id;
 
-    def get_id(self):
-        return self.id;
-
-
-class Rooms():
-    def __init__(self):
-        self.roomInfo = dict();
-        self.boardface = dict();
-
-    def state(self,room):
-        if (room in self.roomInfo) == False:
-            self.roomInfo[room] = 0;
-            self.boardface[room] = list();
-        return self.roomInfo[room];
-
-    def tryJoinRoom(self,room,x):
-        v = self.state(room);
-        if (v>>x) & 1:
-            return False;
-        else:
-            self.roomInfo[room] |= 1<<x;
-            return True;
-
-rooms= Rooms();
+infos = Infos();
 
 @login_manager.user_loader
 def load_user(userid):
@@ -44,38 +20,53 @@ def load_user(userid):
 
 @socketio.on('battle')
 def handle_battle(Sta):
-    room = current_user.id.split(' ')[0];
-    rooms.boardface[room].append(Sta);
+    room = infos.userInfo(current_user.id)[1];
+    infos.addSta(room,Sta);
     emit('battle',Sta,room = room);
 
-@socketio.on('login')
+@socketio.on('loginroom')
 def login(val):
-    room = current_user.id.split(' ')[0];
-    join_room(room);
-    emit('romsta',{"o":rooms.state(room)},room=room);
+    room = infos.userState(current_user.id)[1];
+    emit('romsta', {"o":infos.roomState(room)}, room=room);
+
 
 @socketio.on('wantFace')
 def giveFace(use):
-    room = current_user.id.split(' ')[0];
-    print str(rooms.boardface[room]);
-    emit('loadSta',rooms.boardface[room]);
+    room = infos.userState(current_user.id)[1]
+    emit('loadSta', infos.boardface[room]);
 
 @app.route("/index")
 def index():
     return render_template('index.html');
 
-@app.route("/<room>")
-def roomIndex(room):
-    return render_template('room.html',sta=str(rooms.state(room)),room=room);
+@app.route("/login")
+def login():
+    login_user(User("test"));
+    return "Succ";
 
-@app.route("/<room>/play/<_ind>")
+
+@app.route("/room/<room>")
+@login_required
+def roomIndex(room):
+    #print "room is " + room;todo
+    infos.setRoom(current_user.id,room);
+    print str(infos.userState(current_user.id));
+    return render_template('room.html', sta=str(infos.roomState(room)), room=room);
+
+@app.route("/room/<room>/play/<_ind>")
+@login_required
 def handle_query(room,_ind):
+    info = infos.userState(current_user.id);
     ind = int(_ind);
-    if rooms.tryJoinRoom(room,ind):
-        login_user(User(room+" "+_ind));
-        return render_template("playGround.html",play = ind)
+    print str(info);
+    if info[0] == True and info[2] != -1:
+        return render_template("playGround.html",play = info[2],first="false");
+
+    if infos.tryJoinRoom(current_user.id, room, ind):
+        return render_template("playGround.html",play = ind,first="true")
     else:
         return redirect("/%s" % (room,));
 
+
 if __name__ == '__main__':
-    socketio.run(app,host='0.0.0.0',port=80);
+    socketio.run(app,host='0.0.0.0',port=80,debug=True);
