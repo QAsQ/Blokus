@@ -16,12 +16,12 @@ function createCorner() {
     }
 }
 function initCorner() {
-    var locate = [xy(3,3),xy(3,25),xy(25,25),xy(25,3)];
-    var square = [xy(1,1),xy(1,0),xy(0,0),xy(0,1)];
+    var locate = [xy(1,1),xy(1,25),xy(25,25),xy(25,1)];
+    var square = [xy(2,2),xy(2,0),xy(0,0),xy(0,2)];
     for(var i = 0 ; i < 4 ; i ++) {
         $("#corn_" + i).attr({
-            "width": cellSize*2,
-            "heitht": cellSize*2,
+            "width": cellSize*4,
+            "heitht": cellSize*4,
         }).css({
             left:locate[i].x * cellSize +"px",
             top:locate[i].y * cellSize +"px",
@@ -31,11 +31,11 @@ function initCorner() {
         var e = getE("corn_"+i);
         e.beginPath();
         e.fillStyle = colorTheme.corner(cornerState[i]);
-        e.arc(cellSize,cellSize,cellSize,0,Math.PI * 2,true);
+        e.arc(cellSize*2,cellSize*2,cellSize*2,0,Math.PI * 2,true);
         e.closePath();
         e.fill();
-
-        drawCell(square[i],colorTheme.corner(cornerState[i]),e);
+        e.fillRect(square[i].x * cellSize, square[i].y * cellSize, cellSize * 2, cellSize * 2);
+        //drawCell(square[i],colorTheme.corner(cornerState[i]),e);
     }
     if(round !== -1) $("#corn_"+(round%4)).css("opacity",1);
 }
