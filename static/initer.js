@@ -30,6 +30,10 @@ function initSocket(){
         round = val.length;
         for(var ind in val){
             AddChess(val[ind]);
+            if(val[ind].o === owner && val[ind].sta !== -1){
+                isHide[val[ind].id] = true;
+                $("#chs_"+val[ind].id).hide();
+            }
         }
         checkMyRound();
 
