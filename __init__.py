@@ -52,6 +52,15 @@ def login():
     else:
         return render_template("login.html");
 
+@app.route("/register",methods = ['GET','POST'])
+def register():
+    username = request.form.get("u","");
+    password = request.form.get("p","");
+    cpassword = request.form.get("cp","");
+    if username == "" or password == "":
+        return render_template("register.html")
+
+    return render_template("index.html");
 
 @app.route("/room/<room>")
 @login_required
