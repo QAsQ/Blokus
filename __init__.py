@@ -21,30 +21,34 @@ def load_user(userid):
 
 @socketio.on('battle')
 def handle_battle(Sta):
-    room = infos.userState(current_user.id)[1];
-    if(len(infos.boardface[room]) == 84):
+    room = infos.userRoom[current_user.id];
+    if(len(infos.getroom(room).board) == 84):
         return;
-    print "sta in " + str(len(infos.boardface[room]) );
-    infos.addSta(room,Sta);
-    emit('battle',Sta,room = room);
-    if(len(infos.boardface[room]) == 84):
+    tim = time.time();
+    infos.getroom(room).addChess(Sta);
+    Sta["tim"]=tim;
+    print str(Sta)
+    emit('battle',Sta,room=room);
+    if len(infos.getroom(room).board) == 84:
         emit('gameover',{},room=room);
 
 @socketio.on('loginRoom')
 def login(val):
-    room = infos.userState(current_user.id)[1];
+    room = infos.userRoom[current_user.id];
     join_room(room);
     stTim = time.time();
-    emit('romsta', {"o":infos.roomState(room),"time":stTim}, room=room);
-    if infos.roomState(room) == 15:
-        infos.startTim[room] = time.time();
+    print "room = " + str(infos.getroom(room));
+    print "sta = " + str(infos.getroom(room).state);
+    emit('romsta', {"o":infos.getroom(room).state,"time":stTim}, room=room);
+    if infos.getroom(room).state == 15:
+        infos.getroom(room).start(time.time());
 
 
 @socketio.on('wantFace')
 def giveFace(use):
-    room = infos.userState(current_user.id)[1];
+    room = infos.userRoom[current_user.id];
     join_room(room);
-    emit('loadSta', infos.boardface[room]);
+    emit('loadSta', infos.getroom(room).board);
 
 @app.route("/index")
 def index():
@@ -75,17 +79,18 @@ def register():
 @login_required
 def roomIndex(room):
     infos.setRoom(current_user.id,room);
-    return render_template('room.html', sta=str(infos.roomState(room)), room=room);
+    return render_template('room.html', sta=infos.getroom(room).state, room=room);
 
 @app.route("/room/<room>/play/<_ind>")
 @login_required
 def handle_query(room,_ind):
-    info = infos.userState(current_user.id);
     ind = int(_ind);
-    if info[0] == True and info[2] != -1:
-        return render_template("playGround.html",play = info[2],first="false");
+    if infos.userInRoom(current_user.id,room):
+        return render_template("playGround.html"
+                              ,play = infos.userChair[current_user.id]
+                              ,first="false");
 
-    if infos.tryJoinRoom(current_user.id, room, ind):
+    if infos.tryInRoom(current_user.id, room, ind):
         return render_template("playGround.html",play = ind,first="true")
     else:
         return redirect("/room/%s" % (room,));
