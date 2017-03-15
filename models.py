@@ -11,6 +11,7 @@ class Room():
     def __init__(self):
         self.board = list();
         self.state = 0;
+        self.left = [1080,1080,1080,1080];
     
     def tryin(self,x):
         if (self.state >> x) & 1:
@@ -24,6 +25,11 @@ class Room():
     
     def start(self,stTime):
         self.lastTime = stTime;
+    
+    def updLeft(self,owner,curTime):
+        self.left[owner] -= max(0,curTime-self.lastTime-5);
+        self.lastTime = curTime;
+        return self.left[owner];
     
 
 class Infos():
@@ -49,7 +55,7 @@ class Infos():
         self.userRoom[userid] = room;
     
     def userInRoom(self,userid,room):
-        return userid in self.userRoom and self.userRoom[userid] == room and userid in self.userRoom;
+        return userid in self.userRoom and self.userRoom[userid] == room and userid in self.userChair;
 
 
 

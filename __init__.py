@@ -26,8 +26,7 @@ def handle_battle(Sta):
         return;
     tim = time.time();
     infos.getroom(room).addChess(Sta);
-    Sta["tim"]=tim;
-    print str(Sta)
+    Sta["tim"]=infos.getroom(room).updLeft(int(Sta["o"]),tim);
     emit('battle',Sta,room=room);
     if len(infos.getroom(room).board) == 84:
         emit('gameover',{},room=room);
@@ -37,8 +36,6 @@ def login(val):
     room = infos.userRoom[current_user.id];
     join_room(room);
     stTim = time.time();
-    print "room = " + str(infos.getroom(room));
-    print "sta = " + str(infos.getroom(room).state);
     emit('romsta', {"o":infos.getroom(room).state,"time":stTim}, room=room);
     if infos.getroom(room).state == 15:
         infos.getroom(room).start(time.time());

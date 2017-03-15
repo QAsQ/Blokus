@@ -42,10 +42,12 @@ function initSocket(){
         initCorner();
     })
     socket.on('battle',function(Sta){
+        roundTime[Sta.o] = Math.floor(Sta.tim+0.5);
         if(Sta.o === owner) return;
         nextRound();
         curTime = 5;
         AddChess(Sta);
+        console.log(Sta.tim);
         checkMyRound();
     });
     socket.on('romsta',function (online) {
