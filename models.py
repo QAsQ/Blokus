@@ -1,4 +1,5 @@
 from flask_login import UserMixin
+
 class User(UserMixin):
     def __init__(self,id):
         self.id = id;
@@ -18,6 +19,7 @@ class Infos():
         self.roomInfo = dict();
         self.boardface = dict();
         self.userInfo = dict();
+        self.startTim = dict();
 
     def roomState(self, room):
         if (room in self.roomInfo) == False:

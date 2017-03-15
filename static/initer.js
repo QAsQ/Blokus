@@ -54,6 +54,7 @@ function initSocket(){
         }
         initCorner();
         if(online.o === 15 && round === -1){
+            gameStart();
             nextRound();
             $("#start").modal('show');
         }
@@ -284,4 +285,15 @@ function initColorTheme(theme) {
     else {
         colorTheme = theme;
     }
+}
+var roundTime;
+function countDown(){
+    roundTime[round%4]--;
+    $("#cd_"+(round%4)).text(roundTime[round%4]);
+    setTimeout("countDown()",1000);
+}
+function gameStart(){
+    roundTime = [1080,1080,1080,1080];
+    for(var i = 0 ; i < 4 ; i ++) $("#cd_"+i).text(1080);
+    setTimeout("countDown()",1000);
 }

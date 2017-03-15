@@ -2,6 +2,7 @@ from flask import Flask, render_template,g,request,redirect,url_for
 from flask_socketio import SocketIO,send,emit,join_room,leave_room
 from flask_login import login_user,logout_user,current_user ,login_required,login_manager,LoginManager
 from models import User,checkUser,Infos
+import time
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -22,7 +23,7 @@ def load_user(userid):
 def handle_battle(Sta):
     room = infos.userState(current_user.id)[1];
     if(len(infos.boardface[room]) == 84):
-        return ;
+        return;
     print "sta in " + str(len(infos.boardface[room]) );
     infos.addSta(room,Sta);
     emit('battle',Sta,room = room);
@@ -33,7 +34,10 @@ def handle_battle(Sta):
 def login(val):
     room = infos.userState(current_user.id)[1];
     join_room(room);
-    emit('romsta', {"o":infos.roomState(room)}, room=room);
+    stTim = time.time();
+    emit('romsta', {"o":infos.roomState(room),"time":stTim}, room=room);
+    if infos.roomState(room) == 15:
+        infos.startTim[room] = time.time();
 
 
 @socketio.on('wantFace')
