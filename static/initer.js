@@ -44,6 +44,7 @@ function initSocket(){
     socket.on('battle',function(Sta){
         if(Sta.o === owner) return;
         nextRound();
+        curTime = 5;
         AddChess(Sta);
         checkMyRound();
     });
@@ -64,8 +65,8 @@ function initSocket(){
         var name = ["Red","Green","Yellow","Blue"];
         var counter = [{x:89,id:0},
                        {x:89,id:1},
-                        {x:89,id:2},
-                        {x:89,id:3}];
+                       {x:89,id:2},
+                       {x:89,id:3}];
         for(var ind in boardFace){
             if(inbod(boardFace[ind]))
                 counter[boardFace[ind].o].x--;
@@ -286,14 +287,16 @@ function initColorTheme(theme) {
         colorTheme = theme;
     }
 }
-var roundTime;
+var roundTime,curTime;
 function countDown(){
-    roundTime[round%4]--;
-    $("#cd_"+(round%4)).text(roundTime[round%4]);
+    if(curTime != 0) curTime --;
+    else roundTime[round%4]--;
+    $("#cd_"+(round%4)).text(roundTime[round%4] +":"+curTime);
     setTimeout("countDown()",1000);
 }
 function gameStart(){
     roundTime = [1080,1080,1080,1080];
+    curTime = 5;
     for(var i = 0 ; i < 4 ; i ++) $("#cd_"+i).text(1080);
     setTimeout("countDown()",1000);
 }
