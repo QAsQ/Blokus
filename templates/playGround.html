@@ -6,9 +6,31 @@
     <script src="{{url_for('static',filename='board.js')}}"></script>
     <script src="{{url_for('static',filename='chess.js')}}"></script>
     <script src="{{url_for('static',filename='initer.js')}}"></script>
+    <script src = "{{url_for('static',filename='bootstrap.min.js')}}"></script>
+    <link rel="stylesheet" href="{{url_for('static',filename='bootstrap.min.css')}}" type="text/css" />
     <title>main</title>
 </head>
 <body onload="init({{play}},{{first}})">
+    <div id = "start" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <h1 style="text-align: center;"> Link Start!</h1>
+            </div>
+        </div>
+    </div>
+    <div id = "status" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+      <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <table class="table table-hover">
+                <tr> <th>Rank</th>        <th>Color</th>          <th>Remain</th> </tr>
+                <tr> <td id = "rank_0">0</td> <td id = "color_0"></td> <td id = "left_0"></td> </tr>
+                <tr> <td id = "rank_1">1</td> <td id = "color_1"></td> <td id = "left_1"></td> </tr>
+                <tr> <td id = "rank_2">2</td> <td id = "color_2"></td> <td id = "left_2"></td> </tr>
+                <tr> <td id = "rank_3">3</td> <td id = "color_3"></td> <td id = "left_3"></td> </tr>
+            </table>
+        </div>
+      </div>
+    </div>
     <div id="playGround">
         <canvas id="mask"></canvas>
         <canvas id="last"></canvas>

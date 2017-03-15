@@ -54,18 +54,32 @@ function initSocket(){
         }
         initCorner();
         if(online.o === 15 && round === -1){
-            alert("Game Start!");
             nextRound();
+            $("#start").modal('show');
         }
     });
     socket.on("gameover",function () {
         console.log("Over");
-        var counter = [89,89,89,89];
+        var name = ["Red","Green","Yellow","Blue"];
+        var counter = [{x:89,id:0},
+                       {x:89,id:1},
+                        {x:89,id:2},
+                        {x:89,id:3}];
         for(var ind in boardFace){
             if(inbod(boardFace[ind]))
-                counter[boardFace[ind].o]--;
+                counter[boardFace[ind].o].x--;
         }
-        alert(counter);
+        counter.sort(function (a,b) {
+            return a.x > b.x;
+        });
+        var rnk = 1;
+        for(var ind in counter){
+            $("#left_"+ind).text(counter[ind].x);
+            $("#color_"+ind).text(name[counter[ind].id]);
+            if(ind != 0 && counter[ind].x != counter[ind-1].x) rnk++;
+            $("#rank_"+ind).text(rnk);
+        }
+        $("#status").modal('show');
     });
 }
 function checkMyRound() {
@@ -77,15 +91,16 @@ function checkMyRound() {
             initCorner();
             socket.emit('battle',Sta);
         }
-        else{
-            if(round > 4){
-                socket.emit('battle',Sta);
-                nextRound();
-                AddChess(Sta);
-                isHide[Sta.id] = true;
-                $("#chs_"+Sta.id).hide();
-            }
-        }
+//auto add
+//        else{
+//            if(round > 4){
+//                socket.emit('battle',Sta);
+//                nextRound();
+//                AddChess(Sta);
+//                isHide[Sta.id] = true;
+//                $("#chs_"+Sta.id).hide();
+//            }
+//        }
     }
 }
 function fuck(){
