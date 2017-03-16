@@ -43,7 +43,9 @@ function initSocket(){
         refreshChess();
         initCorner();
         roundTime = board.timer.map(Math.floor);
-        for(var i = 0 ; i < 4 ; i ++) $("#cd_"+i).text(roundTime[i]);
+        for(var i = 0 ; i < 4 ; i ++) 
+            $("#cd_"+i).text(roundTime[i]);
+        curTime = Math.max(0,5-board.cur);
         countDown();
     })
     socket.on('battle',function(Sta){

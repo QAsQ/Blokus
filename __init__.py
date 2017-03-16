@@ -70,7 +70,8 @@ def loginroom(val):
 def giveFace(use):
     room = infos.userRoom[current_user.id];
     join_room(room);
-    board = {"val":infos.getroom(room).board,"timer":infos.getroom(room).left};
+    cur = time.time() - infos.getroom(room).lastTime;
+    board = {"val":infos.getroom(room).board,"timer":infos.getroom(room).left,"cur":int(cur)};
     emit('loadSta', board);
 
 @app.route("/index")
