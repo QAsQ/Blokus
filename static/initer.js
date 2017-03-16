@@ -22,11 +22,13 @@ function initSocket(){
     socket.on('disconnect',function (){
         socket.emit("wantFace",{o:owner});
     });
-    socket.on('loadSta', function (val){
+    socket.on('loadSta', function (board){
+        console.log(board);
         for(var i = 0 ; i < 4 ; i ++){
             cornerState[i] = i;
         }
         clearFace();
+        val = board.val; 
         round = val.length;
         for(var ind in val){
             AddChess(val[ind]);
@@ -40,12 +42,14 @@ function initSocket(){
         refreshBoard();
         refreshChess();
         initCorner();
+        roundTime = board.timer.map(Math.floor);
+        for(var i = 0 ; i < 4 ; i ++) $("#cd_"+i).text(roundTime[i]);
+        countDown();
     })
     socket.on('battle',function(Sta){
         roundTime[Sta.o] = Math.floor(Sta.tim+0.5);
         if(Sta.o === owner) return;
         nextRound();
-        curTime = 5;
         AddChess(Sta);
         console.log(Sta.tim);
         checkMyRound();
@@ -291,14 +295,18 @@ function initColorTheme(theme) {
 }
 var roundTime,curTime;
 function countDown(){
+    console.log(curTime);
     if(curTime != 0) curTime --;
     else roundTime[round%4]--;
+    for(var i = 0 ; i  < 4 ; i ++){
+        $("#cd_"+i).text(roundTime[i]+":");
+    }
     $("#cd_"+(round%4)).text(roundTime[round%4] +":"+curTime);
     setTimeout("countDown()",1000);
 }
 function gameStart(){
     roundTime = [1080,1080,1080,1080];
     curTime = 5;
-    for(var i = 0 ; i < 4 ; i ++) $("#cd_"+i).text(1080);
+    for(var i = 0 ; i < 4 ; i ++) $("#cd_"+i).text(roundTime[i]);
     setTimeout("countDown()",1000);
 }

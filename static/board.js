@@ -42,7 +42,7 @@ function initCorner() {
 function nextRound() {
     if(round !== -1) $("#corn_"+(round%4)).css("opacity",ncor);
     round++;
-
+    curTime = 5;
     $("#corn_"+(round%4)).css("opacity",1);
 }
 
@@ -287,7 +287,7 @@ function cheavi(arrs,bst,x,y) {
     for(var i in arrs){
         if(!inbod(xy(arrs[i].x+x,arrs[i].y+y))) return false;
         if(bst[arrs[i].x + x][arrs[i].y + y] === -1) return false;
-        ret += bst[arrs[i].x + x][arrs[i].y + y];
+            ret += bst[arrs[i].x + x][arrs[i].y + y];
     }
     return ret > 0;
 }
