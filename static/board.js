@@ -64,6 +64,10 @@ function AddChess(Sta) {
     for(var i in sCS[Sta.id]){
         chs = chs.concat(oxy(Sta.o,sCS[Sta.id][i].x,sCS[Sta.id][i].y));
     }
+    if(Sta.o === owner && Sta.sta !== -1){
+        isHide[Sta.id] = true;
+        $("#chs_"+Sta.id).hide();
+    }
     changeStaTo(Sta.sta, chs);
 
     chs = chs.map(upd(Sta.x,Sta.y));

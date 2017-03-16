@@ -17,7 +17,8 @@ class Room():
     def __init__(self):
         self.board = list();
         self.state = 0;
-        self.left = [1080,1080,1080,1080];
+        self.left = [10,10,10,10];
+        self.lastTime = -1;
     
     def tryin(self,x):
         if (self.state >> x) & 1:
@@ -34,6 +35,7 @@ class Room():
     
     def updLeft(self,owner,curTime):
         self.left[owner] -= max(0,curTime-self.lastTime-5);
+        self.left[owner] = max(0,self.left[owner]);
         self.lastTime = curTime;
         return self.left[owner];
     

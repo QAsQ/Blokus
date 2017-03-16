@@ -23,7 +23,6 @@ function initSocket(){
         socket.emit("wantFace",{o:owner});
     });
     socket.on('loadSta', function (board){
-        console.log(board);
         for(var i = 0 ; i < 4 ; i ++){
             cornerState[i] = i;
         }
@@ -32,10 +31,6 @@ function initSocket(){
         round = val.length;
         for(var ind in val){
             AddChess(val[ind]);
-            if(val[ind].o === owner && val[ind].sta !== -1){
-                isHide[val[ind].id] = true;
-                $("#chs_"+val[ind].id).hide();
-            }
         }
         checkMyRound();
 
@@ -46,6 +41,7 @@ function initSocket(){
         for(var i = 0 ; i < 4 ; i ++) 
             $("#cd_"+i).text(roundTime[i]);
         curTime = Math.max(0,5-board.cur);
+        roundTime[round % 4] -= Math.max(0,board.cur-5);
         countDown();
     })
     socket.on('battle',function(Sta){
@@ -53,7 +49,6 @@ function initSocket(){
         if(Sta.o === owner) return;
         nextRound();
         AddChess(Sta);
-        console.log(Sta.tim);
         checkMyRound();
     });
     socket.on('romsta',function (online) {
@@ -69,7 +64,6 @@ function initSocket(){
         }
     });
     socket.on("gameover",function () {
-        console.log("Over");
         var name = ["Red","Green","Yellow","Blue"];
         var counter = [{x:89,id:0},
                        {x:89,id:1},
@@ -297,9 +291,17 @@ function initColorTheme(theme) {
 }
 var roundTime,curTime;
 function countDown(){
-    console.log(curTime);
     if(curTime != 0) curTime --;
-    else roundTime[round%4]--;
+    else{
+        roundTime[round%4]--;
+        if(round % 4 === owner && roundTime[round%4] <= 0){
+            var sta = availableRound();
+            AddChess(sta);
+            socket.emit("battle",sta);
+            nextRound();
+        }
+        roundTime[round%4] = Math.max(roundTime[round%4],0);
+    }
     for(var i = 0 ; i  < 4 ; i ++){
         $("#cd_"+i).text(roundTime[i]+":");
     }
