@@ -17,7 +17,7 @@ class Room():
     def __init__(self):
         self.board = list();
         self.state = 0;
-        self.left = [10,10,10,10];
+        self.left = [1080,1080,1080,1080];
         self.lastTime = -1;
     
     def tryin(self,x):
