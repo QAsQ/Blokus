@@ -1,8 +1,14 @@
 from flask_login import UserMixin
 
 class User(UserMixin):
-    def __init__(self,id):
-        self.id = id;
+    def __init__(self,db,id):
+        cour = db.cursor();
+        cour.execute("select * from user where id= ?",(id,));
+        arr = cour.fetchall()[0];
+        cour.close();
+        print str(arr);
+        self.id = arr[0]
+        self.name = arr[1];
 
     def get_id(self):
         return self.id;
@@ -58,35 +64,11 @@ class Infos():
         return userid in self.userRoom and self.userRoom[userid] == room and userid in self.userChair;
 
 
-
-
-
-#class Infos():
-#    def __init__(self):
-#        self.roomInfo = dict();
-#        self.boardface = dict();
-#        self.userInfo = dict();
-#        self.startTim = dict();
-#
-#    def tryJoinRoom(self,user,room,x):
-#        v = self.roomState(room);
-#        if (v>>x) & 1:
-#            return False;
-#        else:
-#            self.roomInfo[room] |= 1<<x;
-#            self.userInfo[user] = (room, x);
-#            return True;
-#
-#
-#    def setRoom(self,user,room):
-#        self.userInfo[user] = (room, -1);
-#
-#    def addSta(self,room,sta):
-#        self.boardface[room].append(sta);
-
-
-
-def checkUser(name,pw):
-    if name == pw:
-        return True;
-    return False;
+def checkUser(db,name,pw):
+    cur = db.cursor();
+    cur.execute("select id from user where name = ? and pw = ?", (name,pw));
+    id = cur.fetchall();
+    cur.close();
+    if len(id) == 1:
+        return id[0][0];
+    return -1;

@@ -2,10 +2,25 @@ from flask import Flask, render_template,g,request,redirect,url_for
 from flask_socketio import SocketIO,send,emit,join_room,leave_room
 from flask_login import login_user,logout_user,current_user ,login_required,login_manager,LoginManager
 from models import User,checkUser,Infos
+import sqlite3
 import time
 
 app = Flask(__name__)
 socketio = SocketIO(app)
+
+DATEBASE = 'User.db';
+
+def connnect_db():
+    return sqlite3.connect(DATEBASE);
+
+@app.before_request
+def before_requese():
+    g.db = connnect_db();
+
+@app.teardown_request
+def teardown_request(exception):
+    if hasattr(g,'db'):
+        g.db.close()
 
 login_manager = LoginManager()
 login_manager.login_view = "login"
@@ -15,9 +30,19 @@ app.secret_key = 'OrzQAQ'
 
 infos = Infos();
 
+
 @login_manager.user_loader
 def load_user(userid):
-    return  User(userid);
+    g.db = connnect_db();
+    cur = g.db.cursor();
+    cur.execute("select * from user where id = ?", (userid,));
+    par = cur.fetchall();
+    print str(par);
+    if len(par) == 0:
+        return None;
+    user = User(g.db,par[0][0]);
+    g.db.close();
+    return user;
 
 @socketio.on('battle')
 def handle_battle(Sta):
@@ -32,7 +57,7 @@ def handle_battle(Sta):
         emit('gameover',{},room=room);
 
 @socketio.on('loginRoom')
-def login(val):
+def loginroom(val):
     room = infos.userRoom[current_user.id];
     join_room(room);
     stTim = time.time();
@@ -56,12 +81,15 @@ def index():
 def login():
     username = request.form.get("u","");
     password = request.form.get("p","");
-    if username != "" and password != "" and checkUser(username,password):
-        user = User(username);
-        login_user(user);
-        return redirect(request.args.get('next','index'));
-    else:
+    if username == "" or password == "":
         return render_template("login.html");
+    id = checkUser(g.db,username,password);
+    if id == -1:
+        return render_template("login.html");
+    user = User(g.db,id);
+    login_user(user);
+
+    return redirect(request.args.get('next','index'));
 
 @app.route("/register",methods = ['GET','POST'])
 def register():
@@ -70,8 +98,16 @@ def register():
     cpassword = request.form.get("cp","");
     if username == "" or password == "":
         return render_template("register.html")
-
-    return render_template("index.html");
+    cour = g.db.cursor();
+    cour.execute("select id from user where name = ?",(username,));
+    val = cour.fetchall();
+    cour.close();
+    print str(val);
+    if len(val) > 0:
+        return render_template("register.html")
+    g.db.execute("insert into user(name,pw) values(?,?)",(username,password));
+    g.db.commit();
+    return redirect("/login");
 
 @app.route("/room/<room>")
 @login_required
