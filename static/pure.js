@@ -1,6 +1,9 @@
 /**
  * Created by QAQ on 2017/3/11.
  */
+function mucell(v){
+    return xy(v.x * cellSize,v.y * cellSize);
+}
 function count(arrs,x) {
     var ret = 0;
     for(var ind in arrs)

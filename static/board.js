@@ -21,17 +21,19 @@ function createProbar(){
     }
 }
 function initProbar(){
+    var st = [xy(5,4),xy(4,25),xy(25,26),xy(26,5)];
+    var ed = [xy(25,4),xy(4,5),xy(5,26),xy(26,25)];
     for(var i = 0 ; i < 4 ; i ++){
         $("#pgb_" + i).attr({
             "width": cellSize * 30,
-            "heitht": cellSize * 30,
+            "height": cellSize * 30,
         }).css({
             left:"0px",
             top: "0px",
             position:"absolute",
             "z-index":"-2",
         });
-        bars[i] = prograssbar(i,xy(cellSize * 5,(i+1) * cellSize), xy(cellSize * 25,(i+1) * cellSize));
+        bars[i] = prograssbar(i,mucell(st[i]), mucell(ed[i]));
     }
 }
 function refreshProbar() {
@@ -46,7 +48,7 @@ function initCorner() {
     for(var i = 0 ; i < 4 ; i ++) {
         $("#corn_" + i).attr({
             "width": cellSize * 4,
-            "heitht": cellSize * 4,
+            "height": cellSize * 4,
         }).css({
             left: locate[i].x * cellSize + "px",
             top: locate[i].y * cellSize + "px",
