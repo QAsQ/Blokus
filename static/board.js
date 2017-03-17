@@ -14,6 +14,11 @@ function createCorner() {
         $("#playGround").append(corner);
         corner.css("opacity",ncor);
     }
+    for(var i = 0 ; i < 4 ; i ++){
+        var pgb= $("<canvas id = \"pgb_" + i + "\"></canvas>");//progressbar
+        $("#playGround").append(pgb);
+        corner.css("opacity",0);
+    }
 }
 function initCorner() {
     var locate = [xy(1,1),xy(1,25),xy(25,25),xy(25,1)];
@@ -36,6 +41,15 @@ function initCorner() {
         e.fill();
         e.fillRect(square[i].x * cellSize, square[i].y * cellSize, cellSize * 2, cellSize * 2);
         //drawCell(square[i],colorTheme.corner(cornerState[i]),e);
+        $("#pgb_" + i).attr({
+            "width": cellSize * 30,
+            "heitht": cellSize * 30,
+        }).css({
+            left:"0px",
+            top: "0px",
+            position:"absolute",
+            "z-index":"-2",
+        });
     }
     if(round !== -1) $("#corn_"+(round%4)).css("opacity",1);
 }

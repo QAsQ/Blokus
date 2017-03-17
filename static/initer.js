@@ -4,6 +4,7 @@
 var socket;
 var round;
 var ratiox,ratioy,bw,bh;
+var bars;
 
 function initSize() {
     var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
@@ -303,14 +304,36 @@ function countDown(){
         roundTime[round%4] = Math.max(roundTime[round%4],0);
     }
     for(var i = 0 ; i  < 4 ; i ++){
-        $("#cd_"+i).text(roundTime[i]+":");
+        bars[i](roundTime[round % 4],0);
     }
-    $("#cd_"+(round%4)).text(roundTime[round%4] +":"+curTime);
+    bars[round % 4](roundTime[round % 4],curTime);
     setTimeout("countDown()",1000);
 }
 function gameStart(){
     roundTime = [1080,1080,1080,1080];
     curTime = 5;
-    for(var i = 0 ; i < 4 ; i ++) $("#cd_"+i).text(roundTime[i]);
+    bars = new Array;
+    for(var i = 0 ; i < 4 ; i ++) 
+        bars[i] = prograssbar(i,xy(i*cellSize,cellSize * 30),xy(i*cellSize,cellSize * 30));
     setTimeout("countDown()",1000);
+}
+function prograssbar(id,st,ed){
+    return function(tim,cur){
+        console.log(tim,cur);
+        var vx = ed.x - st.x;
+        var vy = ed.y - st.y;
+        var fir = tim / (1080 + 5);
+        var sec = (tim + cur) / (1080 + 5);
+        var Fir = xy(st.x + vx * fir,st.y + vy * fir);
+        var Sec = xy(st.x + vx * sec,st.y + vy * sec);
+        var e = getE("pgb_"+id);
+        e.clearRect(0,0,cellSize,cellSize);
+        e.strokeStyle = colorTheme.corner(id);
+        e.linewith = 2; e.beginPath(); e.moveTo(st.x, st.y); e.lineTo(Fir.x, Fir.y); 
+        e.stroke();
+
+        e.strokeStyle = colorTheme.corner(-1);
+        e.beginPath(); e.moveTo(Fir.x,Fir.y); e.lineTo(Sec.x,Sec.y);
+        e.stroke();
+    }
 }
