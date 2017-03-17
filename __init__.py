@@ -37,7 +37,6 @@ def load_user(userid):
     cur = g.db.cursor();
     cur.execute("select * from user where id = ?", (userid,));
     par = cur.fetchall();
-    print str(par);
     if len(par) == 0:
         return None;
     user = User(g.db,par[0][0]);
@@ -70,6 +69,9 @@ def loginroom(val):
 def giveFace(use):
     room = infos.userRoom[current_user.id];
     join_room(room);
+    if infos.getroom(room) != 15:
+        emit('romsta', {"o":infos.getroom(room).state,"time":time.time()});
+        return;
     cur = time.time() - infos.getroom(room).lastTime;
     board = {"val":infos.getroom(room).board,"timer":infos.getroom(room).left,"cur":int(cur)};
     emit('loadSta', board);
@@ -103,7 +105,6 @@ def register():
     cour.execute("select id from user where name = ?",(username,));
     val = cour.fetchall();
     cour.close();
-    print str(val);
     if len(val) > 0:
         return render_template("register.html")
     g.db.execute("insert into user(name,pw) values(?,?)",(username,password));

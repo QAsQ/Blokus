@@ -3,7 +3,6 @@
  */
 
 var boardFace;
-var colorTheme;
 var lastStep;
 var cornerState,ncor = 0.3;
 function createCorner() {
@@ -14,33 +13,15 @@ function createCorner() {
         $("#playGround").append(corner);
         corner.css("opacity",ncor);
     }
+}
+function createProbar(){
     for(var i = 0 ; i < 4 ; i ++){
         var pgb= $("<canvas id = \"pgb_" + i + "\"></canvas>");//progressbar
         $("#playGround").append(pgb);
-        corner.css("opacity",0);
     }
 }
-function initCorner() {
-    var locate = [xy(1,1),xy(1,25),xy(25,25),xy(25,1)];
-    var square = [xy(2,2),xy(2,0),xy(0,0),xy(0,2)];
-    for(var i = 0 ; i < 4 ; i ++) {
-        $("#corn_" + i).attr({
-            "width": cellSize*4,
-            "heitht": cellSize*4,
-        }).css({
-            left:locate[i].x * cellSize +"px",
-            top:locate[i].y * cellSize +"px",
-            position:"absolute",
-            "z-index":"2",
-        });
-        var e = getE("corn_"+i);
-        e.beginPath();
-        e.fillStyle = colorTheme.corner(cornerState[i]);
-        e.arc(cellSize*2,cellSize*2,cellSize*2,0,Math.PI * 2,true);
-        e.closePath();
-        e.fill();
-        e.fillRect(square[i].x * cellSize, square[i].y * cellSize, cellSize * 2, cellSize * 2);
-        //drawCell(square[i],colorTheme.corner(cornerState[i]),e);
+function initProbar(){
+    for(var i = 0 ; i < 4 ; i ++){
         $("#pgb_" + i).attr({
             "width": cellSize * 30,
             "heitht": cellSize * 30,
@@ -50,8 +31,45 @@ function initCorner() {
             position:"absolute",
             "z-index":"-2",
         });
+        bars[i] = prograssbar(i,xy(cellSize * 5,(i+1) * cellSize), xy(cellSize * 25,(i+1) * cellSize));
     }
-    if(round !== -1) $("#corn_"+(round%4)).css("opacity",1);
+}
+function refreshProbar() {
+    for(var i = 0 ; i < 4 ; i ++){
+        if(round != -1 && round % 4 == i) bars[i](roundTime[i],0);
+        else bars[i](roundTime[i],curTime);
+    }
+}
+function initCorner() {
+    var locate = [xy(1,1),xy(1,25),xy(25,25),xy(25,1)];
+    bars = new Array;
+    for(var i = 0 ; i < 4 ; i ++) {
+        $("#corn_" + i).attr({
+            "width": cellSize * 4,
+            "heitht": cellSize * 4,
+        }).css({
+            left: locate[i].x * cellSize + "px",
+            top: locate[i].y * cellSize + "px",
+            position: "absolute",
+            "z-index": "2",
+        });
+    }
+}
+function refreshCorner() {
+    var square = [xy(2,2),xy(2,0),xy(0,0),xy(0,2)];
+    for(var i = 0 ; i < 4 ; i ++) {
+        var e = getE("corn_" + i);
+        e.beginPath();
+        e.fillStyle = colorTheme.corner(cornerState[i]);
+        e.arc(cellSize * 2, cellSize * 2, cellSize * 2, 0, Math.PI * 2, true);
+        e.closePath();
+        e.fill();
+        e.fillRect(square[i].x * cellSize, square[i].y * cellSize, cellSize * 2, cellSize * 2);
+        //drawCell(square[i],colorTheme.corner(cornerState[i]),e);
+    }
+    if(round !== -1){
+        $("#corn_"+(round%4)).css("opacity",1);
+    }
 }
 function nextRound() {
     if(round !== -1) $("#corn_"+(round%4)).css("opacity",ncor);
@@ -308,4 +326,25 @@ function cheavi(arrs,bst,x,y) {
             ret += bst[arrs[i].x + x][arrs[i].y + y];
     }
     return ret > 0;
+}
+
+
+function prograssbar(id,st,ed){
+    return function(tim,cur){
+        var vx = ed.x - st.x;
+        var vy = ed.y - st.y;
+        var fir = tim / (1080 + 5);
+        var sec = (tim + cur) / (1080 + 5);
+        var Fir = xy(st.x + vx * fir,st.y + vy * fir);
+        var Sec = xy(st.x + vx * sec,st.y + vy * sec);
+        var e = getE("pgb_"+id);
+        e.clearRect(0,0,cellSize,cellSize);
+        e.strokeStyle = colorTheme.corner(id);
+        e.linewith = 2; e.beginPath(); e.moveTo(st.x, st.y); e.lineTo(Fir.x, Fir.y); 
+        e.stroke();
+
+        e.strokeStyle = colorTheme.corner(-1);
+        e.beginPath(); e.moveTo(Fir.x,Fir.y); e.lineTo(Sec.x,Sec.y);
+        e.stroke();
+    }
 }

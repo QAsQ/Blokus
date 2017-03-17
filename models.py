@@ -6,7 +6,6 @@ class User(UserMixin):
         cour.execute("select * from user where id= ?",(id,));
         arr = cour.fetchall()[0];
         cour.close();
-        print str(arr);
         self.id = arr[0]
         self.name = arr[1];
 

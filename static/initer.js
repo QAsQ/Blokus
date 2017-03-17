@@ -5,6 +5,8 @@ var socket;
 var round;
 var ratiox,ratioy,bw,bh;
 var bars;
+var colorTheme;
+
 
 function initSize() {
     var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
@@ -33,16 +35,16 @@ function initSocket(){
         for(var ind in val){
             AddChess(val[ind]);
         }
-        checkMyRound();
+        roundTime = board.timer.map(Math.floor);
+        curTime = Math.max(0,5-board.cur);
+        roundTime[round % 4] -= Math.max(0,board.cur-5);
 
         refreshBoard();
         refreshChess();
-        initCorner();
-        roundTime = board.timer.map(Math.floor);
-        for(var i = 0 ; i < 4 ; i ++) 
-            $("#cd_"+i).text(roundTime[i]);
-        curTime = Math.max(0,5-board.cur);
-        roundTime[round % 4] -= Math.max(0,board.cur-5);
+        refreshCorner();
+        refreshProbar();
+
+        checkMyRound();
         countDown();
     })
     socket.on('battle',function(Sta){
@@ -57,10 +59,10 @@ function initSocket(){
             if((online.o >> i ) & 1) cornerState[i] = i;
             else cornerState[i] = -1;
         }
-        initCorner();
+        refreshCorner();
         if(online.o === 15 && round === -1){
-            gameStart();
             nextRound();
+            gameStart();
             $("#start").modal('show');
         }
     });
@@ -93,7 +95,7 @@ function checkMyRound() {
         if(Sta.sta === -1){
             nextRound();
             cornerState[owner] = -1;
-            initCorner();
+            refreshCorner();
             socket.emit('battle',Sta);
         }
 //auto add
@@ -108,22 +110,24 @@ function checkMyRound() {
 //        }
     }
 }
-function fuck(){
-    socket.emit("wantFace",{o:owner});
-}
 function init(x,first) {
     owner = x;
     round = -1;
+    curTime = 5;
+    roundTime = [1080,1080,1080,1080];
     initColorTheme();
-    clearFace();
     initSize();
-    initBoard();
-    initChess();
+    clearFace();
     createChess();
     createCorner();
+    createProbar();
+    initBoard();
+    initChess();
     initCorner();
+    initProbar();
     refreshBoard();
     refreshChess();
+    refreshProbar();
     initAction();
     initSocket();
     $(window).resize(function () {
@@ -132,8 +136,12 @@ function init(x,first) {
         initBoard();
         initChess();
         initCorner();
+        initProbar();
         refreshBoard();
         refreshChess();
+        refreshCorner();
+        refreshCorner();
+        refreshProbar();
     })
     if(first) socket.emit('loginRoom',{o:owner});
     else socket.emit("wantFace",{o:owner});
@@ -303,37 +311,33 @@ function countDown(){
         }
         roundTime[round%4] = Math.max(roundTime[round%4],0);
     }
-    for(var i = 0 ; i  < 4 ; i ++){
-        bars[i](roundTime[round % 4],0);
-    }
+    bars[(round + 3)%4](roundTime[(round + 3)%4],0);
     bars[round % 4](roundTime[round % 4],curTime);
     setTimeout("countDown()",1000);
 }
 function gameStart(){
-    roundTime = [1080,1080,1080,1080];
-    curTime = 5;
-    bars = new Array;
-    for(var i = 0 ; i < 4 ; i ++) 
-        bars[i] = prograssbar(i,xy(i*cellSize,cellSize * 30),xy(i*cellSize,cellSize * 30));
     setTimeout("countDown()",1000);
 }
+
 function prograssbar(id,st,ed){
     return function(tim,cur){
-        console.log(tim,cur);
         var vx = ed.x - st.x;
         var vy = ed.y - st.y;
-        var fir = tim / (1080 + 5);
-        var sec = (tim + cur) / (1080 + 5);
+        var fir = tim / (1080 + 50);
+        var sec = (tim + cur * 10) / (1080 + 50);
         var Fir = xy(st.x + vx * fir,st.y + vy * fir);
         var Sec = xy(st.x + vx * sec,st.y + vy * sec);
         var e = getE("pgb_"+id);
-        e.clearRect(0,0,cellSize,cellSize);
+        e.clearRect(0,0,cellSize * 30,cellSize * 30);
+        e.linewith = 2; 
+
         e.strokeStyle = colorTheme.corner(id);
-        e.linewith = 2; e.beginPath(); e.moveTo(st.x, st.y); e.lineTo(Fir.x, Fir.y); 
+        e.beginPath(); e.moveTo(st.x, st.y); e.lineTo(Fir.x, Fir.y); 
         e.stroke();
 
-        e.strokeStyle = colorTheme.corner(-1);
+        e.strokeStyle = colorTheme.horn;
         e.beginPath(); e.moveTo(Fir.x,Fir.y); e.lineTo(Sec.x,Sec.y);
         e.stroke();
+
     }
 }
