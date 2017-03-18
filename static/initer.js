@@ -6,6 +6,7 @@ var round;
 var ratiox,ratioy,bw,bh;
 var bars;
 var colorTheme;
+var stepTime,fullTime;
 
 
 function initSize() {
@@ -36,8 +37,8 @@ function initSocket(){
             AddChess(val[ind]);
         }
         roundTime = board.timer.map(Math.floor);
-        curTime = Math.max(0,5-board.cur);
-        roundTime[round % 4] -= Math.max(0,board.cur-5);
+        curTime = Math.max(0,stepTime-board.cur);
+        roundTime[round % 4] -= Math.max(0,board.cur-stepTime);
 
         refreshBoard();
         refreshChess();
@@ -113,8 +114,9 @@ function checkMyRound() {
 function init(x,first) {
     owner = x;
     round = -1;
-    curTime = 5;
-    roundTime = [1080,1080,1080,1080];
+    stepTime = 10,fullTime = 600;
+    curTime = stepTime;
+    roundTime = [fullTime,fullTime,fullTime,fullTime];
     initColorTheme();
     initSize();
     clearFace();
@@ -317,27 +319,4 @@ function countDown(){
 }
 function gameStart(){
     setTimeout("countDown()",1000);
-}
-
-function prograssbar(id,st,ed){
-    return function(tim,cur){
-        var vx = ed.x - st.x;
-        var vy = ed.y - st.y;
-        var fir = tim / (1080 + 50);
-        var sec = (tim + cur * 10) / (1080 + 50);
-        var Fir = xy(st.x + vx * fir,st.y + vy * fir);
-        var Sec = xy(st.x + vx * sec,st.y + vy * sec);
-        var e = getE("pgb_"+id);
-        e.clearRect(0,0,cellSize * 30,cellSize * 30);
-        e.linewith = 2; 
-
-        e.strokeStyle = colorTheme.corner(id);
-        e.beginPath(); e.moveTo(st.x, st.y); e.lineTo(Fir.x, Fir.y); 
-        e.stroke();
-
-        e.strokeStyle = colorTheme.horn;
-        e.beginPath(); e.moveTo(Fir.x,Fir.y); e.lineTo(Sec.x,Sec.y);
-        e.stroke();
-
-    }
 }

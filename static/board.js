@@ -76,7 +76,7 @@ function refreshCorner() {
 function nextRound() {
     if(round !== -1) $("#corn_"+(round%4)).css("opacity",ncor);
     round++;
-    curTime = 5;
+    curTime = stepTime;
     $("#corn_"+(round%4)).css("opacity",1);
 }
 
@@ -330,22 +330,21 @@ function cheavi(arrs,bst,x,y) {
     return ret > 0;
 }
 
-
 function prograssbar(id,st,ed){
     return function(tim,cur){
         var vx = ed.x - st.x;
         var vy = ed.y - st.y;
-        var fir = tim / (1080 + 5);
-        var sec = (tim + cur) / (1080 + 5);
+        var fir = tim / (fullTime+stepTime*10);
+        var sec = (tim + cur*10) / (fullTime+stepTime*10);
         var Fir = xy(st.x + vx * fir,st.y + vy * fir);
         var Sec = xy(st.x + vx * sec,st.y + vy * sec);
         var e = getE("pgb_"+id);
-        e.clearRect(0,0,cellSize,cellSize);
+        e.clearRect(0,0,cellSize * 30,cellSize * 30);
         e.strokeStyle = colorTheme.corner(id);
         e.linewith = 2; e.beginPath(); e.moveTo(st.x, st.y); e.lineTo(Fir.x, Fir.y); 
         e.stroke();
 
-        e.strokeStyle = colorTheme.corner(-1);
+        e.strokeStyle = colorTheme.horn;
         e.beginPath(); e.moveTo(Fir.x,Fir.y); e.lineTo(Sec.x,Sec.y);
         e.stroke();
     }
