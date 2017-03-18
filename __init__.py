@@ -69,7 +69,7 @@ def loginroom(val):
 def giveFace(use):
     room = infos.userRoom[current_user.id];
     join_room(room);
-    if infos.getroom(room) != 15:
+    if infos.getroom(room).state != 15:
         emit('romsta', {"o":infos.getroom(room).state,"time":time.time()});
         return;
     cur = time.time() - infos.getroom(room).lastTime;
