@@ -15,7 +15,12 @@ function initChess() {
 function createChess() {
     chessShape = new Array;
     chessState = new Array;
-    chessLocate = new Array;
+    chessLocate = [xy(29,5),xy(28,5),xy(29,17),xy(32,5),xy(32,20)
+                  ,xy(29,16),xy(41,8),xy(35,17),xy(34,8),xy(37,5)
+                  ,xy(35,5),xy(37,17),xy(31,14),xy(35,8),xy(41,13)
+                  ,xy(29,10),xy(33,10),xy(37,14),xy(37,13),xy(31,10)
+                  ,xy(29,6)];
+    chessLocate = chessLocate.map(mucell);
     for (var index in sCS) {
         chessState[index] = 0;
         chessShape[index] = new Array;
@@ -23,7 +28,7 @@ function createChess() {
             chessShape[index] = chessShape[index].concat(xy(sCS[index][ind].x, sCS[index][ind].y));
         }
     }
-    for (var index in chessShape) {
+for (var index in chessShape) {
         isHide[index] = false;
         var chess = $("<canvas id = \"chs_" + index + "\"></canvas>");
         $("#playGround").append(chess);
@@ -32,7 +37,6 @@ function createChess() {
             "height": cellSize * 5,
             "name": "chess"
         });
-        chessLocate[index] = xy(cellSize * (Math.floor(index / 6) * 5 + 25),cellSize * (5 * (index % 6)));
         chess.css({
             position:"absolute",
             top: chessLocate[index].y + "px",
@@ -90,30 +94,25 @@ function flipChessShape(chsShape,x) {
 }
 
 var sCS = [
-    [xy(0, 0)],//1
-
-    [xy(0, 0), xy(0, 1)],//2
-    [xy(0, 0), xy(0, 1), xy(1, 0)],//2+1
-    [xy(0, 0), xy(0, 1), xy(0, 2)],//3
-    [xy(0, 0), xy(0, 1), xy(1, 0), xy(1, 1)],//[]
-    [xy(0, 0), xy(0, 1), xy(0, 2), xy(1, 1)],//t
-
-    [xy(0, 0), xy(0, 1), xy(0, 2), xy(0, 3)],//4
-    [xy(0, 0), xy(0, 1), xy(0, 2), xy(1, 0)],//3+1
-    [xy(0, 0), xy(0, 1), xy(1, 1), xy(1, 2)],//z
-    [xy(0, 0), xy(0, 1), xy(0, 2), xy(0, 3), xy(1, 0)],//4+1
-    [xy(0, 0), xy(0, 1), xy(0, 2), xy(1, 1), xy(2, 1)],//T
-
-    [xy(0, 0), xy(0, 1), xy(0, 2), xy(1, 0), xy(2, 0)],//L
-    [xy(0, 0), xy(0, 1), xy(0, 2), xy(1, 2), xy(1, 3)],//2+3
-    [xy(0, 0), xy(1, 0), xy(1, 1), xy(1, 2), xy(2, 2)],//3+1+1
-    [xy(0, 0), xy(0, 1), xy(0, 2), xy(0, 3), xy(0, 4)],//5
-    [xy(0, 0), xy(0, 1), xy(0, 2), xy(1, 0), xy(1, 1)],//3*2
-
-    [xy(0, 0), xy(0, 1), xy(1, 1), xy(1, 2), xy(2, 2)],//2+2+1
-    [xy(0, 0), xy(0, 1), xy(0, 2), xy(1, 0), xy(1, 2)],//6-1
-    [xy(0, 0), xy(0, 1), xy(1, 1), xy(1, 2), xy(2, 1)],//1+3+1
-    [xy(1, 0), xy(1, 1), xy(1, 2), xy(0, 1), xy(2, 1)],//10
-    [xy(0, 0), xy(0, 1), xy(0, 2), xy(0, 3), xy(1, 1)]//4+1
-
+    [xy(0,0)],
+    [xy(4,0),xy(3,0)],
+    [xy(0,4),xy(1,4),xy(0,3)],
+    [xy(4,0),xy(3,0),xy(2,0)],
+    [xy(0,0),xy(0,1),xy(1,0),xy(1,1)],
+    [xy(0,0),xy(0,1),xy(0,2),xy(1,1)],
+    [xy(0,0),xy(0,1),xy(0,2),xy(0,3)],
+    [xy(0,4),xy(1,4),xy(2,4),xy(0,3)],
+    [xy(0,0),xy(0,1),xy(1,1),xy(1,2)],
+    [xy(4,0),xy(3,0),xy(2,0),xy(1,0),xy(4,1)],
+    [xy(4,4),xy(4,3),xy(4,2),xy(3,3),xy(2,3)],
+    [xy(4,4),xy(4,3),xy(4,2),xy(3,4),xy(2,4)],
+    [xy(4,4),xy(3,4),xy(2,4),xy(2,3),xy(1,3)],
+    [xy(4,4),xy(4,3),xy(3,3),xy(2,3),xy(2,2)],
+    [xy(0,0),xy(0,1),xy(0,2),xy(0,3),xy(0,4)],
+    [xy(0,4),xy(0,3),xy(0,2),xy(1,4),xy(1,3)],
+    [xy(0,4),xy(1,4),xy(1,3),xy(2,3),xy(2,2)],
+    [xy(0,4),xy(1,4),xy(2,4),xy(0,3),xy(2,3)],
+    [xy(0,0),xy(0,1),xy(1,1),xy(1,2),xy(2,1)],
+    [xy(1,0),xy(1,1),xy(1,2),xy(0,1),xy(2,1)],
+    [xy(0,4),xy(0,3),xy(0,2),xy(0,1),xy(1,3)]
 ];
