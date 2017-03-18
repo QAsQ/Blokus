@@ -60,6 +60,7 @@ class Infos():
     
     def setRoom(self,userid,room):
         self.userRoom[userid] = room;
+        self.userChair.pop(userid);
     
     def userInRoom(self,userid,room):
         return userid in self.userRoom and self.userRoom[userid] == room and userid in self.userChair;
