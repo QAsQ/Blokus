@@ -142,7 +142,6 @@ function init(x,first) {
         refreshBoard();
         refreshChess();
         refreshCorner();
-        refreshCorner();
         refreshProbar();
     })
     if(first) socket.emit('loginRoom',{o:owner});

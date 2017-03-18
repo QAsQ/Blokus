@@ -91,7 +91,7 @@ function changeStaTo(_sta, chs) {
 function AddChess(Sta) {
     if(Sta.sta === -1){
         cornerState[Sta.o] = -1;
-        initCorner();
+        refreshCorner();
         return;
     }
     var chs = new Array;
