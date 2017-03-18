@@ -23,6 +23,7 @@ function createProbar(){
 function initProbar(){
     var st = [xy(5,4),xy(4,25),xy(25,26),xy(26,5)];
     var ed = [xy(25,4),xy(4,5),xy(5,26),xy(26,25)];
+    bars = new Array;
     for(var i = 0 ; i < 4 ; i ++){
         $("#pgb_" + i).attr({
             "width": cellSize * 30,
@@ -44,7 +45,6 @@ function refreshProbar() {
 }
 function initCorner() {
     var locate = [xy(1,1),xy(1,25),xy(25,25),xy(25,1)];
-    bars = new Array;
     for(var i = 0 ; i < 4 ; i ++) {
         $("#corn_" + i).attr({
             "width": cellSize * 4,

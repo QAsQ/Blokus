@@ -51,8 +51,8 @@ function initSocket(){
     socket.on('battle',function(Sta){
         roundTime[Sta.o] = Math.floor(Sta.tim+0.5);
         if(Sta.o === owner) return;
-        nextRound();
         AddChess(Sta);
+        nextRound();
         checkMyRound();
     });
     socket.on('romsta',function (online) {
