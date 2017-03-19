@@ -276,6 +276,7 @@ function initColorTheme(theme) {
             frameColor : "#ffffff",
             player: function (o) {
                 switch (o) {
+                    case -1: return "#b7b7b7";
                     case 0: return "#ed1c24";
                     case 1: return "#23b14d";
                     case 2: return "#00a2e8";

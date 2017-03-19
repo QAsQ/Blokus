@@ -64,6 +64,53 @@
         line-height: 100px;
         font-style: normal;
     }
+    .icon-items-3 li {
+        position: relative;
+        float: left;
+        width: 350px;
+        height:85px;
+        text-align: center;
+        margin: 10px 10px 0 0;
+        /*background-color: #00aec7;*/
+        animation: moveF_Right 500ms ease;
+        overflow: hidden;
+    }
+    .icon-items-3 li:before {
+        position: absolute;
+    }
+    .icon-items-3 li:after {
+        position: absolute;
+    }
+    .icon-items-3 li:hover:before {
+        top: 0;
+        left: 0;
+        content: "";
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255,255,255,.2);
+        z-index: 1;
+    }
+    .icon-items-3 li:hover:after {
+        top: 20px;
+        left: 0;
+        font-weight: bold;
+        content: attr(data);
+        width: 100%;
+        line-height: 30px;
+        z-index: 2;
+        background-color: #005d6a;
+        animation: moveF_Right 500ms ease;
+    }
+
+    .icon-items-3 i[class^="icon-"]:before {
+        font-family: 'icomoon';
+        speak: none;
+        font-weight: normal;
+        -webkit-font-smoothing: antialiased;
+        font-size: 36px;
+        line-height: 100px;
+        font-style: normal;
+    }
     .icon-red:before {
         content: url("{{url_for('static',filename='pic/red.png')}}");
     }
@@ -78,6 +125,9 @@
     }
     .icon-gray:before {
         content: url("{{url_for('static',filename='pic/gray.png')}}");
+    }
+    .icon-ob:before {
+        content: url("{{url_for('static',filename='pic/ob.png')}}");
     }
     @keyframes moveF_Right {
       0% {
@@ -122,6 +172,9 @@
 			<li id = "l_2" data="BLUE" onclick="login(2)"> <i class="icon-blue"></i> </li>
 			<li id = "g_2" data="BLUE"> <i class="icon-gray"></i> </li>
 		</ul>
+        <ul class="icon-items-3 clearfix">
+            <li data= "OBSERVER" onclick="ob()"> <i class="icon-ob"></i> </li>
+        </ul>
 	</section>
 </div>
 <script>
@@ -131,6 +184,9 @@
         }
         function login(x) {
             window.location.href = 'http://' + document.domain + ':' + location.port + '/room/{{room}}/play/' + x;
+        }
+        function ob(){
+            window.location.href = 'http://' + document.domain + ':' + location.port + '/room/{{room}}/ob';
         }
         if({{sta}} === 15){
             $("#warn").text("this room is used,please try other room");

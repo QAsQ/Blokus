@@ -141,7 +141,7 @@ def handle_query(room,_ind):
 def ob(room):
     print room;
     infos.userRoom[current_user.id] = room;
-    return render_template("playGround.html",play = 5,first="false")
+    return render_template("playGround.html",play = -1,first="false")
 
 if __name__ == '__main__':
     socketio.run(app,host='0.0.0.0',port=80);
