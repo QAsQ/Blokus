@@ -114,8 +114,13 @@ def register():
 @app.route("/room/<room>")
 @login_required
 def roomIndex(room):
-    infos.setRoom(current_user.id,room);
-    return render_template('room.html', sta=infos.getroom(room).state, room=room);
+    if infos.userInRoom(current_user.id,room):
+        sta = 15 - (1 << infos.userChair[current_user.id]);
+    else:
+        infos.setRoom(current_user.id,room);
+        sta = infos.getroom(room).state;
+    print "sta = " + str(sta);
+    return render_template('room.html', sta=sta, room=room);
 
 @app.route("/room/<room>/play/<_ind>")
 @login_required
