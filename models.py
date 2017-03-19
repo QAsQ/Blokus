@@ -1,17 +1,27 @@
+from werkzeug.security import generate_password_hash,check_password_hash
 from flask_login import UserMixin
+from flask_sqlalchemy import SQLAlchemy
 
-class User(UserMixin):
-    def __init__(self,db,id):
-        cour = db.cursor();
-        cour.execute("select * from user where id= ?",(id,));
-        arr = cour.fetchall()[0];
-        cour.close();
-        self.id = arr[0]
-        self.name = arr[1];
+db = SQLAlchemy();
+
+class User(UserMixin,db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    username = db.Column(db.String(80),unique=True)
+    password = db.Column(db.String(80))
+
+    def __init__(self,id,username,password):
+        self.id = id;
+        self.username = username;
+        self.password = generate_password_hash(password);
+
+    def check_password(self,password):
+        if self.password is None:
+            return False;
+        return  check_password_hash(self.password,password);
 
     def get_id(self):
         return self.id;
-    
+
 class Room():
     def __init__(self):
         self.board = list();
@@ -66,12 +76,3 @@ class Infos():
     def userInRoom(self,userid,room):
         return userid in self.userRoom and self.userRoom[userid] == room and userid in self.userChair;
 
-
-def checkUser(db,name,pw):
-    cur = db.cursor();
-    cur.execute("select id from user where name = ? and pw = ?", (name,pw));
-    id = cur.fetchall();
-    cur.close();
-    if len(id) == 1:
-        return id[0][0];
-    return -1;

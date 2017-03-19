@@ -1,26 +1,16 @@
 from flask import Flask, render_template,g,request,redirect,url_for
 from flask_socketio import SocketIO,send,emit,join_room,leave_room
 from flask_login import login_user,logout_user,current_user ,login_required,login_manager,LoginManager
-from models import User,checkUser,Infos
-import sqlite3
+from models import User,Infos,db
 import time
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////User.db';
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False;
+
+db.init_app(app);
+
 socketio = SocketIO(app)
-
-DATEBASE = 'User.db';
-
-def connnect_db():
-    return sqlite3.connect(DATEBASE);
-
-@app.before_request
-def before_requese():
-    g.db = connnect_db();
-
-@app.teardown_request
-def teardown_request(exception):
-    if hasattr(g,'db'):
-        g.db.close()
 
 login_manager = LoginManager()
 login_manager.login_view = "login"
@@ -32,16 +22,8 @@ infos = Infos();
 
 
 @login_manager.user_loader
-def load_user(userid):
-    g.db = connnect_db();
-    cur = g.db.cursor();
-    cur.execute("select * from user where id = ?", (userid,));
-    par = cur.fetchall();
-    if len(par) == 0:
-        return None;
-    user = User(g.db,par[0][0]);
-    g.db.close();
-    return user;
+def load_user(id):
+    return  User.query.get(id);
 
 @socketio.on('battle')
 def handle_battle(Sta):
@@ -82,34 +64,36 @@ def index():
 
 @app.route("/login",methods = ['GET','POST'])
 def login():
-    username = request.form.get("u","");
-    password = request.form.get("p","");
-    if username == "" or password == "":
+    if request.method == 'post':
+        username = request.form.get("u","");
+        password = request.form.get("p","");
+        if username == "" or password == "":
+            return render_template("login.html");
+        user = db.query.filter_by(username=username).first();
+        if user is not None and user.check_password(password):
+            login_user(user);
+            return redirect(request.args.get('next','index'));
+        else:
+            return render_template("login.html")
+    if request.method == 'GET':
         return render_template("login.html");
-    id = checkUser(g.db,username,password);
-    if id == -1:
-        return render_template("login.html");
-    user = User(g.db,id);
-    login_user(user);
-
-    return redirect(request.args.get('next','index'));
 
 @app.route("/register",methods = ['GET','POST'])
 def register():
-    username = request.form.get("u","");
-    password = request.form.get("p","");
-    cpassword = request.form.get("cp","");
-    if username == "" or password == "":
-        return render_template("register.html")
-    cour = g.db.cursor();
-    cour.execute("select id from user where name = ?",(username,));
-    val = cour.fetchall();
-    cour.close();
-    if len(val) > 0:
-        return render_template("register.html")
-    g.db.execute("insert into user(name,pw) values(?,?)",(username,password));
-    g.db.commit();
-    return redirect("/login");
+    if request.method == 'POST':
+        u = request.form.get("u");
+        p = request.form.get("p");
+        cp = request.form.get("cp");
+        if p != cp:
+            return render_template("register.html")
+        nuser = User(u,p);
+        db.session.add(nuser);
+        db.session.commit();
+        login_user(nuser);
+        return  redirect("/index");
+
+    if request.method == 'GET':
+        return redirect("/login");
 
 @app.route("/room/<room>")
 @login_required
