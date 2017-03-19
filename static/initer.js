@@ -68,7 +68,7 @@ function initSocket(){
         }
     });
     socket.on("gameover",function () {
-        var name = ["Red","Green","Yellow","Blue"];
+        var name = ["Red","Green","Blue","Yellow"];
         var counter = [{x:89,id:0},
                        {x:89,id:1},
                        {x:89,id:2},
