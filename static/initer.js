@@ -7,7 +7,7 @@ var ratiox,ratioy,bw,bh;
 var bars;
 var colorTheme;
 var stepTime,fullTime;
-var name;
+var username;
 
 
 function initSize() {
@@ -28,8 +28,10 @@ function initSocket(){
         socket.emit("wantFace",{o:owner});
     });
     socket.on('loadSta', function (board){
+        username = new Array;
         for(var i = 0 ; i < 4 ; i ++){
             cornerState[i] = i;
+            username[i] = board.user[i];
         }
         clearFace();
         val = board.val; 
@@ -57,13 +59,13 @@ function initSocket(){
         checkMyRound();
     });
     socket.on('romsta',function (online) {
-        name = online.user;
-        console.log(name);
+        username = new Array;
         for(var i = 0 ; i < 4 ; i ++){
             if((online.o >> i ) & 1){
                 cornerState[i] = i;
             }
             else cornerState[i] = -1;
+            username[i] = online.user[i];
         }
         refreshCorner();
         if(online.o === 15 && round === -1){

@@ -51,10 +51,10 @@ def giveFace(use):
     room = infos.userRoom[current_user.id];
     join_room(room);
     if infos.getroom(room).state != 15:
-        emit('romsta', {"o":infos.getroom(room).state,"time":time.time()});
+        emit('romsta', {"o":infos.getroom(room).state,"time":time.time(),"user":infos.getroom(room).user});
         return;
     cur = time.time() - infos.getroom(room).lastTime;
-    board = {"val":infos.getroom(room).board,"timer":infos.getroom(room).left,"cur":int(cur)};
+    board = {"val":infos.getroom(room).board,"timer":infos.getroom(room).left,"cur":int(cur),"user":infos.getroom(room).user};
     emit('loadSta', board);
 
 @app.route("/index")

@@ -55,7 +55,7 @@ function initCorner() {
             position: "absolute",
             "z-index": "2",
         });
-        $("n"+i).css({
+        $("#n"+i).css({
             left: locate[i].x * cellSize + "px",
             top: locate[i].y * cellSize + "px",
             position: "absolute",
@@ -76,7 +76,7 @@ function refreshCorner() {
         e.fillRect(square[i].x * cellSize, square[i].y * cellSize, cellSize * 2, cellSize * 2);
         //drawCell(square[i],colorTheme.corner(cornerState[i]),e);
         if(cornerState[i] != -1){
-            $("#n"+i).text(name[i]);
+            $("#n"+i).text(username[i]);
         }
     }
     if(round !== -1){
