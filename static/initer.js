@@ -7,6 +7,7 @@ var ratiox,ratioy,bw,bh;
 var bars;
 var colorTheme;
 var stepTime,fullTime;
+var name;
 
 
 function initSize() {
@@ -56,8 +57,12 @@ function initSocket(){
         checkMyRound();
     });
     socket.on('romsta',function (online) {
+        name = online.user;
+        console.log(name);
         for(var i = 0 ; i < 4 ; i ++){
-            if((online.o >> i ) & 1) cornerState[i] = i;
+            if((online.o >> i ) & 1){
+                cornerState[i] = i;
+            }
             else cornerState[i] = -1;
         }
         refreshCorner();
@@ -66,7 +71,6 @@ function initSocket(){
             gameStart();
             $("#start").modal('show');
         }
-        console.log(online.user);
     });
     socket.on("gameover",function () {
         var name = ["Red","Green","Blue","Yellow"];

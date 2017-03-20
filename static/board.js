@@ -55,6 +55,13 @@ function initCorner() {
             position: "absolute",
             "z-index": "2",
         });
+        $("n"+i).css({
+            left: locate[i].x * cellSize + "px",
+            top: locate[i].y * cellSize + "px",
+            position: "absolute",
+            "z-index": "2.5",
+        });
+        
     }
 }
 function refreshCorner() {
@@ -68,6 +75,9 @@ function refreshCorner() {
         e.fill();
         e.fillRect(square[i].x * cellSize, square[i].y * cellSize, cellSize * 2, cellSize * 2);
         //drawCell(square[i],colorTheme.corner(cornerState[i]),e);
+        if(cornerState[i] != -1){
+            $("#n"+i).text(name[i]);
+        }
     }
     if(round !== -1){
         $("#corn_"+(round%4)).css("opacity",1);

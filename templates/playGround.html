@@ -8,7 +8,16 @@
     <script src="{{url_for('static',filename='initer.js')}}"></script>
     <script src = "{{url_for('static',filename='bootstrap.min.js')}}"></script>
     <link rel="stylesheet" href="{{url_for('static',filename='bootstrap.min.css')}}" type="text/css" />
-    <title>main</title>
+    <title>BLOKUS</title>
+    <style>
+    .name{
+        -moz-user-select: none; 
+        -webkit-user-select: none;  
+        -ms-user-select: none; 
+        -khtml-user-select: none; 
+        user-select: none;
+       }
+    </style>
 </head>
 <body onload="init({{play}},{{first}})">
     <div id = "start" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
@@ -36,5 +45,9 @@
         <canvas id="last"></canvas>
         <canvas id="board"></canvas>
     </div>
+    <div id = "n0" class = "name"></div>
+    <div id = "n1" class = "name"></div>
+    <div id = "n2" class = "name"></div>
+    <div id = "n3" class = "name"></div>
 </body>
 </html>
