@@ -41,7 +41,7 @@ def loginroom(val):
     room = infos.userRoom[current_user.id];
     join_room(room);
     stTim = time.time();
-    emit('romsta', {"o":infos.getroom(room).state,"time":stTim}, room=room);
+    emit('romsta', {"o":infos.getroom(room).state,"time":stTim,"user":infos.getroom(room).user}, room=room);
     if infos.getroom(room).state == 15:
         infos.getroom(room).start(time.time());
 

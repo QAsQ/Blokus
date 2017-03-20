@@ -66,6 +66,7 @@ function initSocket(){
             gameStart();
             $("#start").modal('show');
         }
+        console.log(online.user);
     });
     socket.on("gameover",function () {
         var name = ["Red","Green","Blue","Yellow"];

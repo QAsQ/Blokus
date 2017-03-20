@@ -27,12 +27,14 @@ class Room():
         self.state = 0;
         self.left = [600,600,600,600];
         self.lastTime = -1;
+        self.user = [None,None,None,None];
     
-    def tryin(self,x):
+    def tryin(self,x,userid):
         if (self.state >> x) & 1:
             return False;
         else:
             self.state |= 1 << x;
+            self.user[x] = User.query.get(userid).username;
             return True;
     
     def addChess(self,chs):
@@ -60,7 +62,7 @@ class Infos():
         return self.roomInfo[room];
     
     def tryInRoom(self,userid,room,x):
-        if self.getroom(room).tryin(x):
+        if self.getroom(room).tryin(x,userid):
             self.userRoom[userid] = room;
             self.userChair[userid] = x;
             return True;
