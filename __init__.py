@@ -63,19 +63,17 @@ def index():
 
 @app.route("/login",methods = ['GET','POST'])
 def login():
-    if request.method == 'post':
-        username = request.form.get("u","");
-        password = request.form.get("p","");
-        if username == "" or password == "":
-            return render_template("login.html");
-        user = db.query.filter_by(username=username).first();
+    if request.method == 'POST':
+        username = request.form.get("u");
+        password = request.form.get("p");
+        user = User.query.filter_by(username=username).first();
         if user is not None and user.check_password(password):
             login_user(user);
             return redirect(request.args.get('next','index'));
         else:
-            return render_template("login.html")
+            return render_template("login.html",message="User not exist or Wrong password!");
     if request.method == 'GET':
-        return render_template("login.html");
+        return render_template("login.html",message="");
 
 @app.route("/register",methods = ['GET','POST'])
 def register():
@@ -84,17 +82,16 @@ def register():
         p = request.form.get("p");
         cp = request.form.get("cp");
         if p != cp:
-            return render_template("register.html") #todo
+            return render_template("register.html",message="confirm password not same") 
         if User.query.filter_by(username=u).first() is not None:
-            #user exist
-            return render_template("register.html");
+            return render_template("register.html",message="User exist!");
         nuser = User(u,p);
         db.session.add(nuser);
         db.session.commit();
         login_user(nuser);
         return  redirect("/index");
     if request.method == 'GET':
-        return render_template("register.html")
+        return render_template("register.html",message="")
 
 @app.route("/room/<room>")
 @login_required
