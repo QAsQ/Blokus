@@ -84,7 +84,10 @@ def register():
         p = request.form.get("p");
         cp = request.form.get("cp");
         if p != cp:
-            return render_template("register.html")
+            return render_template("register.html") #todo
+        if User.query.filter_by(username=u).first() is not None:
+            #user exist
+            return render_template("register.html");
         nuser = User(u,p);
         db.session.add(nuser);
         db.session.commit();
