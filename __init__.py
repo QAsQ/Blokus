@@ -5,8 +5,9 @@ from models import User,Infos,db
 import time
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////User.db';
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///User.db';
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False;
+app.secret_key = 'OrzQAQ'
 
 db.init_app(app);
 
@@ -16,10 +17,8 @@ login_manager = LoginManager()
 login_manager.login_view = "login"
 login_manager.init_app(app)
 
-app.secret_key = 'OrzQAQ'
 
 infos = Infos();
-
 
 @login_manager.user_loader
 def load_user(id):
@@ -91,9 +90,8 @@ def register():
         db.session.commit();
         login_user(nuser);
         return  redirect("/index");
-
     if request.method == 'GET':
-        return redirect("/login");
+        return render_template("register.html")
 
 @app.route("/room/<room>")
 @login_required
@@ -129,3 +127,4 @@ def ob(room):
 
 if __name__ == '__main__':
     socketio.run(app,host='0.0.0.0',port=80);
+

@@ -9,8 +9,7 @@ class User(UserMixin,db.Model):
     username = db.Column(db.String(80),unique=True)
     password = db.Column(db.String(80))
 
-    def __init__(self,id,username,password):
-        self.id = id;
+    def __init__(self,username,password):
         self.username = username;
         self.password = generate_password_hash(password);
 
