@@ -351,7 +351,7 @@ function prograssbar(id,st,ed){
         var e = getE("pgb_"+id);
         e.clearRect(0,0,cellSize * 30,cellSize * 30);
         e.strokeStyle = colorTheme.corner(id);
-        e.linewith = 2; e.beginPath(); e.moveTo(st.x, st.y); e.lineTo(Fir.x, Fir.y); 
+        e.lineWidth = Math.min(8,cellSize / 2); e.beginPath(); e.moveTo(st.x, st.y); e.lineTo(Fir.x, Fir.y); 
         e.stroke();
 
         e.strokeStyle = colorTheme.horn;
@@ -361,7 +361,7 @@ function prograssbar(id,st,ed){
         e.beginPath();
         if(cur == 0) e.fillStyle = colorTheme.corner(id);
         else e.fillStyle = colorTheme.horn;
-        e.arc(Sec.x,Sec.y,2, 0, Math.PI * 2, true);
+        e.arc(Sec.x,Sec.y,e.lineWidth / 2, 0, Math.PI * 2, true);
         e.closePath();
         e.fill();
     }
