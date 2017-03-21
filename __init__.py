@@ -85,6 +85,9 @@ def register():
             return render_template("register.html",message="confirm password not same") 
         if User.query.filter_by(username=u).first() is not None:
             return render_template("register.html",message="User exist!");
+        if len(u) > 15:
+            return render_template("register.html",message="User name too long!");
+
         nuser = User(u,p);
         db.session.add(nuser);
         db.session.commit();
