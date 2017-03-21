@@ -44,7 +44,7 @@ class Room():
         self.lastTime = stTime;
     
     def updLeft(self,owner,curTime):
-        self.left[owner] -= max(0,curTime-self.lastTime-10);
+        self.left[owner] -= max(0,curTime-self.lastTime-5);
         self.left[owner] = max(0,self.left[owner]);
         self.lastTime = curTime;
         return self.left[owner];
