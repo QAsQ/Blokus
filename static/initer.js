@@ -75,7 +75,6 @@ function initSocket(){
         }
     });
     socket.on("gameover",function () {
-        var name = ["Red","Green","Blue","Yellow"];
         var counter = [{x:89,id:0},
                        {x:89,id:1},
                        {x:89,id:2},
@@ -90,7 +89,7 @@ function initSocket(){
         var rnk = 1;
         for(var ind in counter){
             $("#left_"+ind).text(counter[ind].x);
-            $("#color_"+ind).text(name[counter[ind].id]);
+            $("#color_"+ind).text(username[counter[ind].id]);
             if(ind != 0 && counter[ind].x != counter[ind-1].x) rnk++;
             $("#rank_"+ind).text(rnk);
         }
