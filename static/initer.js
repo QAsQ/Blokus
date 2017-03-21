@@ -106,22 +106,22 @@ function checkMyRound() {
             refreshCorner();
             socket.emit('battle',Sta);
         }
-//auto add
-        else{
-            if(round > 4){
-                socket.emit('battle',Sta);
-                nextRound();
-                AddChess(Sta);
-                isHide[Sta.id] = true;
-                $("#chs_"+Sta.id).hide();
-            }
-        }
     }
+//auto add
+  //      else{
+  //          if(round > 4){
+  //              socket.emit('battle',Sta);
+  //              nextRound();
+  //              AddChess(Sta);
+  //              isHide[Sta.id] = true;
+  //              $("#chs_"+Sta.id).hide();
+  //          }
+  //      }
 }
 function init(x,first) {
     owner = x;
     round = -1;
-    stepTime = 10,fullTime = 600;
+    stepTime = 10,fullTime = 200;
     curTime = stepTime;
     roundTime = [fullTime,fullTime,fullTime,fullTime];
     initColorTheme();
@@ -322,7 +322,7 @@ function countDown(){
     }
     bars[(round + 3)%4](roundTime[(round + 3)%4],0);
     bars[round % 4](roundTime[round % 4],curTime);
-    setTimeout("countDown()",1000);
+    if(round < 84) setTimeout("countDown()",1000);
 }
 function gameStart(){
     setTimeout("countDown()",1000);

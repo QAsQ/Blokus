@@ -39,9 +39,9 @@ function initProbar(){
 }
 function refreshProbar() {
     for(var i = 0 ; i < 4 ; i ++){
-        if(round != -1 && round % 4 == i) bars[i](roundTime[i],0);
-        else bars[i](roundTime[i],curTime);
+         bars[i](roundTime[i],0);
     }
+    if(round != -1) bars[round % 4](roundTime[round % 4],0);
 }
 function initCorner() {
     var locate = [xy(1,1),xy(1,25),xy(25,25),xy(25,1)];
@@ -53,13 +53,13 @@ function initCorner() {
             left: locate[i].x * cellSize + "px",
             top: locate[i].y * cellSize + "px",
             position: "absolute",
-            "z-index": "2",
+            "z-index": "-3",
         });
         $("#n"+i).css({
             left: (locate[i].x+2) * cellSize - $("#n"+i).width() / 2 + "px",
             top: (locate[i].y+2) * cellSize - $("#n"+i).height() / 2 + "px",
             position: "absolute",
-            "z-index": "2.5",
+            "z-index": "-1",
         });
         
     }
@@ -152,7 +152,7 @@ function initBoard() {
         position:"absolute",
         top:dxy + "px",
         left:dxy + "px",
-        "z-index":"0",
+        "z-index":"-5",
         opacity: 1
     });
     $("#mask").attr({
@@ -162,7 +162,7 @@ function initBoard() {
         position:"absolute",
         top:dxy + "px",
         left:dxy + "px",
-        "z-index":"1",
+        "z-index":"-4",
         opacity: 0.7
     });
     $("#last").attr({
@@ -172,7 +172,7 @@ function initBoard() {
         position:"absolute",
         top:dxy + "px",
         left:dxy + "px",
-        "z-index":"2",
+        "z-index":"-3.5",
         opacity: 1
     });
 }
@@ -344,8 +344,8 @@ function prograssbar(id,st,ed){
     return function(tim,cur){
         var vx = ed.x - st.x;
         var vy = ed.y - st.y;
-        var fir = tim / (fullTime+stepTime*10);
-        var sec = (tim + cur*10) / (fullTime+stepTime*10);
+        var fir = tim / (fullTime+stepTime*5);
+        var sec = (tim + cur*5) / (fullTime+stepTime*5);
         var Fir = xy(st.x + vx * fir,st.y + vy * fir);
         var Sec = xy(st.x + vx * sec,st.y + vy * sec);
         var e = getE("pgb_"+id);

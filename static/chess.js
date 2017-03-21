@@ -41,7 +41,7 @@ for (var index in chessShape) {
             position:"absolute",
             top: chessLocate[index].y + "px",
             left:chessLocate[index].x + "px",
-            "z-index":"2",
+            "z-index":"1",
             opacity:initp
         });
         //todo
