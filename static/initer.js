@@ -122,7 +122,7 @@ function checkMyRound() {
 function init(x,first) {
     owner = x;
     round = -1;
-    stepTime = 5,fullTime = 200;
+    stepTime = 5,fullTime = 240;
     curTime = stepTime;
     roundTime = [fullTime,fullTime,fullTime,fullTime];
     initColorTheme();

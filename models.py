@@ -25,7 +25,7 @@ class Room():
     def __init__(self):
         self.board = list();
         self.state = 0;
-        self.left = [200,200,200,200];
+        self.left = [240,240,240,240];
         self.lastTime = -1;
         self.user = [None,None,None,None];
     
