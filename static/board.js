@@ -204,7 +204,7 @@ function drawAvailable(e) {
     for (var i = 0; i <= 19; i++) {
         for (var j = 0; j <= 19; j++) {
             var poi = xy(i, j);
-            if (inThe(owners.concat(boardFace))(poi) === false) {
+            if (inThe(owners.concat(boardFace))(poi) === false ) {
                 drawCell(poi, colorTheme.can, e);
             }
         }
@@ -227,8 +227,8 @@ function refreshBoard() {
     var e = getE("board");
     e.clearRect(0, 0, boardSize, boardSize);
     drawAvailable(e);
-    drawLine(e);
     drawHornAndCell(e);
+    drawLine(e);
     drawLast(e);
 }
 function availableCell() {

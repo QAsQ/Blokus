@@ -8,27 +8,96 @@
     <script src="{{url_for('static',filename='initer.js')}}"></script>
     <script src = "{{url_for('static',filename='bootstrap.min.js')}}"></script>
     <link rel="stylesheet" href="{{url_for('static',filename='bootstrap.min.css')}}" type="text/css" />
-    <title>BLOKUS</title>
-    <style>
-    .name{
-        -moz-user-select: none; 
-        -webkit-user-select: none;  
-        -ms-user-select: none; 
-        -khtml-user-select: none; 
-        user-select: none;
-        width: auto;
-        height: 20px;
-        min-width: 50px;
-        position: absolute;
-        background-color: #444;
-        z-index: 1000;
-        opacity: .8;
-        border-radius: 10px;
-        color: white;
-        border: 2px #999;
-        text-align: center;
-       }
+    <style type="text/css"> 
+        body { 
+            font: normal 11px auto "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif; 
+            color: #4f6b72; 
+            background: #E6EAE9; 
+        } 
+
+        a { 
+            color: #c75f3e; 
+        } 
+
+        #mytable { 
+            width: 700px; 
+            padding: 0; 
+            margin: 0; 
+        } 
+
+        caption { 
+            padding: 0 0 5px 0; 
+            width: 700px;      
+            font: italic 11px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif; 
+            text-align: right; 
+        } 
+
+        th { 
+            font: bold 11px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif; 
+            color: #4f6b72; 
+            border-right: 1px solid #C1DAD7; 
+            border-bottom: 1px solid #C1DAD7; 
+            border-top: 1px solid #C1DAD7; 
+            letter-spacing: 2px; 
+            text-transform: uppercase; 
+            text-align: left; 
+            padding: 6px 6px 6px 12px; 
+            background: #CAE8EA; 
+        } 
+
+
+
+        td { 
+            border-right: 1px solid #C1DAD7; 
+            border-bottom: 1px solid #C1DAD7; 
+            background: #fff; 
+            font-size:11px; 
+            padding: 6px 6px 6px 12px; 
+            color: #4f6b72; 
+        } 
+
+
+        td.alt { 
+            background: #F5FAFA; 
+            color: #797268; 
+        } 
+
+        th.spec { 
+            border-left: 1px solid #C1DAD7; 
+            border-top: 0; 
+            background: #fff; 
+            font: bold 10px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif; 
+        } 
+
+        th.specalt { 
+            border-left: 1px solid #C1DAD7; 
+            border-top: 0; 
+            background: #f5fafa; 
+            font: bold 10px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif; 
+            color: #797268; 
+        } 
+        .name{
+            -moz-user-select: none; 
+            -webkit-user-select: none;  
+            -ms-user-select: none; 
+            -khtml-user-select: none; 
+            user-select: none;
+            width: auto;
+            height: 20px;
+            min-width: 50px;
+            position: absolute;
+            background-color: #444;
+            z-index: 1000;
+            opacity: .8;
+            border-radius: 10px;
+            color: white;
+            border: 2px #999;
+            text-align: center;
+            font-family: icomoon;
+            padding: 0 6px;
+        }
     </style>
+    <title>BLOKUS</title>
 </head>
 <body onload="init({{play}},{{first}})">
     <div id = "start" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
@@ -38,16 +107,39 @@
             </div>
         </div>
     </div>
-    <div id = "status" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
-      <div class="modal-dialog modal-sm" role="document">
+    <div id = "status" class="modal fade" id="myModal" tabindex="-1" role="dialog" >
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <table class="table table-hover">
-                <tr> <th>Rank</th>        <th>Name</th>          <th>Remain</th> </tr>
-                <tr> <td id = "rank_0">0</td> <td id = "color_0"></td> <td id = "left_0"></td> </tr>
-                <tr> <td id = "rank_1">1</td> <td id = "color_1"></td> <td id = "left_1"></td> </tr>
-                <tr> <td id = "rank_2">2</td> <td id = "color_2"></td> <td id = "left_2"></td> </tr>
-                <tr> <td id = "rank_3">3</td> <td id = "color_3"></td> <td id = "left_3"></td> </tr>
+            <center>
+            <table id="mytable" cellspacing="0"> 
+            <caption> </caption> 
+            <tr> 
+                <th scope="col" abbr="rank">rank</th> 
+                <th scope="col" abbr="Name">Name</th> 
+                <th scope="col" abbr="remain">remain</th> 
+            </tr> 
+            <tr> 
+                <th scope="row" abbr="0" class="spec" id = "rank_0">1</th> 
+                <td id = "color_0"></td> 
+                <td id = "left_0"></td>
+            </tr> 
+            <tr> 
+                <th scope="row" abbr="1" class="specalt" id = "rank_1">2</th> 
+                <td id = "color_1" class="alt"></td> 
+                <td id = "left_1" class="alt"></td>
+            </tr> 
+            <tr> 
+                <th scope="row" abbr="2" class="spec" id = "rank_2">3</th> 
+                <td id = "color_2"></td> 
+                <td id = "left_2"></td>
+            </tr> 
+            <tr> 
+                <th scope="row" abbr="3" class="specalt" id = "rank_3">4</th> 
+                <td id = "color_3" class="alt"></td> 
+                <td id = "left_3" class="alt"></td>
+            </tr> 
             </table>
+            </center>
         </div>
       </div>
     </div>

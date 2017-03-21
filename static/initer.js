@@ -90,7 +90,8 @@ function initSocket(){
         for(var ind in counter){
             $("#left_"+ind).text(counter[ind].x);
             $("#color_"+ind).text(username[counter[ind].id]);
-            if(ind != 0 && counter[ind].x != counter[ind-1].x) rnk++;
+            if(ind != 0 && counter[ind].x != counter[ind-1].x) 
+                rnk = 1 + parseInt(ind);
             $("#rank_"+ind).text(rnk);
         }
         $("#status").modal('show');
@@ -106,15 +107,15 @@ function checkMyRound() {
             socket.emit('battle',Sta);
         }
 //auto add
-//        else{
-//            if(round > 4){
-//                socket.emit('battle',Sta);
-//                nextRound();
-//                AddChess(Sta);
-//                isHide[Sta.id] = true;
-//                $("#chs_"+Sta.id).hide();
-//            }
-//        }
+        else{
+            if(round > 4){
+                socket.emit('battle',Sta);
+                nextRound();
+                AddChess(Sta);
+                isHide[Sta.id] = true;
+                $("#chs_"+Sta.id).hide();
+            }
+        }
     }
 }
 function init(x,first) {
@@ -274,11 +275,11 @@ function initAction() {
 function initColorTheme(theme) {
     if (theme === undefined) {
         colorTheme = {
-            horn: "#a5a7a5",
             legal: "#6f645e",
+            horn: "#a5a7a5",
             rim: "#875f5f",
-            unlegal: "#c3bba8",
-            can: "#f9f9f9",
+            unlegal: "#e1d9c4",
+            can: "#f5f9f8",
             frameColor : "#ffffff",
             player: function (o) {
                 switch (o) {
@@ -292,7 +293,7 @@ function initColorTheme(theme) {
             },
             corner: function (o) {
                 switch (o) {
-                    case -1: return "#ffffff";
+                    case -1: return "#e6eae9";
                     case 0: return "#cf1b24";
                     case 1: return "#239546";
                     case 2: return "#0091cf";
