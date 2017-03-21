@@ -56,7 +56,7 @@ function initCorner() {
             "z-index": "-3",
         });
         $("#n"+i).css({
-            left: (locate[i].x+2) * cellSize - $("#n"+i).width() / 2 + "px",
+            left: (locate[i].x+2) * cellSize - ($("#n"+i).width() + 20 )/ 2 + "px",
             top: (locate[i].y+2) * cellSize - $("#n"+i).height() / 2 + "px",
             position: "absolute",
             "z-index": "-1",
