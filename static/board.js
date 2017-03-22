@@ -359,11 +359,13 @@ function prograssbar(id,st,ed){
         e.beginPath(); e.moveTo(Fir.x,Fir.y); e.lineTo(Sec.x,Sec.y);
         e.stroke();
 
-        e.beginPath();
-        if(cur == 0) e.fillStyle = colorTheme.corner(id);
-        else e.fillStyle = colorTheme.horn;
-        e.arc(Sec.x,Sec.y,e.lineWidth / 2, 0, Math.PI * 2, true);
-        e.closePath();
-        e.fill();
+        if(cur !== 0 || tim !== 0){
+            e.beginPath();
+            if(cur == 0) e.fillStyle = colorTheme.corner(id);
+            else e.fillStyle = colorTheme.horn;
+            e.arc(Sec.x,Sec.y,e.lineWidth / 2, 0, Math.PI * 2, true);
+            e.closePath();
+            e.fill();
+        }
     }
 }
