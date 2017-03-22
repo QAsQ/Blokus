@@ -98,7 +98,6 @@ def roomIndex(room):
     else:
         infos.setRoom(current_user.id,room);
         sta = infos.getroom(room).state;
-    print "sta = " + str(sta);
     return render_template('room.html', sta=sta, room=room);
 
 @app.route("/room/<room>/play/<_ind>")
@@ -118,7 +117,6 @@ def handle_query(room,_ind):
 @app.route("/room/<room>/ob")
 @login_required
 def ob(room):
-    print room;
     infos.userRoom[current_user.id] = room;
     return render_template("playGround.html",play = -1,first="false")
 
