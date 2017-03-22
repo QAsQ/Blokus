@@ -308,7 +308,8 @@ function availableRound() {
         bst[crash[ind].x][crash[ind].y] = -1;
     }
 
-    for(var ind in sCS){
+    for(var i in sCS){
+        var ind = sCS.length - i - 1;
         if(isHide[ind] === true) continue;
         var chs = chessShape[ind].map(function (cells) {
             return xy(cells.x, cells.y);
