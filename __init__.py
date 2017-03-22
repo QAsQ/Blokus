@@ -48,6 +48,8 @@ def loginroom(val):
 
 @socketio.on('wantFace')
 def giveFace(use):
+    if current_user.id not in infos.userRoom:
+        return;
     room = infos.userRoom[current_user.id];
     join_room(room);
     if infos.getroom(room).state != 15:
