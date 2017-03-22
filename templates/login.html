@@ -5,19 +5,73 @@
     <title>Login</title>  
     <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='login.css')}}"/>
 </head>  
-<body>  
-    <div id="login">  
-        <h1>Login</h1>  
-        <form method="post">  
-            <input type="text" required="required" placeholder="用户名" name="u"></input>  
-            <input type="password" required="required" placeholder="密码" name="p"></input>  
-            <button class="but" type="submit">登录</button>
-            <div style="text-align:center;">
-                </br>
-                <a href="/register" text-align:right>还没有账号？点此注册！</a>
+<body> 
+    <div id="back_block">
+        <div id="pic">
+            <img src="{{url_for('static',filename='pic.png')}}" alt="">
+        </div>
+        <!-- <div id="login" >  
+            <h1>Login</h1>  
+            <form method="post">  
+                <input type="text" required="required" placeholder="用户名" name="u"></input>  
+                <input type="password" required="required" placeholder="密码" name="p"></input>  
+                <button class="but" type="submit">登录</button>
+                <div style="text-align:center;">
+                    </br>
+                    <a href="/register" text-align:right>还没有账号？点此注册！</a>
+                </div>
+            </form>  
+        </div>  --> 
+        <div class="login-wrap">
+            <div class="login-html">
+            <input id="tab-1" type="radio" name="tab" class="sign-in" checked><label for="tab-1" class="tab">Sign In</label>
+            <input id="tab-2" type="radio" name="tab" class="sign-up"><label for="tab-2" class="tab">Sign Up</label>
+            <div class="login-form">
+                <div class="sign-in-htm">
+                <form method="post"> 
+                    <div class="group">
+                        <label for="user" class="label">Username</label>
+                        <input id="user" type="text" class="input" name="u">
+                    </div>
+                    <div class="group">
+                        <label for="pass" class="label">Password</label>
+                        <input id="pass" type="password" class="input" data-type="password" name="p">
+                    </div>
+                    <!-- <div class="group">
+                        <input id="check" type="checkbox" class="check" checked>
+                        <label for="check"><span class="icon"></span> Keep me Signed in</label>
+                    </div> -->
+                    <button class="but" type="submit">SIGN IN</button>
+                <div class="hr"></div>
+                </form>  
             </div>
-        </form>  
-    </div>  
+
+            <div class="sign-up-htm">
+                <form method="post"> 
+                <div class="group">
+                    <label for="user" class="label">Username</label>
+                    <input id="user" type="text" class="input" name="u">
+                </div>
+
+                <div class="group">
+                    <label for="pass" class="label">Password</label>
+                    <input id="pass" type="password" class="input" data-type="password" name="p">
+                </div>
+
+                <div class="group">
+                    <label for="pass" class="label">Repeat Password</label>
+                    <input id="pass" type="password" class="input" data-type="password" name="rp">
+                </div>
+
+                <button class="but" type="submit">SIGN UP</button>
+
+                <div class="hr"></div>
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
     <div> {{message}} </div>
 </body>  
 </html>  
