@@ -25,9 +25,9 @@ function initSocket(){
     socket = io.connect('http://' + document.domain + ':' + location.port);
     socket.on('connect',function() { });
     socket.on('disconnect',function (){
-        socket.emit("wantFace",{o:owner});
+        socket.emit("loadHistory",{o:owner});
     });
-    socket.on('loadSta', function (board){
+    socket.on('loadHistory', function (board){
         username = new Array;
         for(var i = 0 ; i < 4 ; i ++){
             cornerState[i] = i;
@@ -52,14 +52,14 @@ function initSocket(){
         checkMyRound();
         countDown();
     })
-    socket.on('battle',function(Sta){
+    socket.on('move',function(Sta){
         roundTime[Sta.o] = Math.floor(Sta.tim+0.5);
         if(Sta.o === owner) return;
         AddChess(Sta);
         nextRound();
         checkMyRound();
     });
-    socket.on('romsta',function (online) {
+    socket.on('roomInfo',function (online) {
         username = new Array;
         for(var i = 0 ; i < 4 ; i ++){
             if((online.o >> i ) & 1){
@@ -105,7 +105,7 @@ function checkMyRound() {
             nextRound();
             cornerState[owner] = -1;
             refreshCorner();
-            socket.emit('battle',Sta);
+            socket.emit('move',Sta);
         }
     }
 //auto add
@@ -152,8 +152,8 @@ function init(x,first) {
         refreshCorner();
         refreshProbar();
     })
-    if(first) socket.emit('loginRoom',{o:owner});
-    else socket.emit("wantFace",{o:owner});
+    if(first) socket.emit('joinRoom',{o:owner});
+    else socket.emit("loadHistory",{o:owner});
 }
 function initAction() {
     function getID(cx, cy) {
@@ -316,7 +316,7 @@ function countDown(){
         if(round % 4 === owner && roundTime[round%4] <= 0){
             var sta = availableRound();
             AddChess(sta);
-            socket.emit("battle",sta);
+            socket.emit("move",sta);
             nextRound();
         }
         roundTime[round%4] = Math.max(roundTime[round%4],0);

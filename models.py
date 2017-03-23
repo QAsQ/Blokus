@@ -24,56 +24,63 @@ class User(UserMixin,db.Model):
 class Room():
     def __init__(self):
         self.board = list();
-        self.state = 0;
-        self.left = [240,240,240,240];
-        self.lastTime = -1;
+        self.status = 0;
+        self.remain = [240,240,240,240];
+        self.last= -1;
         self.user = [None,None,None,None];
     
     def tryin(self,x,userid):
-        if (self.state >> x) & 1:
+        if (self.status >> x) & 1:
             return False;
         else:
-            self.state |= 1 << x;
+            self.status |= 1 << x;
             self.user[x] = User.query.get(userid).username;
             return True;
+
+    def out(self,x):
+        self.status &= 15 - (1 << x);
+        self.user[x] = None;
     
+    def info(self):
+        return {"status":self.status,"user":self.user};
+
+    def history(self):
+        return {"history":self.board,"remain":self.remain,"user":self.user};
+
+
     def addChess(self,chs):
         self.board.append(chs);
     
     def start(self,stTime):
         self.lastTime = stTime;
     
-    def updLeft(self,owner,curTime):
-        self.left[owner] -= max(0,curTime-self.lastTime-5);
-        self.left[owner] = max(0,self.left[owner]);
-        self.lastTime = curTime;
-        return self.left[owner];
+    def updateRemain(self,owner,curTime):
+        self.remain[owner] -= max(0,curTime-self.last-5);
+        self.remain[owner] = max(0,self.remain[owner]);
+        self.last = curTime;
+        return self.remain[owner];
     
 
-class Infos():
     def __init__(self):
         self.roomInfo = dict();
-        self.userRoom = dict();
-        self.userChair = dict();
+        self.userInfo = dict(); #(room,index)
+class Infos():
 
-    def getroom(self,room):
-        if not (room in self.roomInfo):
+    def room(self,room):
+        if room not in self.roomInfo:
             self.roomInfo[room] = Room();
         return self.roomInfo[room];
+
+    def user(self,userid):
+        if userid not in self.userInfo:
+            self.userInfo[userid] = ("",-1);
+        return self.userInfo[userid];
     
-    def tryInRoom(self,userid,room,x):
-        if self.getroom(room).tryin(x,userid):
-            self.userRoom[userid] = room;
-            self.userChair[userid] = x;
-            return True;
+    def join(self,userid,index,room):
+        if self.room(room).tryin(index,userid):
+            self.userInfo[userid] = (room,index);
+            return True; 
         else:
             return False;
-    
-    def setRoom(self,userid,room):
-        self.userRoom[userid] = room;
-        if userid in self.userChair:
-            self.userChair.pop(userid);
-    
-    def userInRoom(self,userid,room):
-        return userid in self.userRoom and self.userRoom[userid] == room and userid in self.userChair;
 
+    
