@@ -32,7 +32,7 @@ def handle_battle(Sta):
         return;
     tim = time.time();
     infos.room(room).addChess(Sta);
-    Sta["tim"]=infos.room(room).updLeft(int(Sta["o"]),tim);
+    Sta["tim"]=infos.room(room).updateRemain(int(Sta["o"]),tim);
     emit('move',Sta,room=room);
     if len(infos.room(room).board) == 84:
         emit('gameover',{},room=room);#room boom
@@ -46,7 +46,8 @@ def loginroom(var):
 
 
 @socketio.on('history')
-def history():
+def history(val):
+    room = infos.user(current_user.id)[0];
     #join_room(room); todo
     emit('history',infos.room(room).history(time.time()));
     
@@ -59,13 +60,13 @@ def index():
 def roomIndex(room):
     (lastroom,lastind) = infos.user(current_user.id);
     if lastroom == room:
-        status = 1 << lastind;
+        status = 15 - (1 << lastind);
     else:
         status = infos.room(room).status;
     return render_template("room.html",room = room,sta = status);
     
 def roomInfoUpdate(room):
-    emit("info",infos.room(room).info(),room = room);
+    socketio.emit("info",infos.room(room).info(),room = room);
 
 
 @app.route("/room/<room>/play/<_ind>")
@@ -74,19 +75,15 @@ def joinRoom(room,_ind):
     ind = int(_ind);
     userid = current_user.id;
     (lastroom,lastind) = infos.user(userid);
-    if lastroom == room:
+    if lastroom != "":
         if infos.room(lastroom).status == 15:
-            return  redirect("/room/%s/play/%d" % (lastroom,lastind));
+            return render_template("play.html",play = lastind);
         else:
             infos.room(lastroom).out(lastind);
-            with app.app_context():
-                emit("info",infos.room(lastroom).info,room = lastroom);
+            roomInfoUpdate(lastroom);
     
     if infos.join(userid,ind,room):
-        print str(infos.room(room).info());
-        with app.app_context():
-            emit("info",infos.room(room).info(),room = room);
-        #roomInfoUpdate(room);
+        roomInfoUpdate(room);
         return render_template("play.html",play = ind);
     else:
         return render_template("room.html",room = room,sta = infos.room(room).status);
@@ -95,6 +92,7 @@ def joinRoom(room,_ind):
 @app.route("/room/<room>/ob")
 @login_required
 def ob(room):
+    #todo
     return render_template("play.html",play = -1);
 
 @app.route("/login",methods = ['GET','POST'])

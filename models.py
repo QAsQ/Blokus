@@ -52,7 +52,8 @@ class Room():
         self.board.append(chs);
     
     def start(self,stTime):
-        self.lastTime = stTime;
+        print stTime;
+        self.last = stTime;
     
     def updateRemain(self,owner,curTime):
         self.remain[owner] -= max(0,curTime-self.last-5);

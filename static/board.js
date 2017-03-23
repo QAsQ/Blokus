@@ -76,6 +76,7 @@ function refreshCorner() {
         e.fillRect(square[i].x * cellSize, square[i].y * cellSize, cellSize * 2, cellSize * 2);
         //drawCell(square[i],colorTheme.corner(cornerState[i]),e);
         if(cornerState[i] != -1){
+            //todo
             $("#n"+i).text(username[i]);
         }
     }
@@ -136,7 +137,8 @@ function chessIn(ind, ofx, ofy) {
     var cells = chessShape[ind].map(function (cell) {
         return oxy(owner, ofx + cell.x, ofy + cell.y);
     });
-    socket.emit('battle',{o:owner,sta:chessState[ind],x:ofx,y:ofy,id:ind});
+    console.log("sender");
+    socket.emit('move',{o:owner,sta:chessState[ind],x:ofx,y:ofy,id:ind});
     $("#chs_" + ind).hide();
     boardFace = boardFace.concat(cells);
     lastStep = cells;

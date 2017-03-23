@@ -23,7 +23,8 @@ function initSize() {
 }
 function initSocket(){
     socket = io.connect('http://' + document.domain + ':' + location.port);
-    socket.on('connect',function() { });
+    socket.on('connect',function() { 
+    });
     socket.on('disconnect',function (){
         socket.emit("history",{o:owner});
     });
@@ -69,10 +70,9 @@ function initSocket(){
             username[i] = room.user[i];
         }
         refreshCorner();
-        if(room.status === 15 && round === -1){
-            nextRound();
+        if(room.status === 15){
+            socket.emit("history",{})
             gameStart();
-            //todo ask for history
             $("#start").modal('show');
         }
     });
