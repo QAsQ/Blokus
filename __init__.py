@@ -24,44 +24,49 @@ infos = Infos();
 def load_user(id):
     return  User.query.get(id);
 
+
 @socketio.on('move')
 def handle_battle(Sta):
-    room = infos.userRoom[current_user.id];
-    if(len(infos.getroom(room).board) == 84):
+    room = infos.user(current_user.id)[0];
+    if(len(infos.room(room).board) == 84):
         return;
     tim = time.time();
-    infos.getroom(room).addChess(Sta);
-    Sta["tim"]=infos.getroom(room).updLeft(int(Sta["o"]),tim);
+    infos.room(room).addChess(Sta);
+    Sta["tim"]=infos.room(room).updLeft(int(Sta["o"]),tim);
     emit('move',Sta,room=room);
-    if len(infos.getroom(room).board) == 84:
+    if len(infos.room(room).board) == 84:
         emit('gameover',{},room=room);#room boom
 
-@socketio.on('loginRoom')
-def loginroom(val):
-    room = infos.userRoom[current_user.id];
+@socketio.on('info')
+def loginroom(var):
+    room = infos.user(current_user.id)[0];
     join_room(room);
-    infos.getroom(room).start(time.time());
-    emit('info',infos.room(room).info, room=room);
+    infos.room(room).start(time.time());
+    emit('info',infos.room(room).info());
 
 
-@socketio.on('loadHistory')
+@socketio.on('history')
+def history():
+    #join_room(room); todo
+    emit('history',infos.room(room).history(time.time()));
+    
 @app.route("/index")
-def loadHistory():
-
-
 def index():
     return render_template('index.html');
 
 @app.route("/room/<room>")
 @login_required
 def roomIndex(room):
-    (lastroom,lastind) = infos.user(userid);
+    (lastroom,lastind) = infos.user(current_user.id);
     if lastroom == room:
         status = 1 << lastind;
     else:
-        status = infos.room(room).sta;
-    return render_template("room.html",sta = status);
+        status = infos.room(room).status;
+    return render_template("room.html",room = room,sta = status);
     
+def roomInfoUpdate(room):
+    emit("info",infos.room(room).info(),room = room);
+
 
 @app.route("/room/<room>/play/<_ind>")
 @login_required
@@ -70,22 +75,27 @@ def joinRoom(room,_ind):
     userid = current_user.id;
     (lastroom,lastind) = infos.user(userid);
     if lastroom == room:
-        if infos.room(lastroom).sta == 15:
+        if infos.room(lastroom).status == 15:
             return  redirect("/room/%s/play/%d" % (lastroom,lastind));
         else:
             infos.room(lastroom).out(lastind);
-            socketio.emit("roomInfo",infos.room(lastroom).info,room = lastroom);
+            with app.app_context():
+                emit("info",infos.room(lastroom).info,room = lastroom);
     
     if infos.join(userid,ind,room):
-        return render_template("play.html",play = ind,first = "True");
+        print str(infos.room(room).info());
+        with app.app_context():
+            emit("info",infos.room(room).info(),room = room);
+        #roomInfoUpdate(room);
+        return render_template("play.html",play = ind);
     else:
-        return render_template("room.html",sta = infos.room(room).status);
+        return render_template("room.html",room = room,sta = infos.room(room).status);
 
 
 @app.route("/room/<room>/ob")
 @login_required
 def ob(room):
-    return render_template("play.html",play = -1,first="false")
+    return render_template("play.html",play = -1);
 
 @app.route("/login",methods = ['GET','POST'])
 def login():

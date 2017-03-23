@@ -44,8 +44,8 @@ class Room():
     def info(self):
         return {"status":self.status,"user":self.user};
 
-    def history(self):
-        return {"history":self.board,"remain":self.remain,"user":self.user};
+    def history(self,cur):
+        return {"history":self.board,"remain":self.remain,"cur":cur};
 
 
     def addChess(self,chs):
@@ -61,10 +61,10 @@ class Room():
         return self.remain[owner];
     
 
+class Infos():
     def __init__(self):
         self.roomInfo = dict();
         self.userInfo = dict(); #(room,index)
-class Infos():
 
     def room(self,room):
         if room not in self.roomInfo:

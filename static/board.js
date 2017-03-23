@@ -307,7 +307,6 @@ function availableRound() {
     for(var ind in crash){
         bst[crash[ind].x][crash[ind].y] = -1;
     }
-
     for(var i in sCS){
         var ind = sCS.length - i - 1;
         if(isHide[ind] === true) continue;

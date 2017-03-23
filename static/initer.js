@@ -25,9 +25,9 @@ function initSocket(){
     socket = io.connect('http://' + document.domain + ':' + location.port);
     socket.on('connect',function() { });
     socket.on('disconnect',function (){
-        socket.emit("loadHistory",{o:owner});
+        socket.emit("history",{o:owner});
     });
-    socket.on('loadHistory', function (board){
+    socket.on('history', function (board){
         username = new Array;
         for(var i = 0 ; i < 4 ; i ++){
             cornerState[i] = i;
@@ -59,19 +59,20 @@ function initSocket(){
         nextRound();
         checkMyRound();
     });
-    socket.on('roomInfo',function (online) {
+    socket.on('info',function (room) {
         username = new Array;
         for(var i = 0 ; i < 4 ; i ++){
-            if((online.o >> i ) & 1){
+            if((room.status >> i ) & 1){
                 cornerState[i] = i;
             }
             else cornerState[i] = -1;
-            username[i] = online.user[i];
+            username[i] = room.user[i];
         }
         refreshCorner();
-        if(online.o === 15 && round === -1){
+        if(room.status === 15 && round === -1){
             nextRound();
             gameStart();
+            //todo ask for history
             $("#start").modal('show');
         }
     });
@@ -119,7 +120,7 @@ function checkMyRound() {
   //          }
   //      }
 }
-function init(x,first) {
+function init(x) {
     owner = x;
     round = -1;
     stepTime = 5,fullTime = 240;
@@ -152,8 +153,7 @@ function init(x,first) {
         refreshCorner();
         refreshProbar();
     })
-    if(first) socket.emit('joinRoom',{o:owner});
-    else socket.emit("loadHistory",{o:owner});
+    socket.emit("info",{});
 }
 function initAction() {
     function getID(cx, cy) {
