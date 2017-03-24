@@ -84,6 +84,9 @@ def leftRoom(userid):
 def joinRoom(room,_ind):
     ind = int(_ind);
     userid = current_user.id;
+    if (room,ind) == infos.user(userid): #in this room before
+        return render_template("play.html",play = ind);
+
     if leftRoom(userid) == False: 
         last = infos.user(userid);
         return redirect("/room/%s/play/%d" % last);

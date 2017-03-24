@@ -28,7 +28,6 @@ function initSocket(){
         socket.emit("history",{o:owner});
     });
     socket.on('history', function (board){
-        username = new Array;
         clearFace();
         hist = board.hist; 
         round = hist.length;
@@ -104,17 +103,18 @@ function checkMyRound() {
             refreshCorner();
             socket.emit('move',Sta);
         }
-    }
 //auto add
-  //      else{
-  //          if(round > 4){
-  //              socket.emit('battle',Sta);
-  //              nextRound();
-  //              AddChess(Sta);
-  //              isHide[Sta.id] = true;
-  //              $("#chs_"+Sta.id).hide();
-  //          }
-  //      }
+        else{
+            if(round > 4){
+                socket.emit('battle',Sta);
+                nextRound();
+                AddChess(Sta);
+                isHide[Sta.id] = true;
+                $("#chs_"+Sta.id).hide();
+                socket.emit("move",Sta);
+            }
+        }
+    }
 }
 function init(x) {
     owner = x;
