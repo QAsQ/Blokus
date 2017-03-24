@@ -23,8 +23,7 @@ function initSize() {
 }
 function initSocket(){
     socket = io.connect('http://' + document.domain + ':' + location.port);
-    socket.on('connect',function() { 
-    });
+    socket.on('connect',function() { });
     socket.on('disconnect',function (){
         socket.emit("history",{o:owner});
     });
@@ -61,7 +60,6 @@ function initSocket(){
     });
     socket.on('info',function (room) {
         username = new Array;
-        console.log(room);
         for(var i = 0 ; i < 4 ; i ++){
             if((room.status >> i ) & 1){
                 cornerState[i] = i;
@@ -308,8 +306,6 @@ function initColorTheme(theme) {
 }
 var roundTime,curTime;
 function countDown(){
-    console.log(roundTime);
-    console.log(curTime);
     if(curTime != 0) curTime --;
     else{
         roundTime[round%4]--;

@@ -42,8 +42,6 @@ class Room():
         self.user[x] = None;
     
     def info(self):
-        print "mode";
-        print self.status;
         return {"status":self.status,"user":self.user};
 
     def history(self,cur):
@@ -54,7 +52,6 @@ class Room():
         self.board.append(chs);
     
     def start(self,stTime):
-        print stTime;
         self.last = stTime;
     
     def updateRemain(self,owner,curTime):
@@ -80,7 +77,7 @@ class Infos():
         return self.userInfo[userid];
     
     def join(self,userid,index,room):
-        if self.room(room).tryin(index,userid):
+        if index < 0 or self.room(room).tryin(index,userid):
             self.userInfo[userid] = (room,index);
             return True; 
         else:

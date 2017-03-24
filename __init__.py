@@ -42,18 +42,13 @@ def loginroom(var):
     room = infos.user(current_user.id)[0];
     join_room(room);
     infos.room(room).start(time.time());
-    print infos.room(room).info();
     emit('info',infos.room(room).info());
 
 
 @socketio.on('history')
 def history(val):
     room = infos.user(current_user.id)[0];
-    print "room" + room;
     #join_room(room); todo
-    print "";
-    print str(infos.room(room).history(time.time()));
-    print "";
     emit('history',infos.room(room).history(time.time()));
     
 @app.route("/index")
@@ -80,7 +75,7 @@ def joinRoom(room,_ind):
     ind = int(_ind);
     userid = current_user.id;
     (lastroom,lastind) = infos.user(userid);
-    if lastroom != "":
+    if lastroom != "" and lastind != -1:
         if infos.room(lastroom).status == 15:
             return render_template("play.html",play = lastind);
         else:
@@ -97,7 +92,7 @@ def joinRoom(room,_ind):
 @app.route("/room/<room>/ob")
 @login_required
 def ob(room):
-    #todo
+    infos.join(current_user.id,-1,room);
     return render_template("play.html",play = -1);
 
 @app.route("/login",methods = ['GET','POST'])
