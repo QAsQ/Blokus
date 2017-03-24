@@ -59,7 +59,7 @@ def index():
 @login_required
 def roomIndex(room):
     (lastroom,lastind) = infos.user(current_user.id);
-    if lastroom == room:
+    if lastroom == room and lastind != -1:
         status = 15 - (1 << lastind);
     else:
         status = infos.room(room).status;
@@ -68,20 +68,26 @@ def roomIndex(room):
 def roomInfoUpdate(room):
     socketio.emit("info",infos.room(room).info(),room = room);
 
+def leftRoom(userid):
+    (lastroom,lastind) = infos.user(userid);
+    if lastroom != "" and lastind != -1:
+        if infos.room(lastroom).status == 15:
+            return False;
+        else:
+            infos.room(lastroom).out(lastind);
+            roomInfoUpdate(lastroom);
+    
+    return True;
 
 @app.route("/room/<room>/play/<_ind>")
 @login_required
 def joinRoom(room,_ind):
     ind = int(_ind);
     userid = current_user.id;
-    (lastroom,lastind) = infos.user(userid);
-    if lastroom != "" and lastind != -1:
-        if infos.room(lastroom).status == 15:
-            return render_template("play.html",play = lastind);
-        else:
-            infos.room(lastroom).out(lastind);
-            roomInfoUpdate(lastroom);
-    
+    if leftRoom(userid) == False: 
+        last = infos.user(userid);
+        return redirect("/room/%s/play/%d" % last);
+
     if infos.join(userid,ind,room):
         roomInfoUpdate(room);
         return render_template("play.html",play = ind);
@@ -92,6 +98,9 @@ def joinRoom(room,_ind):
 @app.route("/room/<room>/ob")
 @login_required
 def ob(room):
+    if leftRoom(current_user.id) == False:
+        last = infos.user(userid);
+        return redirect("/room/%s/play/%d" % last);
     infos.join(current_user.id,-1,room);
     return render_template("play.html",play = -1);
 

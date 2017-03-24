@@ -76,8 +76,10 @@ function refreshCorner() {
         e.fillRect(square[i].x * cellSize, square[i].y * cellSize, cellSize * 2, cellSize * 2);
         //drawCell(square[i],colorTheme.corner(cornerState[i]),e);
         if(cornerState[i] != -1){
-            //todo
             $("#n"+i).text(username[i]);
+        }
+        else{
+            $("#n"+i).text("");
         }
     }
     if(round !== -1){
