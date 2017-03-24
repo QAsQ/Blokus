@@ -48,7 +48,11 @@ def loginroom(var):
 @socketio.on('history')
 def history(val):
     room = infos.user(current_user.id)[0];
+    print "room" + room;
     #join_room(room); todo
+    print "";
+    print str(infos.room(room).history(time.time()));
+    print "";
     emit('history',infos.room(room).history(time.time()));
     
 @app.route("/index")

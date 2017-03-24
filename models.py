@@ -45,7 +45,7 @@ class Room():
         return {"status":self.status,"user":self.user};
 
     def history(self,cur):
-        return {"history":self.board,"remain":self.remain,"cur":cur};
+        return {"hist":self.board,"remain":self.remain,"cur":cur-self.last};
 
 
     def addChess(self,chs):

@@ -31,12 +31,11 @@ function initSocket(){
     socket.on('history', function (board){
         username = new Array;
         clearFace();
-        history = board.history; 
-        round = history.length;
-        for(var ind in history){
-            AddChess(history[ind]);
+        hist = board.hist; 
+        round = hist.length;
+        for(var ind in hist){
+            AddChess(hist[ind]);
         }
-        console.log(board);
         roundTime = board.remain.map(Math.floor);
         curTime = Math.max(0,stepTime-board.cur);
         roundTime[round % 4] -= Math.max(0,board.cur-stepTime);
