@@ -30,17 +30,14 @@ function initSocket(){
     });
     socket.on('history', function (board){
         username = new Array;
-        for(var i = 0 ; i < 4 ; i ++){
-            cornerState[i] = i;
-            username[i] = board.user[i];
-        }
         clearFace();
-        val = board.val; 
-        round = val.length;
-        for(var ind in val){
-            AddChess(val[ind]);
+        history = board.history; 
+        round = history.length;
+        for(var ind in history){
+            AddChess(history[ind]);
         }
-        roundTime = board.timer.map(Math.floor);
+        console.log(board);
+        roundTime = board.remain.map(Math.floor);
         curTime = Math.max(0,stepTime-board.cur);
         roundTime[round % 4] -= Math.max(0,board.cur-stepTime);
 
@@ -52,7 +49,7 @@ function initSocket(){
 
         checkMyRound();
         countDown();
-    })
+    });
     socket.on('move',function(Sta){
         roundTime[Sta.o] = Math.floor(Sta.tim+0.5);
         if(Sta.o === owner) return;
