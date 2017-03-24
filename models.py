@@ -58,7 +58,6 @@ class Room():
         self.remain[owner] -= max(0,curTime-self.last-5);
         self.remain[owner] = max(0,self.remain[owner]);
         self.last = curTime;
-        return self.remain[owner];
     
 
 class Infos():

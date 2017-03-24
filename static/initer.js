@@ -51,7 +51,7 @@ function initSocket(){
         }
     });
     socket.on('move',function(Sta){
-        roundTime[Sta.o] = Math.floor(Sta.tim+0.5);
+        roundTime = Sta.remain.map(Math.floor);
         if(Sta.o === owner) return;
         AddChess(Sta);
         nextRound();

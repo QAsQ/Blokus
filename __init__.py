@@ -32,7 +32,8 @@ def handle_battle(Sta):
         return;
     tim = time.time();
     infos.room(room).addChess(Sta);
-    Sta["tim"]=infos.room(room).updateRemain(int(Sta["o"]),tim);
+    infos.room(room).updateRemain(int(Sta["o"]),tim);
+    Sta["remain"]=infos.room(room).remain;
     emit('move',Sta,room=room);
     if len(infos.room(room).board) == 84:
         emit('gameover',{},room=room);#room boom
@@ -41,9 +42,7 @@ def handle_battle(Sta):
 def loginroom(var):
     room = infos.user(current_user.id)[0];
     join_room(room);
-    infos.room(room).start(time.time());
     emit('info',infos.room(room).info());
-
 
 @socketio.on('history')
 def history(val):
@@ -93,6 +92,8 @@ def joinRoom(room,_ind):
 
     if infos.join(userid,ind,room):
         roomInfoUpdate(room);
+        if infos.room(room).status == 15:
+            infos.room(room).start(time.time());
         return render_template("play.html",play = ind);
     else:
         return render_template("room.html",room = room,sta = infos.room(room).status);
