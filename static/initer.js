@@ -37,7 +37,7 @@ function initSocket(){
             AddChess(hist[ind]);
         }
         roundTime = board.remain.map(Math.floor);
-        curTime = Math.max(0,stepTime-board.cur);
+        curTime = Math.max(0,Math.floor(stepTime-board.cur));
         roundTime[round % 4] -= Math.max(0,board.cur-stepTime);
 
         refreshBoard();
@@ -61,6 +61,7 @@ function initSocket(){
     });
     socket.on('info',function (room) {
         username = new Array;
+        console.log(room);
         for(var i = 0 ; i < 4 ; i ++){
             if((room.status >> i ) & 1){
                 cornerState[i] = i;
@@ -307,6 +308,8 @@ function initColorTheme(theme) {
 }
 var roundTime,curTime;
 function countDown(){
+    console.log(roundTime);
+    console.log(curTime);
     if(curTime != 0) curTime --;
     else{
         roundTime[round%4]--;

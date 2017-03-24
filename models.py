@@ -42,6 +42,8 @@ class Room():
         self.user[x] = None;
     
     def info(self):
+        print "mode";
+        print self.status;
         return {"status":self.status,"user":self.user};
 
     def history(self,cur):

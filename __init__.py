@@ -42,6 +42,7 @@ def loginroom(var):
     room = infos.user(current_user.id)[0];
     join_room(room);
     infos.room(room).start(time.time());
+    print infos.room(room).info();
     emit('info',infos.room(room).info());
 
 
