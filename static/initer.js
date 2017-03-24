@@ -45,9 +45,12 @@ function initSocket(){
         refreshCorner();
         refreshProbar();
 
-
         checkMyRound();
         countDown();
+
+        if(round === 0){
+            $("#start").modal('show');
+        }
     });
     socket.on('move',function(Sta){
         roundTime[Sta.o] = Math.floor(Sta.tim+0.5);
@@ -68,8 +71,6 @@ function initSocket(){
         refreshCorner();
         if(room.status === 15){
             socket.emit("history",{})
-            gameStart();
-            $("#start").modal('show');
         }
     });
     socket.on("gameover",function () {
@@ -320,7 +321,4 @@ function countDown(){
     bars[(round + 3)%4](roundTime[(round + 3)%4],0);
     bars[round % 4](roundTime[round % 4],curTime);
     if(round < 84) setTimeout("countDown()",1000);
-}
-function gameStart(){
-    setTimeout("countDown()",1000);
 }
