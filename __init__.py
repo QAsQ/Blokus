@@ -55,10 +55,13 @@ def history(val):
 
 @socketio.on('recorder')
 def recorder(val):
-    emit('recorder',Contest.query.get(val["id"]));
+    contest = Contest.query.get(val["id"]);
+    emit('recorder',{"hist":contest.Record(),"user":contest.player()});
     
 @app.route("/record/<ind>")
 def record(ind):
+    if Contest.query.get(ind) is None:
+        return "<h1> Contest Doesn't Exist</h1>"
     return render_template('recorder.html',id=ind);
 
 @app.route("/index")

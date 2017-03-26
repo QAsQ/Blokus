@@ -146,11 +146,20 @@ function initAction() {
         clix = e.clientX, cliy = e.clientY;
     });
     $(window).keydown(function (e) {
+        console.log(recorder[now]);
+        console.log(recorder.length);
+        console.log(now);
         if(e.keyCode == 81){ //Q
-
+            now = now - 1;
+            now = Math.max(now,0);
+            boardFace = recorder[now];
+            refreshBoard();
         }
         if(e.keyCode == 69){ //E
-
+            now = now + 1;
+            now = Math.min(now,recorder.length-1);
+            boardFace = recorder[now];
+            refreshBoard();
         }
         if (select === -1) return;
         switch (e.keyCode) {
