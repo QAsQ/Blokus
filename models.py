@@ -1,6 +1,7 @@
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
+import json
 
 db = SQLAlchemy();
 
@@ -20,6 +21,28 @@ class User(UserMixin,db.Model):
 
     def get_id(self):
         return self.id;
+    
+
+class Contest(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    play_0 = db.Column(db.Integer)
+    play_1 = db.Column(db.Integer)
+    play_2 = db.Column(db.Integer)
+    play_3 = db.Column(db.Integer)
+    record = db.Column(db.String)
+
+    def __init__(self,(play0,play1,play2,play3),_record):
+        self.play_0 = play0;
+        self.play_1 = play1;
+        self.play_2 = play2;
+        self.play_3 = play3;
+        self.record = json.dumps(_record);
+    
+    def Record(self):
+        return json.loads(self.record);
+
+
+    
 
 class Room():
     def __init__(self):
@@ -28,6 +51,7 @@ class Room():
         self.remain = [240,240,240,240];
         self.last= -1;
         self.user = [None,None,None,None];
+        self.userid = [None,None,None,None];
     
     def tryin(self,x,userid):
         if (self.status >> x) & 1:
@@ -35,11 +59,13 @@ class Room():
         else:
             self.status |= 1 << x;
             self.user[x] = User.query.get(userid).username;
+            self.userid[x] = userid;
             return True;
 
     def out(self,x):
         self.status &= 15 - (1 << x);
         self.user[x] = None;
+        self.userid[x] = None;
     
     def info(self):
         return {"status":self.status,"user":self.user};
@@ -59,6 +85,8 @@ class Room():
         self.remain[owner] = max(0,self.remain[owner]);
         self.last = curTime;
     
+    def toContest(self):
+        return Contest(self.user,self.board);
 
 class Infos():
     def __init__(self):
@@ -82,4 +110,9 @@ class Infos():
         else:
             return False;
 
-    
+    def clearRoom(self,room):
+        db.session.add(self.room(room).toContest());
+        db.session.commit();
+        for id in self.room(room).userid:
+            self.userInfo[id] = ("",-1);
+        self.roomInfo[room] = Room();

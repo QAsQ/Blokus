@@ -95,7 +95,7 @@ function initSocket(){
     });
 }
 function checkMyRound() {
-    if (round % 4 === owner) {
+    if (round < 84 && round % 4 === owner) {
         var Sta = availableRound();
         if(Sta.sta === -1){
             nextRound();
@@ -104,7 +104,7 @@ function checkMyRound() {
             socket.emit('move',Sta);
         }
 //auto add
-        else{
+        else if(round < 84){
             if(round > 4){
                 socket.emit('battle',Sta);
                 nextRound();

@@ -37,6 +37,9 @@ def handle_battle(Sta):
     emit('move',Sta,room=room);
     if len(infos.room(room).board) == 84:
         emit('gameover',{},room=room);#room boom
+        infos.clearRoom(room);
+
+
 
 @socketio.on('info')
 def loginroom(var):
@@ -132,7 +135,8 @@ def login():
             db.session.add(nuser);
             db.session.commit();
             login_user(nuser);
-            return  redirect("/index");
+            return redirect(request.args.get('next','index'));
+
     if request.method == 'GET':
         return render_template("login.html",message="");
 

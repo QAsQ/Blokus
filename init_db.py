@@ -9,4 +9,5 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False;
 db.app = app;
 db.init_app(app);
 
+db.drop_all();
 db.create_all();
