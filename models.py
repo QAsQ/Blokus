@@ -40,6 +40,12 @@ class Contest(db.Model):
     
     def Record(self):
         return json.loads(self.record);
+    
+    def play(self):
+        return (self.play_0,
+                self.play_1,
+                self.play_2,
+                self.play_3);
 
 
     

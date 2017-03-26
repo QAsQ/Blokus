@@ -1,0 +1,29 @@
+<html lang="en">
+<head>
+    <script src="{{url_for('static',filename='jquery.min.js')}}"></script>
+    <script src="{{url_for('static',filename='socket.io.min.js')}}"></script>
+    <script src="{{url_for('static',filename='pure.js')}}"></script>
+    <script src="{{url_for('static',filename='board.js')}}"></script>
+    <script src="{{url_for('static',filename='chess.js')}}"></script>
+    <script src="{{url_for('static',filename='recinit.js')}}"></script>
+    <title>BLOKUS</title>
+</head>
+<body>
+    <div id="playGround">
+        <canvas id="mask"></canvas>
+        <canvas id="last"></canvas>
+        <canvas id="board"></canvas>
+    </div>
+    <script>
+        socket = io.connect('http://' + document.domain + ':' + location.port);
+        socket.on('connect',function() { });
+        socket.emit('recorder',{'id':{{id}}});
+        socket.on('recorder',function (val){
+            for(var ind in val){
+                console.log(val[ind]);
+            }
+        });
+        init();
+    </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 from flask import Flask, render_template,g,request,redirect,url_for
 from flask_socketio import SocketIO,send,emit,join_room,leave_room
 from flask_login import login_user,logout_user,current_user ,login_required,login_manager,LoginManager
-from models import User,Infos,db
+from models import User,Contest,Infos,db
 import time
 
 app = Flask(__name__)
@@ -52,7 +52,15 @@ def history(val):
     room = infos.user(current_user.id)[0];
     #join_room(room); todo
     emit('history',infos.room(room).history(time.time()));
+
+@socketio.on('recorder')
+def recorder(val):
+    emit('recorder',Contest.query.get(val["id"]));
     
+@app.route("/record/<ind>")
+def record(ind):
+    return render_template('recorder.html',id=ind);
+
 @app.route("/index")
 def index():
     return render_template('index.html');
