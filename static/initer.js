@@ -104,16 +104,16 @@ function checkMyRound() {
             socket.emit('move',Sta);
         }
 //auto add
-        else if(round < 84){
-            if(round > 4){
-                socket.emit('battle',Sta);
-                nextRound();
-                AddChess(Sta);
-                isHide[Sta.id] = true;
-                $("#chs_"+Sta.id).hide();
-                socket.emit("move",Sta);
-            }
-        }
+  //      else if(round < 84){
+  //          if(round > 4){
+  //              socket.emit('battle',Sta);
+  //              nextRound();
+  //              AddChess(Sta);
+  //              isHide[Sta.id] = true;
+  //              $("#chs_"+Sta.id).hide();
+  //              socket.emit("move",Sta);
+  //          }
+  //      }
     }
 }
 function init(x) {

@@ -84,13 +84,8 @@ def roomInfoUpdate(room):
 def leftRoom(userid):
     (lastroom,lastind) = infos.user(userid);
     if lastroom != "" and lastind != -1:
-        if infos.room(lastroom).status == 15:
-            return False;
-        else:
-            infos.room(lastroom).out(lastind);
-            roomInfoUpdate(lastroom);
-    
-    return True;
+        infos.room(lastroom).out(lastind);
+        roomInfoUpdate(lastroom);
 
 @app.route("/room/<room>/play/<_ind>")
 @login_required
@@ -99,11 +94,6 @@ def joinRoom(room,_ind):
     userid = current_user.id;
     if (room,ind) == infos.user(userid): #in this room before
         return render_template("play.html",play = ind);
-
-    if leftRoom(userid) == False: 
-        last = infos.user(userid);
-        return redirect("/room/%s/play/%d" % last);
-
     if infos.join(userid,ind,room):
         roomInfoUpdate(room);
         if infos.room(room).status == 15:
@@ -116,9 +106,7 @@ def joinRoom(room,_ind):
 @app.route("/room/<room>/ob")
 @login_required
 def ob(room):
-    if leftRoom(current_user.id) == False:
-        last = infos.user(userid);
-        return redirect("/room/%s/play/%d" % last);
+    leftRoom(current_user.id);
     infos.join(current_user.id,-1,room);
     return render_template("play.html",play = -1);
 
