@@ -85,6 +85,7 @@ def leftRoom(userid):
     (lastroom,lastind) = infos.user(userid);
     if lastroom != "" and lastind != -1:
         infos.room(lastroom).out(lastind);
+        infos.userInfo[userid] = ("",-1);
         roomInfoUpdate(lastroom);
 
 @app.route("/room/<room>/play/<_ind>")
@@ -94,6 +95,7 @@ def joinRoom(room,_ind):
     userid = current_user.id;
     if (room,ind) == infos.user(userid): #in this room before
         return render_template("play.html",play = ind);
+    leftRoom(userid);
     if infos.join(userid,ind,room):
         roomInfoUpdate(room);
         if infos.room(room).status == 15:
