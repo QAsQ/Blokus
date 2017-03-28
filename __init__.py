@@ -24,6 +24,10 @@ infos = Infos();
 def load_user(id):
     return  User.query.get(id);
 
+@socketio.on("listRoom")
+def handle_battle(var):
+    join_room("'list");
+    emit("listRoom",infos.listRoom());
 
 @socketio.on('move')
 def handle_battle(Sta):
@@ -80,6 +84,7 @@ def roomIndex(room):
     
 def roomInfoUpdate(room):
     socketio.emit("info",infos.room(room).info(),room = room);
+    socketio.emit("listRoom",infos.listRoom(),room = "'list");
 
 def leftRoom(userid):
     (lastroom,lastind) = infos.user(userid);

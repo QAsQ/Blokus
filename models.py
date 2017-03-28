@@ -118,4 +118,11 @@ class Infos():
         db.session.commit();
         for id in self.room(room).userid:
             self.userInfo[id] = ("",-1);
-        self.roomInfo[room] = Room();
+        self.roomInfo.pop(room);
+    
+    def listRoom(self):
+        rooms = list();
+        for room in self.roomInfo:
+            if self.roomInfo[room].status != 0:
+                rooms.append((room,self.roomInfo[room].user));
+        return rooms;

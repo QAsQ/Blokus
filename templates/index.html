@@ -6,31 +6,17 @@
     <script src = "static/bootstrap.min.js"></script>
     <link rel="stylesheet" href="static/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="static/indexStyle.css" media="screen" type="text/css" />
+    <script src="{{url_for('static',filename='socket.io.min.js')}}"></script>
     <title>login</title>
 </head>
 <body>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-    <h1 style="text-align:center">Find Your Room</h1> <br/>
-    
-    <div class="panel"> 
-        <div class="wrap">
-        <input id = "input" type="text" placeholder="Enter Room Name"/>
-        <button class="btn btn-default" type="button" onclick="tryrom()">
-            GO!
-        </button>
-        </div>
-    </div>
-    <div style="text-align:center;clear:both">
-    </div>
     <script>
-        function tryrom() {
-            window.location.href = 'http://' + document.domain + ':' + location.port + '/room/' + $("#input").val();
-        }
+        socket = io.connect('http://' + document.domain + ':' + location.port);
+        socket.on('connect',function() { });
+        socket.on('listRoom',function (val){
+            console.log(val);
+        });
+        socket.emit('listRoom',{});
     </script>
 </body>
 </html>
