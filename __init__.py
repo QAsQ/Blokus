@@ -35,7 +35,9 @@ def handle_battle(Sta):
     room = infos.user(current_user.id)[0];
     if(len(infos.room(room).board) == 84):
         return;
-    if False == check(infos.room(room).board,Sta):
+    if False == check(infos.room(room).board,Sta) \
+            or Sta["o"] != infos.user(current_user.id)[1] \
+            or Sta["o"] != len(infos.room(room).board) %4 :
         emit('history',infos.room(room).history(time.time()));
     else:
         tim = time.time();
