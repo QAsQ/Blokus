@@ -8,6 +8,7 @@ var bars;
 var colorTheme;
 var stepTime,fullTime;
 var username;
+var counting = false;
 
 
 function initSize() {
@@ -44,7 +45,10 @@ function initSocket(){
         refreshProbar();
 
         checkMyRound();
-        countDown();
+        if(!counting){
+            countDown();
+            counting = true;
+        }
 
         if(round === 0){
             $("#start").modal('show');

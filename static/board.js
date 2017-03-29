@@ -139,7 +139,6 @@ function chessIn(ind, ofx, ofy) {
     var cells = chessShape[ind].map(function (cell) {
         return oxy(owner, ofx + cell.x, ofy + cell.y);
     });
-    console.log("sender");
     socket.emit('move',{o:owner,sta:chessState[ind],x:ofx,y:ofy,id:ind});
     $("#chs_" + ind).hide();
     boardFace = boardFace.concat(cells);

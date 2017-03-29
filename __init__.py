@@ -2,6 +2,7 @@ from flask import Flask, render_template,g,request,redirect,url_for
 from flask_socketio import SocketIO,send,emit,join_room,leave_room
 from flask_login import login_user,logout_user,current_user ,login_required,login_manager,LoginManager
 from models import User,Contest,Infos,db
+from checker import check
 import time
 
 app = Flask(__name__)
@@ -34,14 +35,17 @@ def handle_battle(Sta):
     room = infos.user(current_user.id)[0];
     if(len(infos.room(room).board) == 84):
         return;
-    tim = time.time();
-    infos.room(room).addChess(Sta);
-    infos.room(room).updateRemain(int(Sta["o"]),tim);
-    Sta["remain"]=infos.room(room).remain;
-    emit('move',Sta,room=room);
-    if len(infos.room(room).board) == 84:
-        emit('gameover',{},room=room);#room boom
-        infos.clearRoom(room);
+    if False == check(infos.room(room).board,Sta):
+        emit('history',infos.room(room).history(time.time()));
+    else:
+        tim = time.time();
+        infos.room(room).addChess(Sta);
+        infos.room(room).updateRemain(int(Sta["o"]),tim);
+        Sta["remain"]=infos.room(room).remain;
+        emit('move',Sta,room=room);
+        if len(infos.room(room).board) == 84:
+            emit('gameover',{},room=room);#room boom
+            infos.clearRoom(room);
 
 
 
