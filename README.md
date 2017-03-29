@@ -4,8 +4,6 @@
 
 flask-login
 
-flask-login
-
 flask-socketio
 
 flask-SQLAlchemy
