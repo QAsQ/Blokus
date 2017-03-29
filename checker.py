@@ -40,6 +40,9 @@ def toCell(Sta):
     return chs;
 
 def check(board,sta):
+    for chs in board:
+        if sta["o"] == chs["o"] and sta["id"] == chs["id"]:
+            return False;
     cells = [cell for chess in map(toCell,board) for cell in chess];
     cells += [(0, -1, -1) , (1, -1, 20) , (2, 20, 20) , (3, 20, -1)];
     owner = filter(lambda (o,x,y) : o == sta["o"],cells);
