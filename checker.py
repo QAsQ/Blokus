@@ -25,7 +25,7 @@ Chess = [
 ];
 
 def toCell(Sta):
-    if Sta["id"] == "-1":
+    if Sta["id"] == -1:
         return list();
     sta = 0;
     chs = Chess[int(Sta["id"])];
@@ -54,10 +54,13 @@ def pre(board,own):
 
 
 def check(board,sta):
+    if sta["sta"] == -1:
+        return True;
     for chs in board:
         if sta["o"] == chs["o"] and sta["id"] == chs["id"]:
             return False;
     (crash,horn) = pre(board,sta["o"]);
+    off   = lambda ps : map(lambda (o,x,y) : (x,y),ps);  #reduction O
     cnt   = lambda obj : sum(map(lambda p : obj.count(p),off(toCell(sta)))); 
     return cnt(horn) > 0 and cnt(crash) == 0;
 
@@ -85,4 +88,4 @@ def roundCheck(board):
 
 
 
-roundCheck(tes);
+#roundCheck(tes);

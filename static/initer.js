@@ -108,16 +108,16 @@ function checkMyRound() {
             socket.emit('move',Sta);
         }
 //auto add
-  //      else if(round < 84){
-  //          if(round > 4){
-  //              socket.emit('battle',Sta);
-  //              nextRound();
-  //              AddChess(Sta);
-  //              isHide[Sta.id] = true;
-  //              $("#chs_"+Sta.id).hide();
-  //              socket.emit("move",Sta);
-  //          }
-  //      }
+        else if(round < 84){
+            if(round > 0){
+                socket.emit('battle',Sta);
+                nextRound();
+                AddChess(Sta);
+                isHide[Sta.id] = true;
+                $("#chs_"+Sta.id).hide();
+                socket.emit("move",Sta);
+            }
+        }
     }
 }
 function init(x) {
@@ -238,9 +238,8 @@ function initAction() {
     $(window).mouseup(function (e) {
         if (select != -1 && inBoard(chessShape[select], pox, poy) === "legal") {
             if(round % 4 === owner){
-                isHide[select] = true;
-                chessIn(select, pox, poy);
-                nextRound();
+                sta = {round:round,x:pox,y:poy,id:select,sta:chessState[select]};
+                AddChess(sta);
             }
             getE("mask").clearRect(0, 0, boardSize, boardSize);
         }

@@ -40,6 +40,7 @@ def handle_battle(Sta):
             or Sta["o"] != len(infos.room(room).board) %4 :
         emit('history',infos.room(room).history(time.time()));
     else:
+    #if True:
         tim = time.time();
         infos.room(room).addChess(Sta);
         infos.room(room).updateRemain(int(Sta["o"]),tim);
@@ -48,7 +49,6 @@ def handle_battle(Sta):
         if len(infos.room(room).board) == 84:
             emit('gameover',{},room=room);#room boom
             infos.clearRoom(room);
-
 
 
 @socketio.on('info')

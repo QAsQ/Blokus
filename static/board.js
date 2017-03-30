@@ -107,6 +107,7 @@ function AddChess(Sta) {
         refreshCorner();
         return;
     }
+    socket.emit('move',{o:owner,sta:chessState[ind],x:ofx,y:ofy,id:ind});
     var chs = new Array;
     for(var i in sCS[Sta.id]){
         chs = chs.concat(oxy(Sta.o,sCS[Sta.id][i].x,sCS[Sta.id][i].y));
@@ -133,18 +134,6 @@ function drawLast() {
     for(var ind in lastStep){
         drawFrame(lastStep[ind],colorTheme.rim,e);
     }
-}
-
-function chessIn(ind, ofx, ofy) {
-    var cells = chessShape[ind].map(function (cell) {
-        return oxy(owner, ofx + cell.x, ofy + cell.y);
-    });
-    socket.emit('move',{o:owner,sta:chessState[ind],x:ofx,y:ofy,id:ind});
-    $("#chs_" + ind).hide();
-    boardFace = boardFace.concat(cells);
-    lastStep = cells;
-    refreshBoard();
-    drawLast();
 }
 function initBoard() {
     var dxy = cellSize * 5;
