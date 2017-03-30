@@ -39,9 +39,9 @@ function initProbar(){
 }
 function refreshProbar() {
     for(var i = 0 ; i < 4 ; i ++){
-         bars[i](roundTime[i],0);
+        bars[i](roundTime[i],0);
     }
-    if(round != -1) bars[round % 4](roundTime[round % 4],0);
+    if(round != -1) bars[round % 4](roundTime[round % 4],curTime);
 }
 function initCorner() {
     var locate = [xy(1,1),xy(1,25),xy(25,25),xy(25,1)];
@@ -75,12 +75,7 @@ function refreshCorner() {
         e.fill();
         e.fillRect(square[i].x * cellSize, square[i].y * cellSize, cellSize * 2, cellSize * 2);
         //drawCell(square[i],colorTheme.corner(cornerState[i]),e);
-        if(cornerState[i] != -1){
-            $("#n"+i).text(username[i]);
-        }
-        else{
-            $("#n"+i).text("");
-        }
+        $("#n"+i).text(username[i]);
     }
     if(round !== -1){
         $("#corn_"+(round%4)).css("opacity",1);
@@ -93,36 +88,37 @@ function nextRound() {
     $("#corn_"+(round%4)).css("opacity",1);
 }
 
-	    //{o:owner,sta:chessState[highlight],x:pox,y:poy,id:highlight}
-function changeStaTo(_sta, chs) {
-    var sta = 0;
-    if (_sta & 1) sta = flipChessShape(chs, sta);
-    while (sta !== _sta) {
-        sta = rotateChessShape(chs, sta, true);
-    }
-}
 function AddChess(Sta) {
+    if(round !== Sta.round) return;
+    var own = Sta.round % 4;
     if(Sta.sta === -1){
-        cornerState[Sta.o] = -1;
+        cornerState[own] = -1;
         refreshCorner();
         return;
     }
-    socket.emit('move',{o:owner,sta:chessState[ind],x:ofx,y:ofy,id:ind});
-    var chs = new Array;
-    for(var i in sCS[Sta.id]){
-        chs = chs.concat(oxy(Sta.o,sCS[Sta.id][i].x,sCS[Sta.id][i].y));
+    chs = sCS[Sta.id].map(function (s){ 
+        return oxy(own,s.x,s.y);
+    });
+    if(own === owner){
+        socket.emit('move',Sta);
+        if(Sta.sta !== -1){
+            isHide[Sta.id] = true;
+            $("#chs_"+Sta.id).hide();
+        }
     }
-    if(Sta.o === owner && Sta.sta !== -1){
-        isHide[Sta.id] = true;
-        $("#chs_"+Sta.id).hide();
+    var _sta = 0;
+    if (Sta.sta & 1) _sta = flipChessShape(chs, _sta);
+    while (Sta.sta !== _sta) {
+        _sta = rotateChessShape(chs,_sta, true);
     }
-    changeStaTo(Sta.sta, chs);
 
     chs = chs.map(upd(Sta.x,Sta.y));
 
     boardFace = boardFace.concat(chs);
     lastStep = chs;
     drawLast();
+    nextRound();
+    refreshProbar();
     refreshBoard();
 }
 function drawLast() {
@@ -221,7 +217,7 @@ function refreshBoard() {
     drawAvailable(e);
     drawHornAndCell(e);
     drawLine(e);
-    drawLast(e);
+    drawLast();
 }
 function availableCell() {
     var owners = boardFace.filter(function (cell) {
@@ -277,59 +273,6 @@ function inMask(ind, ofx, ofy) {
     for (var index in cells) {
         drawCell(cells[index], color, e);
     }
-}
-
-function availableRound() {
-    var bst = new Array;
-    for(var i = 0 ; i < 20 ; i ++){
-        bst[i] = new Array;
-        for(var j = 0 ; j < 20 ; j ++){
-            bst[i][j] = 0;
-        }
-    }
-    var owners = boardFace.filter(function (cell) {
-        return cell.o === owner;
-    });
-    var horn = owners.map(upd(1, 1)).concat(owners.map(upd(-1, 1))).concat(owners.map(upd(1, -1))).concat(owners.map(upd(-1, -1))).filter(inbod);
-    var crash = owners.map(upd(0, 1)).concat(owners.map(upd(1, 0))).concat(owners.map(upd(0, -1))).concat(owners.map(upd(-1, 0)));
-    crash = crash.concat(boardFace).filter(inbod);
-    for(var ind in horn){
-        bst[horn[ind].x][horn[ind].y] = 1;
-    }
-    for(var ind in crash){
-        bst[crash[ind].x][crash[ind].y] = -1;
-    }
-    for(var i in sCS){
-        var ind = sCS.length - i - 1;
-        if(isHide[ind] === true) continue;
-        var chs = chessShape[ind].map(function (cells) {
-            return xy(cells.x, cells.y);
-        });
-        var s = 0;
-        for(var sta = 0 ; sta < 8 ; sta ++){
-            if(sta === 4){
-                s = flipChessShape(chs,s);
-            }
-            s = rotateChessShape(chs,s,true);
-            for(var x = -4 ; x < 20 ; x ++){
-                for(var y = -4 ; y < 20 ; y ++){
-                    //if(cheavi(chs,bst,x,y) === true) return true;
-                    if(cheavi(chs,bst,x,y) === true)
-                        return {sta:s,x:x,y:y,id:ind,o:owner};
-                }
-            }
-        }
-    }
-    return {sta:-1,x:-1,y:-1,id:-1,o:owner};
-}
-function cheavi(arrs,bst,x,y) {
-    var ret = 0;
-    for(var i in arrs){
-        if(!inbod(xy(arrs[i].x+x,arrs[i].y+y))) return false;
-        if(bst[arrs[i].x + x][arrs[i].y + y] === -1) return false;
-            ret += bst[arrs[i].x + x][arrs[i].y + y];
-    }
-    return ret > 0;
 }
 
 function prograssbar(id,st,ed){

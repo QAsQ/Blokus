@@ -45,8 +45,16 @@ Server -> Client : over
 
 
 
+Chess in round:
 
+​	locate{
 
+​	x,y:
 
+​	}棋子左上角的坐标
 
-render -> info
+​	id: 棋子的id
+
+​	sta: 棋子的状态
+
+​	round: 所处的回合 (also owner)

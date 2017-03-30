@@ -44,22 +44,18 @@ function initSocket(){
         refreshCorner();
         refreshProbar();
 
-        checkMyRound();
+
+        if(!counting && round === 0){
+            $("#start").modal('show');
+        }
         if(!counting){
             countDown();
             counting = true;
         }
-
-        if(round === 0){
-            $("#start").modal('show');
-        }
     });
     socket.on('move',function(Sta){
         roundTime = Sta.remain.map(Math.floor);
-        if(Sta.o === owner) return;
         AddChess(Sta);
-        nextRound();
-        checkMyRound();
     });
     socket.on('info',function (room) {
         username = new Array;
@@ -97,28 +93,6 @@ function initSocket(){
         }
         $("#status").modal('show');
     });
-}
-function checkMyRound() {
-    if (round < 84 && round % 4 === owner) {
-        var Sta = availableRound();
-        if(Sta.sta === -1){
-            nextRound();
-            cornerState[owner] = -1;
-            refreshCorner();
-            socket.emit('move',Sta);
-        }
-//auto add
-        else if(round < 84){
-            if(round > 0){
-                socket.emit('battle',Sta);
-                nextRound();
-                AddChess(Sta);
-                isHide[Sta.id] = true;
-                $("#chs_"+Sta.id).hide();
-                socket.emit("move",Sta);
-            }
-        }
-    }
 }
 function init(x) {
     owner = x;
@@ -312,15 +286,8 @@ function countDown(){
     if(curTime != 0) curTime --;
     else{
         roundTime[round%4]--;
-        if(round % 4 === owner && roundTime[round%4] <= 0){
-            var sta = availableRound();
-            AddChess(sta);
-            socket.emit("move",sta);
-            nextRound();
-        }
         roundTime[round%4] = Math.max(roundTime[round%4],0);
     }
-    bars[(round + 3)%4](roundTime[(round + 3)%4],0);
     bars[round % 4](roundTime[round % 4],curTime);
     if(round < 84) setTimeout("countDown()",1000);
 }
