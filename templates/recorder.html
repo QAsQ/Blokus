@@ -62,9 +62,13 @@
                 Sta = Stas[ind];
                 var chs = new Array;
                 for(var i in sCS[Sta.id]){
-                    chs = chs.concat(oxy(Sta.o,sCS[Sta.id][i].x,sCS[Sta.id][i].y));
+                    chs = chs.concat(oxy(Sta.round % 4,sCS[Sta.id][i].x,sCS[Sta.id][i].y));
                 }
-                changeStaTo(Sta.sta, chs);
+                var _sta = 0;
+                if (Sta.sta & 1) _sta = flipChessShape(chs, _sta);
+                while (Sta.sta !== _sta) {
+                    _sta = rotateChessShape(chs,_sta, true);
+                }
                 chs = chs.map(upd(Sta.x,Sta.y));
                 recorder[ind+1] = recorder[ind].concat(chs);
             }

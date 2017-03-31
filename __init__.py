@@ -128,7 +128,6 @@ def joinRoom(room,_ind):
         if infos.room(room).status == 15:
             infos.room(room).start(time.time());
             setTimer(room);
-            print "hello";
             socketio.emit("startGame",{},room = room);
         return render_template("play.html",play = ind);
     else:
