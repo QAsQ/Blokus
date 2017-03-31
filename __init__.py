@@ -46,7 +46,7 @@ def setTimer(room):
 
 def autoAdd(room,Sta):
     def Adder():
-        if infos.room(room).round == Sta["round"]:
+        if infos.room(room).round() == Sta["round"]:
             nextTurn(room,Sta);
     return Adder;
 
