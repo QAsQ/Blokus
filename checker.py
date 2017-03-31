@@ -36,8 +36,18 @@ def toCell(Sta):
         chs = map(lambda (x,y) : (y,4-x),chs);
         sta = (sta + (6 if 1 == (sta & 1) else 2)) % 8;
 
-    chs = map(lambda (x,y) : (Sta["o"],x + Sta["x"],y + Sta["y"]) ,chs)
+    chs = map(lambda (x,y) : (Sta["round"] % 4,x + Sta["x"],y + Sta["y"]) ,chs)
     return chs;
+
+Chesses = [list() for id in range(21)];
+
+for id in range(0,21):
+    sta = 0;
+    Chesses[id] = [list() in range (8)];
+    for sta in range(8):
+        pass;
+
+
 
 def pre(board,own):
     cells = [cell for chess in map(toCell,board) for cell in chess];
@@ -57,17 +67,14 @@ def check(board,sta):
     if sta["sta"] == -1:
         return True;
     for chs in board:
-        if sta["o"] == chs["o"] and sta["id"] == chs["id"]:
+        if sta["ronnd"] % 4 == chs["round"] % 4 and sta["id"] == chs["id"]:
             return False;
-    (crash,horn) = pre(board,sta["o"]);
+    (crash,horn) = pre(board,sta["round"] % 4);
     off   = lambda ps : map(lambda (o,x,y) : (x,y),ps);  #reduction O
     cnt   = lambda obj : sum(map(lambda p : obj.count(p),off(toCell(sta)))); 
     return cnt(horn) > 0 and cnt(crash) == 0;
 
-tes = '[{"sta": 0, "o": 0, "remain": [234.56199979782104, 240, 240, 240], "y": -2, "x": 0, "id": "15"}, {"sta": 0, "o": 1, "remain": [234.56199979782104, 240, 240, 240], "y": 17, "x": 0, "id": "5"}, {"sta": 2, "o": 2, "remain": [234.56199979782104, 240, 240, 240], "y": 15, "x": 15, "id": "2"}, {"sta": 6, "o": 3, "remain": [234.56199979782104, 240, 240, 240], "y": 0, "x": 16, "id": "20"}]';
-#print check(tes, {"y": 0, "x": 2, "sta": 6, "o": 0, "id": "20"});
-
-def roundCheck(board):
+def nextSta(board):
     own = len(board) % 4;
     #bod = [[0 for col in range(20)] for row in range(20)];
     #(crash,horn) = pre(board,len(board) % 4);
@@ -79,12 +86,10 @@ def roundCheck(board):
         for x in range(-4,20):
             for y in range(-4,20):
                 for sta in range(0,8):
-                    Sta = {"id":Id,"x":x,"y":y,"sta":sta,"o":own};
+                    Sta = {"id":Id,"x":x,"y":y,"sta":sta,"round":len(board)};
                     if check(board,Sta):
                         return Sta;
-    return {"id":-1,"x":-1,"y":-1,"sta":-1,"o":own};
-                    
-                    
+    return {"id":-1,"x":-1,"y":-1,"sta":-1,"round":len(board)};
 
 
 

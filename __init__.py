@@ -2,7 +2,8 @@ from flask import Flask, render_template,g,request,redirect,url_for
 from flask_socketio import SocketIO,send,emit,join_room,leave_room
 from flask_login import login_user,logout_user,current_user ,login_required,login_manager,LoginManager
 from models import User,Contest,Infos,db
-from checker import check
+from threading import Timer
+from checker import check,nextSta
 import time
 
 app = Flask(__name__)
@@ -25,31 +26,45 @@ infos = Infos();
 def load_user(id):
     return  User.query.get(id);
 
-@socketio.on("listRoom")
-def handle_battle(var):
-    join_room("'list");
-    emit("listRoom",infos.listRoom());
+def updSta(room,Sta):
+    socketio.emit("move",Sta,room = room);
+    infos.room(room).nextTurn(Sta,time.time());
+
+def setTimer(room):
+    Sta = nextSta(infos.room(room).board);
+    while infos.room(room).haveNext() and Sta["sta"] == -1:
+        infos.room(room).nextTurn(Sta,time.time());
+        updSta(room,Sta);
+        Sta = nextSta(infos.room(room).board);
+    if infos.room(room).haveNext():
+        Timer(infos.room(room).nextTime(),autoAdd(room,sta)).start();
+    else:
+        emit('gameover',{},room = room);
+        infos.clearRoom(room);
+        
+
+def autoAdd(room,Sta):
+    def Adder():
+        if infos.room(room).round == Sta["round"]:
+            nextTurn(room,Sta);
+    return Adder;
+
+def nextTurn(room,Sta):
+    updSta(room,Sta);
+    setTimer(room);
 
 @socketio.on('move')
 def handle_battle(Sta):
-    room = infos.user(current_user.id)[0];
-    if(len(infos.room(room).board) == 84):
-        return;
-    if False == check(infos.room(room).board,Sta) \
-            or Sta["o"] != infos.user(current_user.id)[1] \
-            or Sta["o"] != len(infos.room(room).board) %4 :
-        emit('history',infos.room(room).history(time.time()));
+    if check(infos.room(room).board,Sta):
+        updSta(room,Sta);
+        setTimer(room);
     else:
-    #if True:
-        tim = time.time();
-        infos.room(room).addChess(Sta);
-        infos.room(room).updateRemain(int(Sta["o"]),tim);
-        Sta["remain"]=infos.room(room).remain;
-        emit('move',Sta,room=room);
-        if len(infos.room(room).board) == 84:
-            emit('gameover',{},room=room);#room boom
-            infos.clearRoom(room);
+        emit('history',infos.room(room).history(time.time()));
 
+@socketio.on("listRoom")
+def handle_listroom(var):
+    join_room("'list");
+    emit("listRoom",infos.listRoom());
 
 @socketio.on('info')
 def loginroom(var):
@@ -111,6 +126,8 @@ def joinRoom(room,_ind):
         roomInfoUpdate(room);
         if infos.room(room).status == 15:
             infos.room(room).start(time.time());
+            #socket todo
+            #threading todo
         return render_template("play.html",play = ind);
     else:
         return render_template("room.html",room = room,sta = infos.room(room).status);

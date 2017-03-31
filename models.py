@@ -72,24 +72,31 @@ class Room():
     
     def info(self):
         return {"status":self.status,"user":self.user};
+    
+    def round(self):
+        return len(self.board);
 
     def history(self,cur):
         return {"hist":self.board,"remain":self.remain,"cur":cur-self.last};
-
-
-    def addChess(self,chs):
-        self.board.append(chs);
     
     def start(self,stTime):
         self.last = stTime;
     
-    def updateRemain(self,owner,curTime):
+    def nextTurn(self,chs,curTime):
+        owner = self.round() % 4;
         self.remain[owner] -= max(0,curTime-self.last-5);
         self.remain[owner] = max(0,self.remain[owner]);
+        self.board.append(chs);
         self.last = curTime;
     
     def toContest(self):
         return Contest(self.user,self.board);
+    
+    def nextTimer(self):
+        return remain[self.round() + 5];
+    
+    def haveNext(self):
+        return self.round() < 84;
 
 class Infos():
     def __init__(self):
