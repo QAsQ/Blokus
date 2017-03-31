@@ -93,7 +93,7 @@ class Room():
         return Contest(self.user,self.board);
     
     def nextTimer(self):
-        return remain[self.round() + 5];
+        return self.remain[self.round() % 4] + 5;
     
     def haveNext(self):
         return self.round() < 84;

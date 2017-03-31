@@ -55,6 +55,6 @@ Chess in round:
 
 ​	id: 棋子的id
 
-​	sta: 棋子的状态
+​	sta: 棋子的状态 (-1)
 
 ​	round: 所处的回合 (also owner)

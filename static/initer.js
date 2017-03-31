@@ -131,7 +131,7 @@ function init(x) {
 }
 function initAction() {
     function getID(cx, cy) {
-        for (var i in chessLocate) {
+        for(var i = 0 ; i < 21 ; i ++){
             if (isHide[i] === true) continue;
             var offx = chessLocate[i].x;
             var offy = chessLocate[i].y;
@@ -212,7 +212,9 @@ function initAction() {
     $(window).mouseup(function (e) {
         if (select != -1 && inBoard(chessShape[select], pox, poy) === "legal") {
             if(round % 4 === owner){
+                console.log( typeof select);
                 sta = {round:round,x:pox,y:poy,id:select,sta:chessState[select]};
+                console.log(sta)
                 AddChess(sta);
             }
             getE("mask").clearRect(0, 0, boardSize, boardSize);

@@ -27,6 +27,7 @@ def load_user(id):
     return  User.query.get(id);
 
 def updSta(room,Sta):
+    print str(Sta);
     socketio.emit("move",Sta,room = room);
     infos.room(room).nextTurn(Sta,time.time());
 
@@ -37,7 +38,7 @@ def setTimer(room):
         updSta(room,Sta);
         Sta = nextSta(infos.room(room).board);
     if infos.room(room).haveNext():
-        Timer(infos.room(room).nextTime(),autoAdd(room,sta)).start();
+        Timer(infos.room(room).nextTimer(),autoAdd(room,Sta)).start();
     else:
         emit('gameover',{},room = room);
         infos.clearRoom(room);
@@ -55,6 +56,7 @@ def nextTurn(room,Sta):
 
 @socketio.on('move')
 def handle_battle(Sta):
+    room  = infos.user(current_user.id)[0];
     if check(infos.room(room).board,Sta):
         updSta(room,Sta);
         setTimer(room);

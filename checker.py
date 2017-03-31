@@ -67,7 +67,7 @@ def check(board,sta):
     if sta["sta"] == -1:
         return True;
     for chs in board:
-        if sta["ronnd"] % 4 == chs["round"] % 4 and sta["id"] == chs["id"]:
+        if (sta["round"] % 4) == (chs["round"] % 4) and sta["id"] == chs["id"]:
             return False;
     (crash,horn) = pre(board,sta["round"] % 4);
     off   = lambda ps : map(lambda (o,x,y) : (x,y),ps);  #reduction O
