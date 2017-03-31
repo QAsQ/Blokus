@@ -95,6 +95,8 @@ def index():
 @app.route("/room/<room>")
 @login_required
 def roomIndex(room):
+    if room[0] == "'":
+        return "<h1> RoomUsed </h1>";
     (lastroom,lastind) = infos.user(current_user.id);
     if lastroom == room and lastind != -1:
         status = 15 - (1 << lastind);
@@ -126,7 +128,8 @@ def joinRoom(room,_ind):
         if infos.room(room).status == 15:
             infos.room(room).start(time.time());
             setTimer(room);
-            #socket todo
+            print "hello";
+            socketio.emit("startGame",{},room = room);
         return render_template("play.html",play = ind);
     else:
         return render_template("room.html",room = room,sta = infos.room(room).status);

@@ -44,13 +44,13 @@ function initSocket(){
         refreshProbar();
 
 
-        if(!counting && round === 0){
-            $("#start").modal('show');
-        }
         if(!counting){
             countDown();
             counting = true;
         }
+    });
+    socket.on('startGame',function (sta){
+        $("#start").modal('show');
     });
     socket.on('move',function(Sta){
         roundTime = Sta.remain.map(Math.floor);
