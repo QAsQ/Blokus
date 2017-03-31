@@ -29,9 +29,8 @@ function initSocket(){
         socket.emit("history",{o:owner});
     });
     socket.on('history', function (board){
-        clearFace();
         hist = board.hist; 
-        round = hist.length;
+        round = 0;
         for(var ind in hist){
             AddChess(hist[ind]);
         }
@@ -212,9 +211,7 @@ function initAction() {
     $(window).mouseup(function (e) {
         if (select != -1 && inBoard(chessShape[select], pox, poy) === "legal") {
             if(round % 4 === owner){
-                console.log( typeof select);
                 sta = {round:round,x:pox,y:poy,id:select,sta:chessState[select]};
-                console.log(sta)
                 AddChess(sta);
             }
             getE("mask").clearRect(0, 0, boardSize, boardSize);

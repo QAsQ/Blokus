@@ -89,10 +89,7 @@ function nextRound() {
 }
 
 function AddChess(Sta) {
-    console.log(round);
-    console.log(Sta);
     if(round !== Sta.round) return;
-    console.log(Sta);
     var own = Sta.round % 4;
     if(Sta.sta === -1){
         cornerState[own] = -1;

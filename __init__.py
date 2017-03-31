@@ -27,7 +27,7 @@ def load_user(id):
     return  User.query.get(id);
 
 def updSta(room,Sta):
-    print str(Sta);
+    Sta["remain"] = infos.room(room).remain;
     socketio.emit("move",Sta,room = room);
     infos.room(room).nextTurn(Sta,time.time());
 
@@ -60,8 +60,6 @@ def handle_battle(Sta):
     if check(infos.room(room).board,Sta):
         updSta(room,Sta);
         setTimer(room);
-    else:
-        emit('history',infos.room(room).history(time.time()));
 
 @socketio.on("listRoom")
 def handle_listroom(var):
