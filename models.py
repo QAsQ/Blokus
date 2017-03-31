@@ -51,7 +51,7 @@ class Room():
     def __init__(self):
         self.board = list();
         self.status = 0;
-        self.remain = [10,10,10,10];
+        self.remain = [240,240,240,240];
         self.last= -1;
         self.user = [None,None,None,None];
         self.userid = [None,None,None,None];
@@ -93,8 +93,8 @@ class Room():
         return Contest(self.user,self.board);
     
     def nextTimer(self):
-        print "tim + " + str(self.remain[self.round() % 4] + 5);
         return self.remain[self.round() % 4] + 5;
+        #return 0.5;
     
     def haveNext(self):
         return self.round() < 84;

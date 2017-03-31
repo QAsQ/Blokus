@@ -34,13 +34,12 @@ def updSta(room,Sta):
 def setTimer(room):
     Sta = nextSta(infos.room(room).board);
     while infos.room(room).haveNext() and Sta["sta"] == -1:
-        infos.room(room).nextTurn(Sta,time.time());
         updSta(room,Sta);
         Sta = nextSta(infos.room(room).board);
     if infos.room(room).haveNext():
         Timer(infos.room(room).nextTimer(),autoAdd(room,Sta)).start();
     else:
-        emit('gameover',{},room = room);
+        socketio.emit('gameover',{},room = room);
         infos.clearRoom(room);
         
 
@@ -126,8 +125,8 @@ def joinRoom(room,_ind):
         roomInfoUpdate(room);
         if infos.room(room).status == 15:
             infos.room(room).start(time.time());
+            setTimer(room);
             #socket todo
-            #threading todo
         return render_template("play.html",play = ind);
     else:
         return render_template("room.html",room = room,sta = infos.room(room).status);

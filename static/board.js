@@ -94,28 +94,29 @@ function AddChess(Sta) {
     if(Sta.sta === -1){
         cornerState[own] = -1;
         refreshCorner();
-        return;
     }
-    chs = sCS[Sta.id].map(function (s){ 
-        return oxy(own,s.x,s.y);
-    });
-    if(own === owner){
-        socket.emit('move',Sta);
-        if(Sta.sta !== -1){
-            isHide[Sta.id] = true;
-            $("#chs_"+Sta.id).hide();
+    else{
+        chs = sCS[Sta.id].map(function (s){ 
+            return oxy(own,s.x,s.y);
+        });
+        if(own === owner){
+            socket.emit('move',Sta);
+            if(Sta.sta !== -1){
+                isHide[Sta.id] = true;
+                $("#chs_"+Sta.id).hide();
+            }
         }
-    }
-    var _sta = 0;
-    if (Sta.sta & 1) _sta = flipChessShape(chs, _sta);
-    while (Sta.sta !== _sta) {
-        _sta = rotateChessShape(chs,_sta, true);
-    }
+        var _sta = 0;
+        if (Sta.sta & 1) _sta = flipChessShape(chs, _sta);
+        while (Sta.sta !== _sta) {
+            _sta = rotateChessShape(chs,_sta, true);
+        }
 
-    chs = chs.map(upd(Sta.x,Sta.y));
+        chs = chs.map(upd(Sta.x,Sta.y));
 
-    boardFace = boardFace.concat(chs);
-    lastStep = chs;
+        boardFace = boardFace.concat(chs);
+        lastStep = chs;
+    }
     drawLast();
     nextRound();
     refreshProbar();
