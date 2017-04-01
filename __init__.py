@@ -156,7 +156,7 @@ def login():
             user = User.query.filter_by(username=username).first();
             if user is not None and user.check_password(password):
                 login_user(user);
-                return redirect(request.args.get('next','index'));
+                return redirect(request.args.get('next','/'));
             else:
                 return render_template("login.html",message="User not exist or Wrong password!");
         else:
@@ -170,7 +170,7 @@ def login():
             db.session.add(nuser);
             db.session.commit();
             login_user(nuser);
-            return redirect(request.args.get('next','index'));
+            return redirect(request.args.get('next','/'));
 
     if request.method == 'GET':
         return render_template("login.html",message="");
