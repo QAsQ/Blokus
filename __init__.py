@@ -91,6 +91,7 @@ def record(ind):
 
 
 @app.route("/",methods = ['GET','POST'])
+@login_required
 def index():
     if request.method == 'POST':
         room = request.form.get("room");
