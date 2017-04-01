@@ -40,7 +40,8 @@ def setTimer(room):
         Timer(infos.room(room).nextTimer(),autoAdd(room,Sta)).start();
     else:
         socketio.emit('gameover',{},room = room);
-        infos.clearRoom(room);
+        with app.app_context():
+            infos.clearRoom(room);
         
 
 def autoAdd(room,Sta):

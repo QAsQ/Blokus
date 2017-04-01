@@ -94,8 +94,7 @@ class Room():
     
     def nextTimer(self):
         return self.remain[self.round() % 4] + 5;
-        #return 0.5;
-    
+  
     def haveNext(self):
         return self.round() < 84;
 
