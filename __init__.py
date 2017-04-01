@@ -27,9 +27,9 @@ def load_user(id):
     return  User.query.get(id);
 
 def updSta(room,Sta):
+    infos.room(room).nextTurn(Sta,time.time());
     Sta["remain"] = infos.room(room).remain;
     socketio.emit("move",Sta,room = room);
-    infos.room(room).nextTurn(Sta,time.time());
 
 def setTimer(room):
     Sta = nextSta(infos.room(room).board);
