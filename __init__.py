@@ -88,15 +88,19 @@ def record(ind):
         return "<h1> Contest Doesn't Exist</h1>"
     return render_template('recorder.html',id=ind);
 
-@app.route("/index")
+
+@app.route("/",methods = ['GET','POST'])
 def index():
+    if request.method == 'POST':
+        room = request.form.get("room");
+        return redirect("/room/%s" % room);
     return render_template('index.html');
 
 @app.route("/room/<room>")
 @login_required
 def roomIndex(room):
     if room[0] == "'":
-        return "<h1> RoomUsed </h1>";
+        return "<h1>Permission Denied</h1>";
     (lastroom,lastind) = infos.user(current_user.id);
     if lastroom == room and lastind != -1:
         status = 15 - (1 << lastind);
