@@ -31,7 +31,8 @@ class Contest(db.Model):
     play_3 = db.Column(db.Integer)
     record = db.Column(db.String)
 
-    def __init__(self,(play0,play1,play2,play3),_record):
+    def __init__(self,players,_record):
+        (play0,play1,play2,play3) = players;
         self.play_0 = play0;
         self.play_1 = play1;
         self.play_2 = play2;

@@ -162,11 +162,11 @@ def login():
                 return render_template("login.html",message="User not exist or Wrong password!");
         else:
             if password != repeat:
-                return render_template("register.html",message="confirm password not same") 
+                return render_template("login.html",message="confirm password not same") 
             if User.query.filter_by(username=username).first() is not None:
-                return render_template("register.html",message="User exist!");
+                return render_template("login.html",message="User exist!");
             if len(username) > 15:
-                return render_template("register.html",message="User name too long!");
+                return render_template("login.html",message="User name too long!");
             nuser = User(username,password);
             db.session.add(nuser);
             db.session.commit();
