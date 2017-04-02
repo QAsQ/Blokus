@@ -5,6 +5,7 @@ from models import User,Contest,Infos,db
 from threading import Timer
 from checker import check,nextSta
 import time
+import re
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///User.db';
@@ -161,12 +162,12 @@ def login():
             else:
                 return render_template("login.html",message="User not exist or Wrong password!");
         else:
+            if re.match(r'^[0-9a-zA-Z]{1,15}$',username) == None:
+                return render_template("login.html",message="Invalid username");
             if password != repeat:
-                return render_template("login.html",message="confirm password not same") 
+                return render_template("login.html",message="Confirm password not same");
             if User.query.filter_by(username=username).first() is not None:
                 return render_template("login.html",message="User exist!");
-            if len(username) > 15:
-                return render_template("login.html",message="User name too long!");
             nuser = User(username,password);
             db.session.add(nuser);
             db.session.commit();
