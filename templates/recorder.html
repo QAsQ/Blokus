@@ -6,6 +6,7 @@
     <script src="{{url_for('static',filename='board.js')}}"></script>
     <script src="{{url_for('static',filename='chess.js')}}"></script>
     <script src="{{url_for('static',filename='recinit.js')}}"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0,user-scalable=no"/>
     <style>
         .name{
             -moz-user-select: none; 
@@ -39,6 +40,7 @@
         <canvas id="mask"></canvas>
         <canvas id="last"></canvas>
         <canvas id="board"></canvas>
+        <canvas id="shade" style="position:absolute;z-index:10"></canvas>
     </div>
     <script>
         socket = io.connect('http://' + document.domain + ':' + location.port);

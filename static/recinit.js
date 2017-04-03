@@ -63,12 +63,12 @@ function initAction() {
                 var poi = chessShape[i][j];
                 if (inreg(0, cellSize, cx - offx - cellSize * poi.x)
                     && inreg(0, cellSize, cy - offy - cellSize * poi.y))
-                    return i;
+                    return parseInt(i);
             }
         }
         return -1;
     }
-
+    var extend = false;
     var mouseDown = false;
     var select = -1;
     var clix, cliy // mouselocetion
@@ -124,27 +124,37 @@ function initAction() {
         getPo();
         inMask(select, pox, poy);
     }
-
-    $(window).mousedown(function (e) {
+    function down(e){
         mouseDown = true;
         clix = e.clientX, cliy = e.clientY;
         getE("mask").clearRect(0, 0, boardSize, boardSize);
         updSelect(getID(clix, cliy));
         if (select !== -1)
             getPo(), inMask(select, pox, poy);
-    });
-    $(window).mouseup(function (e) {
+    }
+    function up(e){
         getE("mask").clearRect(0, 0, boardSize, boardSize);
         mouseDown = false;
-    });
-    $(window).mousemove(function (e) {
+    }
+    function move(e){
         if (mouseDown === true && select !== -1) {
             getPo();
             moveChess(e);
             inMask(select, pox, poy);
         }
         clix = e.clientX, cliy = e.clientY;
+    }
+    $("#playGround").on('mousedown',down);
+    $("#playGround").on('touchstart',function (e){
+        down(e.originalEvent.touches[0]);
+        return false;
     });
+    $("#playGround").on('mousemove',move);
+    $("#playGround").on('touchmove',function (e){
+        e.preventDefault();
+        move(e.originalEvent.touches[0]);
+    });
+    $("#playGround").on('mouseup touchend',up);
     $(window).keydown(function (e) {
         if(e.keyCode == 81){ //Q
             now = now - 1;
@@ -185,6 +195,7 @@ function initColorTheme(theme) {
             unlegal: "#e1d9c4",
             can: "#f5f9f8",
             frameColor : "#ffffff",
+            shade : "#3f3f3f",
             player: function (o) {
                 switch (o) {
                     case -1: return "#b7b7b7";

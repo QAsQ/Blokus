@@ -164,6 +164,12 @@ function initBoard() {
         "z-index":"-3.5",
         opacity: 1
     });
+    $('#shade').attr({
+        "width": bw,
+        "height": bh,
+    }).css({
+        opacity:0.9
+    });
 }
 function clearFace() {
     boardFace = new Array;
