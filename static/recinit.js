@@ -124,8 +124,26 @@ function initAction() {
         inMask(select, pox, poy);
     }
     var extend = false,moved = false;
-    function shadeoff(){
-        //
+    function shadeoff(event,id,poi){
+        var pos = [xy(-1,-1),xy(0,-1),xy(1,-1)
+                  ,xy(-1, 0)         ,xy(1,0)
+                  ,xy(-1, 1),xy(0, 1),xy(1,1)];
+        var mx = (event.pageX - poi.x) / cellSize;
+        var my = (event.pageY - poi.y) / cellSize;
+        var sta = -1;
+        for(var ind = 0 ; ind < 8 ; ind ++){
+            if(inreg(pos[ind].x * 5 ,pos[ind].x * 5 + 5,mx) 
+            && inreg(pos[ind].y * 5 ,pos[ind].y * 5 + 5,my)){
+                sta = ind;
+            }
+        }
+        if(sta != -1){
+            if(0 != ((sta - chessState[id]) & 1))
+                chessState[id] = flipChessShape(chessShape[id],chessState[id]);
+             while(sta != chessState[id])
+                 chessState[id] = rotateChessShape(chessShape[id],chessState[id],true);
+            refreshChess(id);
+        }
         getE("shade").clearRect(0,0,cellSize * 15,cellSize * 15);
     }
     function shadeon(id,poi){
@@ -133,13 +151,11 @@ function initAction() {
             left:poi.x - 5 * cellSize + "px",
             top:poi.y - 5 * cellSize + "px"
         });
-        e = getE("shade");
+        var e = getE("shade");
         e.fillStyle = colorTheme.shade;
         e.fillRect(0,0,cellSize * 15,cellSize * 15);
-        chs = sCS[id].map(function (e){
-            return e;
-        });
-        sta = 0;
+        var chs = sCS[id].map(upd(0,0));
+        var sta = 0;
         var pos = [xy(-1,-1),xy(0,-1),xy(1,-1)
                   ,xy(-1, 0)         ,xy(1,0)
                   ,xy(-1, 1),xy(0, 1),xy(1,1)];
@@ -147,7 +163,7 @@ function initAction() {
             if(_sta == 4)
                 sta = flipChessShape(chs,sta);
             sta = rotateChessShape(chs,sta);
-            tchs = chs.map(upd(pos[sta].x*5+5,pos[sta].y*5+5));
+            var tchs = chs.map(upd(pos[sta].x*5+5,pos[sta].y*5+5));
             for(var ind in tchs){
                 drawCell(tchs[ind],colorTheme.player(owner),e);
             }
@@ -155,8 +171,8 @@ function initAction() {
                 drawFrame(tchs[ind],colorTheme.frameColor,e);
             }
         }
-        e.strokeStyle = "#ffffff";
-        e.lineWidth = 3;
+        e.strokeStyle = "#000000";
+        e.lineWidth = 1;
         e.beginPath();
         for (var i = 0; i <= 3; i++) {
             e.moveTo(i * cellSize * 5, 0), e.lineTo(i * cellSize * 5, cellSize * 15);
@@ -166,15 +182,20 @@ function initAction() {
         e.stroke();
     }
     function down(e){
-        mouseDown = true;
-        clix = e.clientX, cliy = e.clientY;
-        getE("mask").clearRect(0, 0, boardSize, boardSize);
-        updSelect(getID(clix, cliy));
-        if (select !== -1)
-            getPo(), inMask(select, pox, poy);
-        moved = false;
+        if(extend == true){
+            shadeoff(e,select,chessLocate[select]);
+        }
+        else{
+            mouseDown = true;
+            clix = e.clientX, cliy = e.clientY;
+            getE("mask").clearRect(0, 0, boardSize, boardSize);
+            updSelect(getID(clix, cliy));
+            if (select !== -1)
+                getPo(), inMask(select, pox, poy);
+            moved = false;
+        }
     }
-    function up(e){
+    function up(){
         getE("mask").clearRect(0, 0, boardSize, boardSize);
         mouseDown = false;
         if(extend == false && moved == false && select != -1){
@@ -184,16 +205,11 @@ function initAction() {
         else{
             if(extend == true){
                 extend = false;
-                shadeoff();
             }
         }
     }
     function move(e){
         if (mouseDown === true && select !== -1) {
-            if(extend == true){
-                extend = false;
-                shadeoff();
-            }
             getPo();
             moveChess(e);
             moved = true;
