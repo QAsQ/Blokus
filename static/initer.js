@@ -200,31 +200,122 @@ function initAction() {
         inMask(select, pox, poy);
     }
 
-    $(window).mousedown(function (e) {
-        mouseDown = true;
-        clix = e.clientX, cliy = e.clientY;
-        getE("mask").clearRect(0, 0, boardSize, boardSize);
-        updSelect(getID(clix, cliy));
-        if (select !== -1)
-            getPo(), inMask(select, pox, poy);
-    });
-    $(window).mouseup(function (e) {
-        if (select != -1 && inBoard(chessShape[select], pox, poy) === "legal") {
-            if(round % 4 === owner){
-                sta = {round:round,x:pox,y:poy,id:select,sta:chessState[select]};
-                AddChess(sta);
+    var extend = false,moved = false;
+    function shadeoff(event,id,poi){
+        var pos = [xy(-1,-1),xy(0,-1),xy(1,-1)
+                  ,xy(-1, 0)         ,xy(1,0)
+                  ,xy(-1, 1),xy(0, 1),xy(1,1)];
+        var mx = (event.pageX - poi.x) / cellSize;
+        var my = (event.pageY - poi.y) / cellSize;
+        var sta = -1;
+        for(var ind = 0 ; ind < 8 ; ind ++){
+            if(inreg(pos[ind].x * 5 ,pos[ind].x * 5 + 5,mx) 
+            && inreg(pos[ind].y * 5 ,pos[ind].y * 5 + 5,my)){
+                sta = ind;
             }
-            getE("mask").clearRect(0, 0, boardSize, boardSize);
         }
+        if(sta != -1){
+            if(0 != ((sta - chessState[id]) & 1))
+                chessState[id] = flipChessShape(chessShape[id],chessState[id]);
+             while(sta != chessState[id])
+                 chessState[id] = rotateChessShape(chessShape[id],chessState[id],true);
+            refreshChess(id);
+        }
+        getE("shade").clearRect(0,0,cellSize * 15,cellSize * 15);
+    }
+    function shadeon(id,poi){
+        $("#shade").css({
+            left:poi.x - 5 * cellSize + "px",
+            top:poi.y - 5 * cellSize + "px"
+        });
+        var e = getE("shade");
+        e.fillStyle = colorTheme.shade;
+        e.fillRect(0,0,cellSize * 15,cellSize * 15);
+        var chs = sCS[id].map(upd(0,0));
+        var sta = 0;
+        var pos = [xy(-1,-1),xy(0,-1),xy(1,-1)
+                  ,xy(-1, 0)         ,xy(1,0)
+                  ,xy(-1, 1),xy(0, 1),xy(1,1)];
+        for(var _sta= 0 ; _sta < 8 ;_sta ++){
+            if(_sta == 4)
+                sta = flipChessShape(chs,sta);
+            sta = rotateChessShape(chs,sta);
+            var tchs = chs.map(upd(pos[sta].x*5+5,pos[sta].y*5+5));
+            for(var ind in tchs){
+                drawCell(tchs[ind],colorTheme.player(owner),e);
+            }
+            for(var ind in tchs){
+                drawFrame(tchs[ind],colorTheme.frameColor,e);
+            }
+        }
+        e.strokeStyle = "#000000";
+        e.lineWidth = 1;
+        e.beginPath();
+        for (var i = 0; i <= 3; i++) {
+            e.moveTo(i * cellSize * 5, 0), e.lineTo(i * cellSize * 5, cellSize * 15);
+            e.moveTo(0, i * cellSize * 5), e.lineTo(cellSize * 15, i * cellSize * 5);
+        }
+        e.closePath();
+        e.stroke();
+    }
+    function down(e){
+        if(extend == true){
+            shadeoff(e,select,chessLocate[select]);
+        }
+        else{
+            mouseDown = true;
+            clix = e.clientX, cliy = e.clientY;
+            getE("mask").clearRect(0, 0, boardSize, boardSize);
+            updSelect(getID(clix, cliy));
+            if (select !== -1)
+                getPo(), inMask(select, pox, poy);
+            moved = false;
+        }
+    }
+    function up(){
+        getE("mask").clearRect(0, 0, boardSize, boardSize);
         mouseDown = false;
-    });
-    $(window).mousemove(function (e) {
+        if (extend == false 
+            && select != -1 
+            && inBoard(chessShape[select], pox, poy) === "legal" 
+            && round % 4 === owner){
+            sta = {round:round,x:pox,y:poy,id:select,sta:chessState[select]};
+            AddChess(sta);
+        }
+        else{
+            if(extend == false && moved == false && select != -1){
+                extend = true;
+                shadeon(select,chessLocate[select]);
+            }
+            else{
+                if(extend == true){
+                    extend = false;
+                }
+            }
+        }
+    }
+    function move(e){
         if (mouseDown === true && select !== -1) {
             getPo();
             moveChess(e);
+            moved = true;
             inMask(select, pox, poy);
         }
         clix = e.clientX, cliy = e.clientY;
+    }
+    $("#playGround").on('mousedown',down);
+    $("#playGround").on('touchstart',function (e){
+        down(e.originalEvent.touches[0]);
+        return false;
+    });
+    $("#playGround").on('mousemove',move);
+    $("#playGround").on('touchmove',function (e){
+        e.preventDefault();
+        move(e.originalEvent.touches[0]);
+    });
+    $("#playGround").on('mouseup touchend',function (){
+        up();
+        return false;
     });
     $(window).keydown(function (e) {
         if (select === -1) return;
@@ -254,6 +345,7 @@ function initColorTheme(theme) {
             unlegal: "#e1d9c4",
             can: "#f5f9f8",
             frameColor : "#ffffff",
+            shade : "#e6eae9",
             player: function (o) {
                 switch (o) {
                     case -1: return "#b7b7b7";

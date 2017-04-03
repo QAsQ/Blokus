@@ -268,7 +268,7 @@ function initColorTheme(theme) {
             unlegal: "#e1d9c4",
             can: "#f5f9f8",
             frameColor : "#ffffff",
-            shade : "#3f3f3f",
+            shade : "#e6eae9",
             player: function (o) {
                 switch (o) {
                     case -1: return "#b7b7b7";

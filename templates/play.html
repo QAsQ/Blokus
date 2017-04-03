@@ -8,6 +8,7 @@
     <script src="{{url_for('static',filename='initer.js')}}"></script>
     <script src = "{{url_for('static',filename='bootstrap.min.js')}}"></script>
     <link rel="stylesheet" href="{{url_for('static',filename='bootstrap.min.css')}}" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0,user-scalable=no"/>
     <style type="text/css"> 
         body { 
             font: normal 11px auto "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif; 
@@ -99,7 +100,7 @@
     </style>
     <title>BLOKUS</title>
 </head>
-<body onload="init({{play}})">
+<body style="margin:0px 0px 0px 0px" onload="init({{play}})">
     <div id = "start" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
         <div class="modal-dialog modal-sm" role="document">
             <div class="modal-content">
@@ -147,6 +148,7 @@
         <canvas id="mask"></canvas>
         <canvas id="last"></canvas>
         <canvas id="board"></canvas>
+        <canvas id="shade" style="position:absolute;z-index:10"></canvas>
     </div>
     <div id = "n0" class = "name"></div>
     <div id = "n1" class = "name"></div>
