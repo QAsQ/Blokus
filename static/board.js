@@ -165,8 +165,8 @@ function initBoard() {
         opacity: 1
     });
     $('#shade').attr({
-        "width": bw,
-        "height": bh,
+        "width": 15 * cellSize + "px",
+        "height": 15 * cellSize + "px"
     }).css({
         opacity:0.9
     });
