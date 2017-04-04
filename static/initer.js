@@ -141,6 +141,20 @@ function initAction() {
                     return i;
             }
         }
+        for(var i = 0 ; i < 21 ; i ++){
+            if (isHide[i] === true) continue;
+            var Max = function (l,r){ return xy(Math.max(l.x,r.x),Math.max(l.y,r.y)); }
+            var Min = function (l,r){ return xy(Math.min(l.x,r.x),Math.min(l.y,r.y)); }
+            var ma = chessShape[i].reduce(Max);
+            var mi = chessShape[i].reduce(Min);
+            if(ma.x - mi.x <= 1) ma.x ++,mi.x--;
+            if(ma.y - mi.y <= 1) ma.y ++,mi.y--;
+            var offx = chessLocate[i].x;
+            var offy = chessLocate[i].y;
+            if (inreg(mi.x,ma.x + 1, (cx - offx) / cellSize)
+             && inreg(mi.y,ma.y + 1, (cy - offy) / cellSize))
+                return i;
+        }
         return -1;
     }
 
@@ -294,26 +308,34 @@ function initAction() {
             }
         }
     }
+    var action = 0;
     function move(e){
         if (mouseDown === true && select !== -1) {
             getPo();
             moveChess(e);
             moved = true;
             inMask(select, pox, poy);
+            if(action > 0){
+                moveChessTo(chessLocate[select].x,chessLocate[select].y - cellSize,select);
+                action --;
+            }
         }
         clix = e.clientX, cliy = e.clientY;
     }
     $("#playGround").on('mousedown',down);
     $("#playGround").on('touchstart',function (e){
         down(e.originalEvent.touches[0]);
+        action = 5;
         return false;
     });
     $("#playGround").on('mousemove',move);
     $("#playGround").on('touchmove',function (e){
         e.preventDefault();
         move(e.originalEvent.touches[0]);
+        return false;
     });
     $("#playGround").on('mouseup touchend',function (){
+        action = 0;
         up();
         return false;
     });
