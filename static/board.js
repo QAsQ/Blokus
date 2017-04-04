@@ -182,7 +182,8 @@ function clearFace() {
 }
 function drawLine(e) {
     e.lineWidth = 1;
-    e.strokeStyle = "rgba(105,105,105,0.5)";
+    e.strokeStyle = colorTheme.lineColor;
+    console.log(colorTheme.lineColor);
     e.beginPath();
     for (var i = 0; i <= 20; i++) {
         e.moveTo(i * cellSize, 0), e.lineTo(i * cellSize, boardSize);

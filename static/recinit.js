@@ -269,6 +269,7 @@ function initColorTheme(theme) {
             can: "#f5f9f8",
             frameColor : "#ffffff",
             shade : "#e6eae9",
+            lineColor: "#e6eae9",
             player: function (o) {
                 switch (o) {
                     case -1: return "#b7b7b7";
