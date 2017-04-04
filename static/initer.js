@@ -340,7 +340,7 @@ function initColorTheme(theme) {
     if (theme === undefined) {
         colorTheme = {
             legal: "#6f645e",
-            horn: "#a5a7a5",
+            horn: "#d5d7d5",
             rim: "#875f5f",
             unlegal: "#e1d9c4",
             can: "#f5f9f8",

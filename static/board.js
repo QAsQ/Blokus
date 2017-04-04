@@ -221,7 +221,8 @@ function drawHornAndCell(e) {
 }
 function refreshBoard() {
     var e = getE("board");
-    e.clearRect(0, 0, boardSize, boardSize);
+    e.fillStyle = "#ffffff";
+    e.fillRect(0, 0, boardSize, boardSize);
     drawAvailable(e);
     drawHornAndCell(e);
     drawLine(e);
