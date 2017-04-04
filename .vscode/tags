@@ -1,0 +1,116 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	Development	//
+Adder	../../__init__.py	/^    def Adder():$/;"	kind:function	line:49
+Chess	../../checker.py	/^Chess = [$/;"	kind:variable	line:3
+Chesses	../../checker.py	/^Chesses = [list() for id in range(21)];$/;"	kind:variable	line:37
+Contest	../../__init__.py	/^from models import User,Contest,Infos,db$/;"	kind:namespace	line:4
+Contest	../../models.py	/^class Contest(db.Model):$/;"	kind:class	line:26
+Flask	../../__init__.py	/^from flask import Flask, render_template,g,request,redirect,url_for$/;"	kind:namespace	line:1
+Flask	../../init_db.py	/^from flask import Flask$/;"	kind:namespace	line:2
+Infos	../../__init__.py	/^from models import User,Contest,Infos,db$/;"	kind:namespace	line:4
+Infos	../../models.py	/^class Infos():$/;"	kind:class	line:102
+LoginManager	../../__init__.py	/^from flask_login import login_user,logout_user,current_user ,login_required,login_manager,LoginManager$/;"	kind:namespace	line:3
+Record	../../models.py	/^    def Record(self):$/;"	kind:member	line:42
+Room	../../models.py	/^class Room():$/;"	kind:class	line:51
+SQLAlchemy	../../models.py	/^from flask_sqlalchemy import SQLAlchemy$/;"	kind:namespace	line:3
+SocketIO	../../__init__.py	/^from flask_socketio import SocketIO,send,emit,join_room,leave_room$/;"	kind:namespace	line:2
+Timer	../../__init__.py	/^from threading import Timer$/;"	kind:namespace	line:5
+User	../../__init__.py	/^from models import User,Contest,Infos,db$/;"	kind:namespace	line:4
+User	../../init_db.py	/^from models import db,User$/;"	kind:namespace	line:1
+User	../../models.py	/^class User(UserMixin,db.Model):$/;"	kind:class	line:8
+UserMixin	../../models.py	/^from flask_login import UserMixin$/;"	kind:namespace	line:2
+__init__	../../models.py	/^    def __init__(self):$/;"	kind:member	line:103
+__init__	../../models.py	/^    def __init__(self):$/;"	kind:member	line:52
+__init__	../../models.py	/^    def __init__(self,players,_record):$/;"	kind:member	line:34
+__init__	../../models.py	/^    def __init__(self,username,password):$/;"	kind:member	line:13
+__init__.py	../../__init__.py	1;"	kind:file	line:1
+app	../../__init__.py	/^app = Flask(__name__)$/;"	kind:variable	line:10
+app	../../init_db.py	/^app = Flask(__name__);$/;"	kind:variable	line:4
+autoAdd	../../__init__.py	/^def autoAdd(room,Sta):$/;"	kind:function	line:48
+check	../../__init__.py	/^from checker import check,nextSta$/;"	kind:namespace	line:6
+check	../../checker.py	/^def check(board,Sta):$/;"	kind:function	line:67
+check_password	../../models.py	/^    def check_password(self,password):$/;"	kind:member	line:17
+check_password_hash	../../models.py	/^from werkzeug.security import generate_password_hash,check_password_hash$/;"	kind:namespace	line:1
+checker.py	../../checker.py	1;"	kind:file	line:1
+clearRoom	../../models.py	/^    def clearRoom(self,room):$/;"	kind:member	line:124
+current_user	../../__init__.py	/^from flask_login import login_user,logout_user,current_user ,login_required,login_manager,LoginManager$/;"	kind:namespace	line:3
+db	../../__init__.py	/^from models import User,Contest,Infos,db$/;"	kind:namespace	line:4
+db	../../init_db.py	/^from models import db,User$/;"	kind:namespace	line:1
+db	../../models.py	/^db = SQLAlchemy();$/;"	kind:variable	line:6
+emit	../../__init__.py	/^from flask_socketio import SocketIO,send,emit,join_room,leave_room$/;"	kind:namespace	line:2
+g	../../__init__.py	/^from flask import Flask, render_template,g,request,redirect,url_for$/;"	kind:namespace	line:1
+genchs	../../checker.py	/^    def genchs(id,sta):$/;"	kind:function	line:39
+generate_password_hash	../../models.py	/^from werkzeug.security import generate_password_hash,check_password_hash$/;"	kind:namespace	line:1
+get_id	../../models.py	/^    def get_id(self):$/;"	kind:member	line:22
+handle_battle	../../__init__.py	/^def handle_battle(Sta):$/;"	kind:function	line:59
+handle_listroom	../../__init__.py	/^def handle_listroom(var):$/;"	kind:function	line:66
+haveNext	../../models.py	/^    def haveNext(self):$/;"	kind:member	line:99
+history	../../__init__.py	/^def history(val):$/;"	kind:function	line:77
+history	../../models.py	/^    def history(self,cur):$/;"	kind:member	line:80
+id	../../models.py	/^    id = db.Column(db.Integer,primary_key=True)$/;"	kind:variable	line:27
+id	../../models.py	/^    id = db.Column(db.Integer,primary_key=True)$/;"	kind:variable	line:9
+inb	../../checker.py	/^inb   = lambda (x,y) : inr(x) and inr(y);            #in board$/;"	kind:function	line:55
+index	../../__init__.py	/^def index():$/;"	kind:function	line:96
+info	../../models.py	/^    def info(self):$/;"	kind:member	line:74
+infos	../../__init__.py	/^infos = Infos();$/;"	kind:variable	line:24
+init_db.py	../../init_db.py	1;"	kind:file	line:1
+join	../../models.py	/^    def join(self,userid,index,room):$/;"	kind:member	line:117
+joinRoom	../../__init__.py	/^def joinRoom(room,_ind):$/;"	kind:function	line:127
+join_room	../../__init__.py	/^from flask_socketio import SocketIO,send,emit,join_room,leave_room$/;"	kind:namespace	line:2
+json	../../checker.py	/^import json$/;"	kind:namespace	line:1
+json	../../models.py	/^import json$/;"	kind:namespace	line:4
+leave_room	../../__init__.py	/^from flask_socketio import SocketIO,send,emit,join_room,leave_room$/;"	kind:namespace	line:2
+leftRoom	../../__init__.py	/^def leftRoom(userid):$/;"	kind:function	line:118
+listRoom	../../models.py	/^    def listRoom(self):$/;"	kind:member	line:131
+load_user	../../__init__.py	/^def load_user(id):$/;"	kind:function	line:27
+login	../../__init__.py	/^def login():$/;"	kind:function	line:152
+login_manager	../../__init__.py	/^from flask_login import login_user,logout_user,current_user ,login_required,login_manager,LoginManager$/;"	kind:namespace	line:3
+login_manager	../../__init__.py	/^login_manager = LoginManager()$/;"	kind:variable	line:19
+login_required	../../__init__.py	/^from flask_login import login_user,logout_user,current_user ,login_required,login_manager,LoginManager$/;"	kind:namespace	line:3
+login_user	../../__init__.py	/^from flask_login import login_user,logout_user,current_user ,login_required,login_manager,LoginManager$/;"	kind:namespace	line:3
+loginroom	../../__init__.py	/^def loginroom(var):$/;"	kind:function	line:71
+logout_user	../../__init__.py	/^from flask_login import login_user,logout_user,current_user ,login_required,login_manager,LoginManager$/;"	kind:namespace	line:3
+models.py	../../models.py	1;"	kind:file	line:1
+nextSta	../../__init__.py	/^from checker import check,nextSta$/;"	kind:namespace	line:6
+nextSta	../../checker.py	/^def nextSta(board):$/;"	kind:function	line:78
+nextTimer	../../models.py	/^    def nextTimer(self):$/;"	kind:member	line:96
+nextTurn	../../__init__.py	/^def nextTurn(room,Sta):$/;"	kind:function	line:54
+nextTurn	../../models.py	/^    def nextTurn(self,chs,curTime):$/;"	kind:member	line:86
+ob	../../__init__.py	/^def ob(room):$/;"	kind:function	line:146
+off	../../checker.py	/^off   = lambda ps : map(lambda (o,x,y) : (x,y),ps);  #reduction O$/;"	kind:function	line:53
+out	../../models.py	/^    def out(self,x):$/;"	kind:member	line:69
+password	../../models.py	/^    password = db.Column(db.String(80))$/;"	kind:variable	line:11
+play_0	../../models.py	/^    play_0 = db.Column(db.Integer)$/;"	kind:variable	line:28
+play_1	../../models.py	/^    play_1 = db.Column(db.Integer)$/;"	kind:variable	line:29
+play_2	../../models.py	/^    play_2 = db.Column(db.Integer)$/;"	kind:variable	line:30
+play_3	../../models.py	/^    play_3 = db.Column(db.Integer)$/;"	kind:variable	line:31
+player	../../models.py	/^    def player(self):$/;"	kind:member	line:45
+pre	../../checker.py	/^def pre(board,owner):$/;"	kind:function	line:57
+quickCheck	../../checker.py	/^    def quickCheck(_x,_y,sta,id):$/;"	kind:function	line:89
+re	../../__init__.py	/^import re$/;"	kind:namespace	line:8
+record	../../__init__.py	/^def record(ind):$/;"	kind:function	line:88
+record	../../models.py	/^    record = db.Column(db.String)$/;"	kind:variable	line:32
+recorder	../../__init__.py	/^def recorder(val):$/;"	kind:function	line:83
+redirect	../../__init__.py	/^from flask import Flask, render_template,g,request,redirect,url_for$/;"	kind:namespace	line:1
+render_template	../../__init__.py	/^from flask import Flask, render_template,g,request,redirect,url_for$/;"	kind:namespace	line:1
+request	../../__init__.py	/^from flask import Flask, render_template,g,request,redirect,url_for$/;"	kind:namespace	line:1
+room	../../models.py	/^    def room(self,room):$/;"	kind:member	line:107
+roomIndex	../../__init__.py	/^def roomIndex(room):$/;"	kind:function	line:104
+roomInfoUpdate	../../__init__.py	/^def roomInfoUpdate(room):$/;"	kind:function	line:114
+round	../../models.py	/^    def round(self):$/;"	kind:member	line:77
+send	../../__init__.py	/^from flask_socketio import SocketIO,send,emit,join_room,leave_room$/;"	kind:namespace	line:2
+setTimer	../../__init__.py	/^def setTimer(room):$/;"	kind:function	line:35
+socketio	../../__init__.py	/^socketio = SocketIO(app)$/;"	kind:variable	line:17
+start	../../models.py	/^    def start(self,stTime):$/;"	kind:member	line:83
+time	../../__init__.py	/^import time$/;"	kind:namespace	line:7
+toCell	../../checker.py	/^def toCell(Sta):$/;"	kind:function	line:27
+toContest	../../models.py	/^    def toContest(self):$/;"	kind:member	line:93
+tryin	../../models.py	/^    def tryin(self,x,userid):$/;"	kind:member	line:60
+updSta	../../__init__.py	/^def updSta(room,Sta):$/;"	kind:function	line:30
+url_for	../../__init__.py	/^from flask import Flask, render_template,g,request,redirect,url_for$/;"	kind:namespace	line:1
+user	../../models.py	/^    def user(self,userid):$/;"	kind:member	line:112
+username	../../models.py	/^    username = db.Column(db.String(80),unique=True)$/;"	kind:variable	line:10

@@ -20,7 +20,6 @@ function createChess() {
                   ,xy(35,5),xy(37,17),xy(31,14),xy(35,8),xy(41,13)
                   ,xy(29,10),xy(33,10),xy(37,14),xy(37,13),xy(31,10)
                   ,xy(29,6)];
-    chessLocate = chessLocate.map(mucell);
     for (var index in sCS) {
         chessState[index] = 0;
         chessShape[index] = new Array;
@@ -28,7 +27,17 @@ function createChess() {
             chessShape[index] = chessShape[index].concat(xy(sCS[index][ind].x, sCS[index][ind].y));
         }
     }
-for (var index in chessShape) {
+    if(bw < bh){
+        chessLocate = chessLocate.map(function (p){
+            return xy(p.y,p.x);
+        });
+        for(var ind in chessState){
+            chessState[ind] = flipChessShape(chessShape[ind],chessState[ind]);
+            chessState[ind] = rotateChessShape(chessShape[ind],chessState[ind],false);
+        }
+    }
+    chessLocate = chessLocate.map(mucell);
+    for (var index in chessShape) {
         isHide[index] = false;
         var chess = $("<canvas id = \"chs_" + index + "\"></canvas>");
         $("#playGround").append(chess);
