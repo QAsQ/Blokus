@@ -45,7 +45,8 @@ class Contest(db.Model):
     def player(self):
         return (self.play_0,self.play_1,self.play_2,self.play_3);
 
-
+    def convert(self):
+        return {"id":self.id,"user":(self.play_0,self.play_1,self.play_2,self.play_3)}
     
 
 class Room():
@@ -94,7 +95,8 @@ class Room():
         return Contest(self.user,self.board);
     
     def nextTimer(self):
-        return self.remain[self.round() % 4] + 5;
+        #return self.remain[self.round() % 4] + 5;
+        return 1;
   
     def haveNext(self):
         return self.round() < 84;

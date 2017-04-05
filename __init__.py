@@ -1,6 +1,7 @@
-from flask import Flask, render_template,g,request,redirect,url_for
+from flask import Flask, render_template,g,request,redirect,url_for,jsonify
 from flask_socketio import SocketIO,send,emit,join_room,leave_room
 from flask_login import login_user,logout_user,current_user ,login_required,login_manager,LoginManager
+from sqlalchemy import or_
 from models import User,Contest,Infos,db
 from threading import Timer
 from checker import check,nextSta
@@ -84,6 +85,17 @@ def recorder(val):
     contest = Contest.query.get(val["id"]);
     emit('recorder',{"hist":contest.Record(),"user":contest.player()});
     
+@app.route("/user/<username>",methods = ["POST","GET"])
+def user(username):
+    if request.method == 'POST':
+        lists = Contest.query.filter(or_(Contest.play_0 == username \
+                                        ,Contest.play_1 == username \
+                                        ,Contest.play_2 == username \
+                                        ,Contest.play_3 == username)).all();
+        lists = map(lambda Obj : Obj.convert(),lists);
+        return jsonify(lists);
+    return render_template('user.html',name=username);
+
 @app.route("/record/<ind>")
 def record(ind):
     if Contest.query.get(ind) is None:
