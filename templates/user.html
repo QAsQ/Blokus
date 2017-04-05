@@ -1,0 +1,88 @@
+<html lang="en">
+<style>
+div{   
+   width: 600px;
+   height: 600px;
+   position:absolute;/*
+   background-color: #000;*/
+   text-align: center;
+   left:50%;
+   top: 50%;
+   transform: translate(-50%,-60%); 
+ }   
+             
+ h2 {   
+   font: 400 80px/1.5 Helvetica, Verdana, sans-serif;   
+   margin: 0;   
+   padding: 0;
+   background: #F9F0DA;
+   border: 2px solid #000; 
+ }   
+             
+ ul.list {   
+   list-style-type: none;   
+   margin: 0;   
+   padding: 0; 
+   text-align:center;  
+ }   
+             
+ li {   
+   font: 200 20px/1.5 Helvetica, Verdana, sans-serif;   
+   border: 2px solid #000;   
+   text-align:center;
+   text-decoration: none;
+ }   
+             
+ li:last-child {   
+ }   
+             
+ li a {   
+   text-decoration: none;   
+   color: #000;   
+   display: block;   
+   text-align:center;
+   font-size: 30px; 
+   -webkit-transition: font-size 0.3s ease, background-color 0.3s ease;   
+   -moz-transition: font-size 0.3s ease, background-color 0.3s ease;   
+   -o-transition: font-size 0.3s ease, background-color 0.3s ease;   
+   -ms-transition: font-size 0.3s ease, background-color 0.3s ease;   
+   transition: font-size 0.3s ease, background-color 0.3s ease;   
+ }   
+             
+ li a:hover {   
+   font-size: 40px;   
+   background: #F9F0DA;  
+ }  
+</style>
+<head>
+    <script src="{{url_for('static',filename='jquery.min.js')}}"></script>
+    <title>{{name}}</title>
+</head>
+<body style="background: #dbdbdb">
+  <div>   
+    <h2>Game Record</h2>   
+    <ul class="list">   
+      <!-- <li><a href="#">Zurich</a></li>   
+      <li><a href="#">Geneva</a></li>   
+      <li><a href="#">Winterthur</a></li>   
+      <li><a href="#">Lausanne</a></li>   
+      <li><a href="#">Lucerne</a></li>  -->  
+    </ul>   
+  </div>  
+    <script>
+        $.ajax({url:"/user/{{name}}"
+               ,async:true
+               ,method: 'POST'
+               ,success:function (val){
+                    console.log(val);
+                    $("#list").empty();
+                    for (var i=val.length-1;i>0;i--){
+                      var lii = $('<li></li>');
+                      console.log(val[i].user);
+                      lii.append("<a href=/record/"+val[i].id+">"+val[i].user[0]+" / "+val[i].user[1]+" / "+val[i].user[2]+" / "+val[i].user[3]+"</a>");
+                      $('ul').append(lii);
+                    }
+                }});
+    </script>
+</body>
+</html>
