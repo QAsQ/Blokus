@@ -318,8 +318,14 @@ function initAction() {
             inMask(select, pox, poy);
             if(action > 0){
                 action --;
-                if(action < 8)
-                    moveChessTo(chessLocate[select].x,chessLocate[select].y - cellSize,select);
+                if(action < 8){
+                    if(bw > bh){
+                        moveChessTo(chessLocate[select].x - cellSize,chessLocate[select].y,select);
+                    }
+                    else{
+                        moveChessTo(chessLocate[select].x,chessLocate[select].y - cellSize,select);
+                    }
+                }
             }
         }
         clix = e.clientX, cliy = e.clientY;
