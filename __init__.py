@@ -84,9 +84,18 @@ def history(val):
 def recorder(val):
     contest = Contest.query.get(val["id"]);
     emit('recorder',{"hist":contest.Record(),"user":contest.player()});
+
+@app.route("/user")
+@login_required
+def handle_user():
+    user = User.query.filter_by(id=current_user.id).first();
+    if user is None:
+        return "<h1>User not Found</h1>";
+    return redirect("/user/%s" % user.username);
+
     
 @app.route("/user/<username>",methods = ["POST","GET"])
-def user(username):
+def userindex(username):
     if request.method == 'POST':
         lists = Contest.query.filter(or_(Contest.play_0 == username \
                                         ,Contest.play_1 == username \
