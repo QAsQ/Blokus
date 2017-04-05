@@ -214,7 +214,7 @@ function initAction() {
         inMask(select, pox, poy);
     }
 
-    var extend = false,moved = false;
+    var extend = false;
     function shadeoff(event,id,poi){
         var pos = [xy(-1,-1),xy(0,-1),xy(1,-1)
                   ,xy(-1, 0)         ,xy(1,0)
@@ -283,7 +283,6 @@ function initAction() {
             updSelect(getID(clix, cliy));
             if (select !== -1)
                 getPo(), inMask(select, pox, poy);
-            moved = false;
         }
     }
     function up(){
@@ -297,7 +296,8 @@ function initAction() {
             AddChess(sta);
         }
         else{
-            if(extend == false && moved == false && select != -1){
+            console.log(action);
+            if(extend == false && action >= 8 && select != -1){
                 extend = true;
                 shadeon(select,chessLocate[select]);
             }
@@ -311,13 +311,15 @@ function initAction() {
     var action = 0;
     function move(e){
         if (mouseDown === true && select !== -1) {
+            console.log(action);
             getPo();
             moveChess(e);
             moved = true;
             inMask(select, pox, poy);
             if(action > 0){
-                moveChessTo(chessLocate[select].x,chessLocate[select].y - cellSize,select);
                 action --;
+                if(action < 8)
+                    moveChessTo(chessLocate[select].x,chessLocate[select].y - cellSize,select);
             }
         }
         clix = e.clientX, cliy = e.clientY;
@@ -325,7 +327,7 @@ function initAction() {
     $("#playGround").on('mousedown',down);
     $("#playGround").on('touchstart',function (e){
         down(e.originalEvent.touches[0]);
-        action = 5;
+        action = 15;
         return false;
     });
     $("#playGround").on('mousemove',move);
@@ -335,8 +337,8 @@ function initAction() {
         return false;
     });
     $("#playGround").on('mouseup touchend',function (){
-        action = 0;
         up();
+        action = 0;
         return false;
     });
     $(window).keydown(function (e) {
