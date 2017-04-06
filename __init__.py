@@ -161,6 +161,10 @@ def joinRoom(room,_ind):
     else:
         return render_template("room.html",room = room,sta = infos.room(room).status);
 
+@app.errorhandler(404)
+def error(val):
+    return redirect('/');
+
 
 @app.route("/room/<room>/ob")
 @login_required
