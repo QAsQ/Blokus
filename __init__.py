@@ -127,7 +127,7 @@ def roomIndex(room):
         return "<h1>Permission Denied</h1>";
     (lastroom,lastind) = infos.user(current_user.id);
     if lastroom == room and lastind != -1:
-        status = 15 - (1 << lastind);
+        status = infos.room(room).status - (1 << lastind);
     else:
         status = infos.room(room).status;
     return render_template("room.html",room = room,sta = status);
