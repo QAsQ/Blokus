@@ -2,10 +2,24 @@
 <html lang="en">  
 <head>  
     <meta charset="UTF-8">  
-    <title>Login</title>  
+    <title>Login</title>
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>  
     <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='login.css')}}"/>
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-</head>  
+</head>
+<style>
+.warning{
+    height: 40px;
+    width: 600px;
+   /* background-color:#000;*/
+    position:absolute;
+    text-align: center;
+    left:50%;
+    top: 50%;
+    transform: translate(-50%,-50%); 
+}
+</style>
 <body> 
     <div id="back_block">
         <div id="pic">
@@ -31,11 +45,11 @@
                 <div class="sign-in-htm">
                 <form method="post"> 
                     <div class="group">
-                        <label for="user" class="label">Username</label>
+                        <label for="user" class="label" style="text-align:left;">Username</label>
                         <input id="user" type="text" class="input" name="u">
                     </div>
                     <div class="group">
-                        <label for="pass" class="label">Password</label>
+                        <label for="pass" class="label" style="text-align:left;">Password</label>
                         <input id="pass" type="password" class="input" data-type="password" name="p">
                     </div>
                     <!-- <div class="group">
@@ -50,17 +64,17 @@
             <div class="sign-up-htm">
                 <form method="post"> 
                 <div class="group">
-                    <label for="user" class="label">Username</label>
+                    <label for="user" class="label" style="text-align:left;">Username</label>
                     <input id="user" type="text" class="input" name="u">
                 </div>
 
                 <div class="group">
-                    <label for="pass" class="label">Password</label>
+                    <label for="pass" class="label" style="text-align:left;">Password</label>
                     <input id="pass" type="password" class="input" data-type="password" name="p">
                 </div>
 
                 <div class="group">
-                    <label for="pass" class="label">Repeat Password</label>
+                    <label for="pass" class="label" style="text-align:left;">Repeat Password</label>
                     <input id="pass" type="password" class="input" data-type="password" name="rp">
                 </div>
 
@@ -73,6 +87,17 @@
             </form>
         </div>
     </div>
-    <div> {{message}} </div>
+    <!-- <div class="warning"> {{message}} </div> -->
+    <div id = "alerts" class="alert alert-danger" style="text-align:center;font-size:20px;">
+        <a href="#" class="close" data-dismiss="alert">
+            &times;
+        </a>
+    <danger>{{message}}</danger>
+    <script>
+        if("{{message}}" === ""){
+            $("#alerts").alert('close');
+        }
+    </script>
+</div>
 </body>  
 </html>  

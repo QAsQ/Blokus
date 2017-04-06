@@ -34,42 +34,6 @@ img {
     max-width: 100%;
     max-height: 100%;
 }
-/*
-#login{   
-    position: absolute;   
-    top: 50%;   
-    left:75%;   
-    margin: -150px 0 0 -150px;   
-    width: 300px;   
-    height: 300px;   
-}   
-#login h1{   
-    color: #2D2D3F;   
-    text-shadow:0 0 10px;
-    letter-spacing: 1px;   
-    text-align: center;   
-}   
-h1{   
-    font-size: 2em;   
-    margin: 0.67em 0;   
-}   
-input{   
-    width: 278px;   
-    height: 18px;   
-    margin-bottom: 10px;   
-    outline: none;   
-    padding: 10px;   
-    font-size: 13px;   
-    color: #fff;   
-    text-shadow:1px 1px 1px;   
-    border-top: 1px solid #312E3D;   
-    border-left: 1px solid #312E3D;   
-    border-right: 1px solid #312E3D;   
-    border-bottom: 1px solid #56536A;   
-    border-radius: 4px;   
-    background-color: #2D2D3F;   
-}
-*/ 
 .but{   
     width: 300px;   
     min-height: 20px;   
