@@ -236,9 +236,9 @@ function initAction() {
         }
         if(sta != -1){
             if(0 != ((sta - chessState[id]) & 1))
-                chessState[id] = flipChessShape(chessShape[id],chessState[id]);
-             while(sta != chessState[id])
-                 chessState[id] = rotateChessShape(chessShape[id],chessState[id],true);
+                flipChess(id,centx,centy);
+            while(sta != chessState[id])
+                rotateChess(id,centx,centy,true);
             refreshChess(id);
         }
         getE("shade").clearRect(0,0,cellSize * 15,cellSize * 15);
