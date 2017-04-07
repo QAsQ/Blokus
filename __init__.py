@@ -120,6 +120,11 @@ def index():
         return redirect("/room/%s" % room);
     return render_template('index.html');
 
+
+@app.route("/intro")
+def introduction():
+    return render_template("intro.html");
+
 @app.route("/room/<room>")
 @login_required
 def roomIndex(room):
