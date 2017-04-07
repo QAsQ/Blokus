@@ -137,8 +137,10 @@ function initAction() {
             for (var j in chessShape[i]) {
                 var poi = chessShape[i][j];
                 if (inreg(0, cellSize, cx - offx - cellSize * poi.x)
-                    && inreg(0, cellSize, cy - offy - cellSize * poi.y))
+                    && inreg(0, cellSize, cy - offy - cellSize * poi.y)){
+                    centx = cx - offx,centy = cy - offy;
                     return i;
+                }
             }
         }
         for(var i = 0 ; i < 21 ; i ++){
@@ -152,8 +154,10 @@ function initAction() {
             var offx = chessLocate[i].x;
             var offy = chessLocate[i].y;
             if (inreg(mi.x,ma.x + 1, (cx - offx) / cellSize)
-             && inreg(mi.y,ma.y + 1, (cy - offy) / cellSize))
+             && inreg(mi.y,ma.y + 1, (cy - offy) / cellSize)){
+                centx = cx - offx,centy = cy - offy;
                 return i;
+             }
         }
         return -1;
     }
@@ -169,16 +173,6 @@ function initAction() {
         select = x;
         if (select != -1) $("#chs_" + select).css("opacity", highp);
     }
-    function getCent() {
-        getPo();
-        if (!inreg(0, cellSize * 5, clix - chsx) || !inreg(0, cellSize * 5, cliy - chsy)) {
-            centx =chsx + cellSize * 2.5, centy = chsy + cellSize * 2.5;
-        }
-        else{
-            centx = clix, centy = cliy;
-        }
-    }
-
     function getPo() {
         chsx = $("#chs_" + select).position().left;
         chsy = $("#chs_" + select).position().top;
@@ -190,9 +184,12 @@ function initAction() {
         chsx -= clix - e.clientX, chsy -= cliy - e.clientY;
         moveChessTo(chsx,chsy,select);
     }
-    function flipChess() {
-        getCent();
-        chsy = centy * 2 - cellSize * 5 - chsy;
+    function flipChess(ind,cenx,ceny) {
+        tcentx = chessLocate[ind].x + cenx;
+        tcenty = chessLocate[ind].y + ceny;
+        chsy = tcenty * 2 - cellSize * 5 - chsy;
+
+        centy = 5 * cellSize - centy;
         moveChessTo(chsx,chsy,select);
 
         chessState[select] = flipChessShape(chessShape[select],chessState[select]);
@@ -200,11 +197,20 @@ function initAction() {
         getPo();
         inMask(select, pox, poy);
     }
-    function rotateChess(ind, clix, cliy, clock) {
-        getCent();
-        var dx = centx - chsx, dy = centy - chsy;
-        if(clock) chsx = centx - dy, chsy =  centy - (5 * cellSize - dx);
-        else      chsx = centx - (5 * cellSize - dy), chsy =  centy - dx;
+    function rotateChess(ind, cenx, ceny, clock) {
+        tcentx = chessLocate[ind].x + cenx;
+        tcenty = chessLocate[ind].y + ceny;
+        var dx = tcentx - chsx, dy = tcenty - chsy;
+        if(clock) chsx = tcentx - dy, chsy =  tcenty - (5 * cellSize - dx);
+        else      chsx = tcentx - (5 * cellSize - dy), chsy =  tcenty - dx;
+
+        if(clock) centx = cellSize *  5 - centx;
+        else       centy = cellSize *  5 - centy;
+        {
+            var temp = centx;
+            centx = centy;
+            centy = temp;
+        }
         moveChessTo(chsx,chsy,select);
 
         chessState[select] = rotateChessShape(chessShape[select],chessState[select],clock);
@@ -351,13 +357,13 @@ function initAction() {
         switch (e.keyCode) {
             case 87: //w
             case 83: //s
-                flipChess(select, clix, cliy);
+                flipChess(select, centx, centy);
                 break;
             case 65: // a
-                rotateChess(select, clix, cliy, true);
+                rotateChess(select, centx, centy, true);
                 break;
             case 68: //d
-                rotateChess(select, clix, cliy, false);
+                rotateChess(select, centx, centy, false);
                 break;
             default:
                 break;
