@@ -273,6 +273,7 @@ function initAction() {
         e.stroke();
     }
     function down(e){
+        moved = false;
         if(extend == true){
             shadeoff(e,select,chessLocate[select]);
         }
@@ -296,8 +297,7 @@ function initAction() {
             AddChess(sta);
         }
         else{
-            console.log(action);
-            if(extend == false && action >= 8 && select != -1){
+            if(extend == false && (moved == false || action >= 8 )&& select != -1){
                 extend = true;
                 shadeon(select,chessLocate[select]);
             }
@@ -308,10 +308,9 @@ function initAction() {
             }
         }
     }
-    var action = 0;
+    var action = 0,moved = false;
     function move(e){
         if (mouseDown === true && select !== -1) {
-            console.log(action);
             getPo();
             moveChess(e);
             moved = true;
