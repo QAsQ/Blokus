@@ -125,6 +125,10 @@ def index():
 def introduction():
     return render_template("intro.html");
 
+@app.route("/about")
+def about():
+    return render_template("about.html");
+
 @app.route("/room/<room>")
 @login_required
 def roomIndex(room):
