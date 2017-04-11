@@ -158,7 +158,7 @@ def joinRoom(room,_ind):
     ind = int(_ind);
     userid = current_user.id;
     if (room,ind) == infos.user(userid): #in this room before
-        return render_template("play.html",play = ind);
+        return render_template("play.html",play = ind,room = room);
     leftRoom(userid);
     if infos.join(userid,ind,room):
         roomInfoUpdate(room);
@@ -166,7 +166,7 @@ def joinRoom(room,_ind):
             infos.room(room).start(time.time());
             setTimer(room);
             socketio.emit("startGame",{},room = room);
-        return render_template("play.html",play = ind);
+        return render_template("play.html",play = ind,room=room);
     else:
         return render_template("room.html",room = room,sta = infos.room(room).status);
 
@@ -180,7 +180,7 @@ def error(val):
 def ob(room):
     leftRoom(current_user.id);
     infos.join(current_user.id,-1,room);
-    return render_template("play.html",play = -1);
+    return render_template("play.html",play = -1,room = room);
 
 @app.route("/login",methods = ['GET','POST'])
 def login():

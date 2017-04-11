@@ -9,6 +9,7 @@
     <script src = "{{url_for('static',filename='bootstrap.min.js')}}"></script>
     <link rel="stylesheet" href="{{url_for('static',filename='bootstrap.min.css')}}" type="text/css" />
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0,user-scalable=no"/>
     <style type="text/css"> 
         body { 
@@ -98,6 +99,17 @@
             font-family: icomoon;
             padding: 0 6px;
         }
+        .side-bar {width: 66px;position: fixed;bottom: 20px;right: 25px;line-height: 0;z-index: 100;} 
+        .side-bar a {width: 66px;height: 66px;display: inline-block;background-color: #ddd;margin-bottom: 2px;} 
+        .side-bar a:hover {background-color: #669fdd;} 
+        .side-bar .robot {background-position: 0 -62px; background-color:#cf1b24;} 
+        .side-bar .qq-group {background-position: 0 -130px;position: relative;background-color:#239546;} 
+        .side-bar .again {background-position: 0 -198px; background-color:#0091cf;} 
+        .side-bar .leave {background-position: 0 -266px; background-color:#ebb60d;} 
+        .side-bar .qq-group:hover .chat-tips {display: block;} 
+        .chat-tips {padding: 20px;border: 1px solid #d1d2d6;position: absolute;right: 78px;top: -55px;background-color: #fff;display: none;} 
+        .chat-tips i {width: 9px;height: 16px;display: inline-block;position: absolute;right: -9px;top: 80px;background-position:-88px -350px;} 
+        .chat-tips img {width: 138px;height: 138px;} 
     </style>
     <title>BLOKUS</title>
 </head>
@@ -155,5 +167,18 @@
     <div id = "n1" class = "name"></div>
     <div id = "n2" class = "name"></div>
     <div id = "n3" class = "name"></div>
+
+    <!--悬浮功能键-->
+    <!--http://www.thinkcmf.com/font/icons/icons/times-->
+    <div class="side-bar">  
+        <a href="#" class="robot"><i class="fa fa-cog" style="font-size:45px; color:#fff;padding-left:13px;padding-top:11px;"></i></a>
+
+        <a href="#" class="qq-group"><i class="fa fa-qq" style="font-size:45px; color:#fff;padding-left:10px;padding-top:11px;"></i><div class="chat-tips"> 
+        <img style="width:138px;height:138px;" src="http://i1.piimg.com/4851/237d7c69b1ac38fc.png" alt="QQ群二维码"></div></a> 
+
+        <a href="javascript:history.go(0);" class="again"><i class="fa fa-refresh" style="font-size:45px; color:#fff;padding-left:14px;padding-top:11px;"></i></a>
+
+        <a href="/room/{{room}}/ob" class="leave"><i class="fa fa-sign-out" style="font-size:45px; color:#fff;padding-left:13px;padding-top:11px;"></i></a>  
+    </div>
 </body>
 </html>
