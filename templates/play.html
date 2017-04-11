@@ -99,10 +99,20 @@
             font-family: icomoon;
             padding: 0 6px;
         }
+
+        .side-bar i {
+            font-size:45px; 
+            color:#fff;
+            padding-left:10px;
+            padding-top:11px;
+        }
         .side-bar {width: 66px;position: fixed;bottom: 20px;right: 25px;line-height: 0;z-index: 100;} 
         .side-bar a {width: 66px;height: 66px;display: inline-block;background-color: #ddd;margin-bottom: 2px;} 
         .side-bar a:hover {background-color: #669fdd;} 
-        .side-bar .robot {background-position: 0 -62px; background-color:#cf1b24;} 
+        .side-bar .robot {
+            /*background-position: 0 -62px; 
+            background-color:#cf1b24;*/
+        } 
         .side-bar .qq-group {background-position: 0 -130px;position: relative;background-color:#239546;} 
         .side-bar .again {background-position: 0 -198px; background-color:#0091cf;} 
         .side-bar .leave {background-position: 0 -266px; background-color:#ebb60d;} 
@@ -110,8 +120,28 @@
         .chat-tips {padding: 20px;border: 1px solid #d1d2d6;position: absolute;right: 78px;top: -55px;background-color: #fff;display: none;} 
         .chat-tips i {width: 9px;height: 16px;display: inline-block;position: absolute;right: -9px;top: 80px;background-position:-88px -350px;} 
         .chat-tips img {width: 138px;height: 138px;} 
+
+
+        <!-- robot -->
+        .tgl{display:none}
+        .tgl,.tgl *,.tgl :after,.tgl :before,.tgl+.tgl-btn,.tgl:after,.tgl:before{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
+        .tgl ::-moz-selection,.tgl :after::-moz-selection,.tgl :before::-moz-selection,.tgl+.tgl-btn::-moz-selection,.tgl::-moz-selection,.tgl:after::-moz-selection,.tgl:before::-moz-selection{background:0 0}
+        .tgl ::selection,.tgl :after::selection,.tgl :before::selection,.tgl+.tgl-btn::selection,.tgl::selection,.tgl:after::selection,.tgl:before::selection{background:0 0}
+        .tgl+.tgl-btn{outline:0;display:block;width:66px;height:66px;position:relative;cursor:pointer}
+        .tgl+.tgl-btn:after,.tgl+.tgl-btn:before{position:relative;display:block;content:"";width:50%;height:100%}
+        .tgl+.tgl-btn:after{left:0}
+        .tgl+.tgl-btn:before{display:none}
+        .tgl:checked+.tgl-btn:after{left:50%}
+        .tgl-flip+.tgl-btn{padding:2px;-webkit-transition:all .2s ease;transition:all .2s ease;font-family:sans-serif;-webkit-perspective:100px;-ms-perspective:100px;perspective:100px}
+        .tgl-flip+.tgl-btn:after,.tgl-flip+.tgl-btn:before{display:inline-block;-webkit-transition:all .4s ease;transition:all .4s ease;width:100%;text-align:center;position:absolute;line-height:2em;font-weight:700;color:#fff;position:absolute;top:0;left:0;-webkit-backface-visibility:hidden;-ms-backface-visibility:hidden;backface-visibility:hidden;}
+        .tgl-flip+.tgl-btn:after{content: '\2714';font-size:30px;background:#02C66F;-webkit-transform:rotateY(-180deg);-ms-transform:rotateY(-180deg);transform:rotateY(-180deg)}
+        .tgl-flip+.tgl-btn:before{background:#cf1b24;content: '\2716';font-size:30px;}
+        .tgl-flip+.tgl-btn:active:before{-webkit-transform:rotateY(-20deg);-ms-transform:rotateY(-20deg);transform:rotateY(-20deg)}
+        .tgl-flip:checked+.tgl-btn:before{-webkit-transform:rotateY(180deg);-ms-transform:rotateY(180deg);transform:rotateY(180deg)}
+        .tgl-flip:checked+.tgl-btn:after{-webkit-transform:rotateY(0);-ms-transform:rotateY(0);transform:rotateY(0);left:0;background:#7FC6A6}
+        .tgl-flip:checked+.tgl-btn:active:after{-webkit-transform:rotateY(20deg);-ms-transform:rotateY(20deg);transform:rotateY(20deg)}
     </style>
-    <title>BLOKUS</title>
+<title>BLOKUS</title>
 </head>
 <body style="margin:0px 0px 0px 0px" onload="init({{play}})">
     <div id = "start" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
@@ -170,15 +200,30 @@
 
     <!--悬浮功能键-->
     <!--http://www.thinkcmf.com/font/icons/icons/times-->
+    <!-- http://www.qdfuns.com/notes/21482/e65394e28f9bd242759bb991eb4ed4cc.html -->
     <div class="side-bar">  
-        <a href="#" class="robot"><i class="fa fa-cog" style="font-size:45px; color:#fff;padding-left:13px;padding-top:11px;"></i></a>
+        
+        <!-- <button class="robot"><i class="fa fa-cog" style="font-size:45px; color:#fff;padding-left:13px;padding-top:11px;"></i></button>-->
 
-        <a href="#" class="qq-group"><i class="fa fa-qq" style="font-size:45px; color:#fff;padding-left:10px;padding-top:11px;"></i><div class="chat-tips"> 
+        <span class=''>
+            <input class='tgl tgl-flip' id='robot' type='checkbox' style="position:absolute;left:-9999px;" onclick="check()">
+            <label class='tgl-btn' for='robot'></label>
+        </span>
+
+        <a href="#" class="qq-group"><i class="fa fa-qq"></i><div class="chat-tips"> 
         <img style="width:138px;height:138px;" src="http://i1.piimg.com/4851/237d7c69b1ac38fc.png" alt="QQ群二维码"></div></a> 
 
-        <a href="javascript:history.go(0);" class="again"><i class="fa fa-refresh" style="font-size:45px; color:#fff;padding-left:14px;padding-top:11px;"></i></a>
+        <a href="javascript:history.go(0);" class="again"><i class="fa fa-refresh"></i></a>
 
-        <a href="/room/{{room}}/ob" class="leave"><i class="fa fa-sign-out" style="font-size:45px; color:#fff;padding-left:13px;padding-top:11px;"></i></a>  
+        <a href="/room/{{room}}/ob" class="leave"><i class="fa fa-sign-out"></i></a>  
     </div>
 </body>
+    <script Language="javascript">  
+        function check(){ 
+            if(document.getElementById("robot").checked){
+                alert("checkbox is checked");
+                console.log(1);
+            }
+        } 
+ </script>
 </html>
