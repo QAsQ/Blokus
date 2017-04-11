@@ -9,6 +9,7 @@ var colorTheme;
 var stepTime,fullTime;
 var username;
 var counting = false;
+var robot;
 
 
 function initSize() {
@@ -21,6 +22,19 @@ function initSize() {
     bw = w,bh = h;
     cellSize = Math.floor(Math.min(w,h)/ 30);
     boardSize = cellSize * 20;
+    //if(Math.min(w,h) < 600){
+        {
+        var boxsize = cellSize * 3;
+        var fontsize = cellSize * 1.5;
+        var paddingsize = (boxsize - fontsize) / 2;
+        $(".side-bar i").css("font-size",fontsize+"px");
+        $(".tgl-flip+.tgl-btn :after").css("font-size",fontsize+"px");
+        $(".tgl-flip+.tgl-btn :before").css("font-size",fontsize+"px");
+        $(".side-bar").css({width:boxsize+"px"});
+        $(".side-bar a").css({width:boxsize+"px",height:boxsize+"px"});
+        $(".tgl+.tgl-btn").css({"font-size":fontsize+"px",width:boxsize+"px",height:boxsize+"px"});
+        $(".side-bar i").css({"padding-left":paddingsize+"px","padding-top":paddingsize+"px"});
+    }
 }
 function initSocket(){
     socket = io.connect('http://' + document.domain + ':' + location.port);
@@ -55,6 +69,12 @@ function initSocket(){
     socket.on('move',function(Sta){
         roundTime = Sta.remain.map(Math.floor);
         AddChess(Sta);
+        if(round < 84 && round % 4 == owner && robot){
+            Sta = availableRound();
+            if(Sta.sta != -1){
+                AddChess(Sta);
+            }
+        }
     });
     socket.on('info',function (room) {
         username = new Array;
@@ -95,6 +115,7 @@ function initSocket(){
 }
 function init(x) {
     owner = x;
+    robot = false;
     round = -1;
     stepTime = 5,fullTime = 240;
     curTime = stepTime;

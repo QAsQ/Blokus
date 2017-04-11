@@ -311,3 +311,54 @@ function prograssbar(id,st,ed){
         }
     }
 }
+function availableRound() {
+    var bst = new Array;
+    for(var i = 0 ; i < 20 ; i ++){
+        bst[i] = new Array;
+        for(var j = 0 ; j < 20 ; j ++){
+            bst[i][j] = 0;
+        }
+    }
+    var owners = boardFace.filter(function (cell) {
+        return cell.o === owner;
+    });
+    var horn = owners.map(upd(1, 1)).concat(owners.map(upd(-1, 1))).concat(owners.map(upd(1, -1))).concat(owners.map(upd(-1, -1))).filter(inbod);
+    var crash = owners.map(upd(0, 1)).concat(owners.map(upd(1, 0))).concat(owners.map(upd(0, -1))).concat(owners.map(upd(-1, 0)));
+    crash = crash.concat(boardFace).filter(inbod);
+    for(var ind in horn){
+        bst[horn[ind].x][horn[ind].y] = 1;
+    }
+    for(var ind in crash){
+        bst[crash[ind].x][crash[ind].y] = -1;
+    }
+    for(var i in sCS){
+        var ind = sCS.length - i - 1;
+        if(isHide[ind] === true) continue;
+        var chs = chessShape[ind].map(function (cells) {
+            return xy(cells.x, cells.y);
+        });
+        var s = 0;
+        for(var sta = 0 ; sta < 8 ; sta ++){
+            if(sta === 4){
+                s = flipChessShape(chs,s);
+            }
+            s = rotateChessShape(chs,s,true);
+            for(var x = -4 ; x < 20 ; x ++){
+                for(var y = -4 ; y < 20 ; y ++){
+                    if(cheavi(chs,bst,x,y) === true)
+                        return {sta:s,x:x,y:y,id:ind,round:round};
+                }
+            }
+        }
+    }
+    return {sta:-1,x:-1,y:-1,id:-1,round:round};
+}
+function cheavi(arrs,bst,x,y) {
+    var ret = 0;
+    for(var i in arrs){
+        if(!inbod(xy(arrs[i].x+x,arrs[i].y+y))) return false;
+        if(bst[arrs[i].x + x][arrs[i].y + y] === -1) return false;
+            ret += bst[arrs[i].x + x][arrs[i].y + y];
+    }
+    return ret > 0;
+}

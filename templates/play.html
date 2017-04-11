@@ -198,9 +198,6 @@
     <div id = "n2" class = "name"></div>
     <div id = "n3" class = "name"></div>
 
-    <!--悬浮功能键-->
-    <!--http://www.thinkcmf.com/font/icons/icons/times-->
-    <!-- http://www.qdfuns.com/notes/21482/e65394e28f9bd242759bb991eb4ed4cc.html -->
     <div class="side-bar">  
         
         <!-- <button class="robot"><i class="fa fa-cog" style="font-size:45px; color:#fff;padding-left:13px;padding-top:11px;"></i></button>-->
@@ -220,9 +217,14 @@
 </body>
     <script Language="javascript">  
         function check(){ 
+            robot = !robot;
             if(document.getElementById("robot").checked){
-                alert("checkbox is checked");
-                console.log(1);
+                if(round < 84 && round % 4 == owner && robot){
+                    Sta = availableRound();
+                    if(Sta.sta != -1){
+                        AddChess(Sta);
+                    }
+                }
             }
         } 
  </script>
