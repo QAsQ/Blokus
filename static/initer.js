@@ -28,12 +28,12 @@ function initSize() {
         var fontsize = cellSize * 1.5;
         var paddingsize = (boxsize - fontsize) / 2;
         $(".side-bar i").css("font-size",fontsize+"px");
-        $(".tgl-flip+.tgl-btn :after").css("font-size",fontsize+"px");
-        $(".tgl-flip+.tgl-btn :before").css("font-size",fontsize+"px");
         $(".side-bar").css({width:boxsize+"px"});
         $(".side-bar a").css({width:boxsize+"px",height:boxsize+"px"});
         $(".tgl+.tgl-btn").css({"font-size":fontsize+"px",width:boxsize+"px",height:boxsize+"px"});
         $(".side-bar i").css({"padding-left":paddingsize+"px","padding-top":paddingsize+"px"});
+        $('head').append("<style>.tgl-flip+.tgl-btn :after{font-size:"+fontsize+"px}</style>");
+        $('head').append("<style>.tgl-flip+.tgl-btn :before{font-size:"+fontsize+"px}</style>");
     }
 }
 function initSocket(){
