@@ -134,6 +134,7 @@ def about():
 def roomIndex(room):
     if room[0] == "'":
         return "<h1>Permission Denied</h1>";
+    room = room[:20];
     (lastroom,lastind) = infos.user(current_user.id);
     if lastroom == room and lastind != -1:
         status = infos.room(room).status - (1 << lastind);
