@@ -100,7 +100,7 @@ function initSocket(){
                 counter[boardFace[ind].o].x--;
         }
         counter.sort(function (a,b) {
-            return a.x > b.x;
+            return a.x - b.x;
         });
         var rnk = 1;
         for(var ind in counter){
