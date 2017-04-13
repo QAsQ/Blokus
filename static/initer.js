@@ -45,6 +45,7 @@ function initSocket(){
     socket.on('history', function (board){
         hist = board.hist; 
         round = 0;
+        clearFace();
         for(var ind in hist){
             AddChess(hist[ind]);
         }
