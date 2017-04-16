@@ -334,7 +334,7 @@ function availableRound() {
     for(var i in sCS){
         var ind = sCS.length - i - 1;
         if(isHide[ind] === true) continue;
-        var chs = chessShape[ind].map(function (cells) {
+        var chs = sCS[ind].map(function (cells) {
             return xy(cells.x, cells.y);
         });
         var s = 0;

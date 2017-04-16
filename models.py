@@ -101,7 +101,7 @@ class Room():
         return self.round() < 84;
     
     def deadline(self,curTime):
-        return self.last != -1 and curTime < self.last + self.remain[self.round() % 4];
+        return self.last != -1 and curTime >= self.last + self.remain[self.round() % 4];
         
 
 class Infos():
