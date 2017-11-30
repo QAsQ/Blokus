@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src = "static/jquery.min.js"></script>
+    <script src = "static/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="static/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <script src="{{url_for('static',filename='socket.io.min.js')}}"></script>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <title>Blokus</title>
+</head>
+<style type="text/css">
+* {box-sizing: border-box;}
+body{
+    margin: 0;
+    text-align:center;
+    background-color: #dbdbdb;
+}
+div.search {
+    padding: 30px 0;
+    background-color: #DBDBDB;
+}
+form {
+  position: relative;
+  width: 500px;
+  margin: 0 auto;
+}
+.d7 {background: #FFFFFF;}
+.d7:after {content:""; clear:both; display:table}
+.d7 form {
+  position: absolute;
+  width: auto;
+  height: 80px;
+  display: inline-block;
+  left:40px;
+  right:0;
+  top:20px;
+  bottom: 0;
+  margin: 0 auto;
+}
+.d7 input {
+  width: 380px;
+  height: 55px;
+  padding-left: 15px;
+  border-radius: 42px;
+  border: 2px solid #324b4e;
+  background: #F9F0DA;
+  position: relative;
+  outline: none;
+  margin:0 auto;
+  transition: .3s linear;
+}
+.d7 input:focus {
+  width: 400px;
+}
+.d7 button {
+  width: 55px;
+  height: 55px;
+  background: none;
+  border: none;
+  position: relative;
+  top: -2px;
+  left:-58px;
+  right: 0;
+}
+.d7 button:before{
+  content: "\f002";
+  font-family: FontAwesome;
+  color: #324b4e;
+}
+#hor-minimalist-b
+{
+    font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+    font-size: 16px;
+    background: #F9F0DA;
+    margin: 45px;
+    width: 480px;
+    border-collapse: collapse;
+    border-radius: 7px;
+    border: 2px solid #324b4e; 
+    text-align: center;
+    margin:auto;
+}
+#hor-minimalist-b th
+{
+    font-size: 18px;
+    font-weight: normal;
+    color: #324b4e;
+    padding: 10px 8px;
+    border-bottom: 2px solid #324b4e;
+    text-align: center;
+}
+#hor-minimalist-b td
+{
+    border-bottom: 1px solid #324b4e;
+    color: #324b4e;
+    padding: 6px 8px;
+}
+#hor-minimalist-b tbody tr:hover td
+{
+    color: #000;
+}
+.user {
+  display: inline-block;
+  position: relative;
+  float:right;
+  margin: -4px 40px 0px 0px;
+  padding: 0 20px;
+  text-align: center;
+  text-decoration: none;
+  font: bold 12px/25px Arial, sans-serif;
+  border: 2px solid #324b4e;
+  text-shadow: 1px 1px 1px rgba(255,255,255, .22);
+
+  -webkit-border-radius: 30px;
+  -moz-border-radius: 30px;
+  border-radius: 30px;
+
+  -webkit-box-shadow: 1px 1px 1px rgba(0,0,0, .29), inset 1px 1px 1px rgba(255,255,255, .44);
+  -moz-box-shadow: 1px 1px 1px rgba(0,0,0, .29), inset 1px 1px 1px rgba(255,255,255, .44);
+  box-shadow: 1px 1px 1px rgba(0,0,0, .29), inset 1px 1px 1px rgba(255,255,255, .44);
+
+  -webkit-transition: all 0.15s ease;
+  -moz-transition: all 0.15s ease;
+  -o-transition: all 0.15s ease;
+  -ms-transition: all 0.15s ease;
+  transition: all 0.15s ease;
+}
+.blue {
+  color: #324b4e;
+  background: #F9F0DA;
+}
+.big {
+  padding: 0 19px;
+  padding-top: 12.5px;
+  height: 50px;
+  text-transform: uppercase;
+  font: bold 20px/22px Arial, sans-serif;
+}
+a{
+  text-decoration:none;
+  color: #324b4e;
+}
+a:hover {
+  text-decoration: none;
+  color: #000;
+  text-shadow: 1px 1px 1px rgba(255,255,255, .22);
+}
+</style>
+<body>
+
+    <div class="search d7"  style="text-align:center">
+        <form method="POST">
+          <input type="text" id="input" placeholder="Enter Your Room" name="room">
+          <button type="submit"></button>
+        </form>
+        <a href="/user" class="user blue big">User File</a>
+    </div>
+
+    <div>
+    <table id="hor-minimalist-b">
+        <tr>
+            <th>Name</th>
+            <th>Player</th>
+        </tr> 
+    </table>
+    </div>
+    <script>
+        socket = io.connect('http://' + document.domain + ':' + location.port);
+        socket.on('connect',function() { });
+        socket.on('listRoom',function (val){
+            $("#hor-minimalist-b  tr:not(:first)").empty();
+                for (var i = 0; i < val.length; i++) {
+                var tr = $('<tr></tr>');
+                tr.append("<td><a href=/room/" + val[i][0] +">"+val[i][0]+"</a></td>");
+                var tmp="<td>";
+                for (var j=0;j<3;j++){
+                    if (val[i][1][j]!=null) tmp+=val[i][1][j]+"/";
+                    else tmp+="___/";
+                }
+                if (val[i][1][3]!=null) tmp+=val[i][1][j];
+                    else tmp+="___"
+                tmp+="</td>";
+                tr.append(tmp);
+                $('table').append(tr);
+            }
+        });
+        socket.emit('listRoom',{});
+    </script>
+</body>
+</html>

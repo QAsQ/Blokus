@@ -1,0 +1,82 @@
+<html lang="en">
+<head>
+    <script src="{{url_for('static',filename='jquery.min.js')}}"></script>
+    <script src="{{url_for('static',filename='socket.io.min.js')}}"></script>
+    <script src="{{url_for('static',filename='pure.js')}}"></script>
+    <script src="{{url_for('static',filename='board.js')}}"></script>
+    <script src="{{url_for('static',filename='chess.js')}}"></script>
+    <script src="{{url_for('static',filename='recinit.js')}}"></script>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0,user-scalable=no"/>
+    <style>
+        .name{
+            -moz-user-select: none; 
+            -webkit-user-select: none;  
+            -ms-user-select: none; 
+            -khtml-user-select: none; 
+            user-select: none;
+            width: auto;
+            height: 20px;
+            min-width: 50px;
+            position: absolute;
+            background-color: #444;
+            z-index: 1000;
+            opacity: .8;
+            border-radius: 10px;
+            color: white;
+            border: 2px #999;
+            text-align: center;
+            font-family: icomoon;
+            padding: 0 6px;
+        }
+    </style>
+    <title>BLOKUS</title>
+</head>
+<body style="margin:0px 0px 0px 0px">
+    <div id="playGround">
+        <div id = "n0" class = "name"></div>
+        <div id = "n1" class = "name"></div>
+        <div id = "n2" class = "name"></div>
+        <div id = "n3" class = "name"></div>
+        <canvas id="mask"></canvas>
+        <canvas id="last"></canvas>
+        <canvas id="board"></canvas>
+        <canvas id="shade" style="position:absolute;z-index:10"></canvas>
+    </div>
+    <script>
+        socket = io.connect('http://' + document.domain + ':' + location.port);
+        socket.on('connect',function() { });
+        socket.emit('recorder',{'id':{{id}}});
+        init();
+        socket.on('recorder',function (val){
+            username = new Array;
+            for(var i = 0 ; i < 4 ; i ++){
+                username[i] = val.user[i];
+                cornerState[i] = i;
+            }
+            refreshCorner();
+            var Stas = val.hist.filter(function (val){
+                return val.sta !== -1;
+            });
+            recorder = new Array;
+            recorder[0] = new Array;
+            for(var ind in Stas){
+                ind = parseInt(ind);
+                Sta = Stas[ind];
+                var chs = new Array;
+                for(var i in sCS[Sta.id]){
+                    chs = chs.concat(oxy(Sta.round % 4,sCS[Sta.id][i].x,sCS[Sta.id][i].y));
+                }
+                var _sta = 0;
+                if (Sta.sta & 1) _sta = flipChessShape(chs, _sta);
+                while (Sta.sta !== _sta) {
+                    _sta = rotateChessShape(chs,_sta, true);
+                }
+                chs = chs.map(upd(Sta.x,Sta.y));
+                recorder[ind+1] = recorder[ind].concat(chs);
+            }
+            now = 0;
+        });
+    </script>
+</body>
+</html>

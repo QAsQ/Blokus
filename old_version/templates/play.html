@@ -1,0 +1,231 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <script src="{{url_for('static',filename='jquery.min.js')}}"></script>
+    <script src="{{url_for('static',filename='socket.io.min.js')}}"></script>
+    <script src="{{url_for('static',filename='pure.js')}}"></script>
+    <script src="{{url_for('static',filename='board.js')}}"></script>
+    <script src="{{url_for('static',filename='chess.js')}}"></script>
+    <script src="{{url_for('static',filename='initer.js')}}"></script>
+    <script src = "{{url_for('static',filename='bootstrap.min.js')}}"></script>
+    <link rel="stylesheet" href="{{url_for('static',filename='bootstrap.min.css')}}" type="text/css" />
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0,user-scalable=no"/>
+    <style type="text/css"> 
+        body { 
+            font: normal 11px auto "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif; 
+            color: #4f6b72; 
+            background: #E6EAE9; 
+        } 
+
+        a { 
+            color: #c75f3e; 
+        } 
+
+        #mytable { 
+            width: 300px; 
+            padding: 0; 
+            margin: 0; 
+        } 
+
+        caption { 
+            padding: 0 0 5px 0; 
+            width: 300px;      
+            font: italic 11px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif; 
+            text-align: right; 
+        } 
+
+        th { 
+            font: bold 11px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif; 
+            color: #4f6b72; 
+            border-right: 1px solid #C1DAD7; 
+            border-bottom: 1px solid #C1DAD7; 
+            border-top: 1px solid #C1DAD7; 
+            letter-spacing: 2px; 
+            text-transform: uppercase; 
+            text-align: left; 
+            padding: 6px 6px 6px 12px; 
+            background: #CAE8EA; 
+        } 
+
+
+
+        td { 
+            border-right: 1px solid #C1DAD7; 
+            border-bottom: 1px solid #C1DAD7; 
+            background: #fff; 
+            font-size:11px; 
+            padding: 6px 6px 6px 12px; 
+            color: #4f6b72; 
+        } 
+
+
+        td.alt { 
+            background: #F5FAFA; 
+            color: #797268; 
+        } 
+
+        th.spec { 
+            border-left: 1px solid #C1DAD7; 
+            border-top: 0; 
+            background: #fff; 
+            font: bold 10px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif; 
+        } 
+
+        th.specalt { 
+            border-left: 1px solid #C1DAD7; 
+            border-top: 0; 
+            background: #f5fafa; 
+            font: bold 10px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif; 
+            color: #797268; 
+        } 
+        .name{
+            -moz-user-select: none; 
+            -webkit-user-select: none;  
+            -ms-user-select: none; 
+            -khtml-user-select: none; 
+            user-select: none;
+            width: auto;
+            height: 20px;
+            min-width: 50px;
+            position: absolute;
+            background-color: #444;
+            z-index: 1000;
+            opacity: .8;
+            border-radius: 10px;
+            color: white;
+            border: 2px #999;
+            text-align: center;
+            font-family: icomoon;
+            padding: 0 6px;
+        }
+
+        .side-bar i {
+            font-size:45px; 
+            color:#fff;
+            padding-left:10px;
+            padding-top:11px;
+        }
+        .side-bar {width: 66px;position: fixed;bottom: 20px;right: 25px;line-height: 0;z-index: 100;} 
+        .side-bar a {width: 66px;height: 66px;display: inline-block;background-color: #ddd;margin-bottom: 2px;} 
+        .side-bar a:hover {background-color: #669fdd;} 
+        .side-bar .robot {
+            /*background-position: 0 -62px; 
+            background-color:#cf1b24;*/
+        } 
+        .side-bar .qq-group {background-position: 0 -130px;position: relative;background-color:#239546;} 
+        .side-bar .again {background-position: 0 -198px; background-color:#0091cf;} 
+        .side-bar .leave {background-position: 0 -266px; background-color:#ebb60d;} 
+        .side-bar .qq-group:hover .chat-tips {display: block;} 
+        .chat-tips {padding: 20px;border: 1px solid #d1d2d6;position: absolute;right: 78px;top: -55px;background-color: #fff;display: none;} 
+        .chat-tips i {width: 9px;height: 16px;display: inline-block;position: absolute;right: -9px;top: 80px;background-position:-88px -350px;} 
+        .chat-tips img {width: 138px;height: 138px;} 
+
+
+        <!-- robot -->
+        .tgl{display:none}
+        .tgl,.tgl *,.tgl :after,.tgl :before,.tgl+.tgl-btn,.tgl:after,.tgl:before{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
+        .tgl ::-moz-selection,.tgl :after::-moz-selection,.tgl :before::-moz-selection,.tgl+.tgl-btn::-moz-selection,.tgl::-moz-selection,.tgl:after::-moz-selection,.tgl:before::-moz-selection{background:0 0}
+        .tgl ::selection,.tgl :after::selection,.tgl :before::selection,.tgl+.tgl-btn::selection,.tgl::selection,.tgl:after::selection,.tgl:before::selection{background:0 0}
+        .tgl+.tgl-btn{outline:0;display:block;width:66px;height:66px;position:relative;cursor:pointer}
+        .tgl+.tgl-btn:after,.tgl+.tgl-btn:before{position:relative;display:block;content:"";width:50%;height:100%}
+        .tgl+.tgl-btn:after{left:0}
+        .tgl+.tgl-btn:before{display:none}
+        .tgl:checked+.tgl-btn:after{left:50%}
+        .tgl-flip+.tgl-btn{padding:2px;-webkit-transition:all .2s ease;transition:all .2s ease;font-family:sans-serif;-webkit-perspective:100px;-ms-perspective:100px;perspective:100px}
+        .tgl-flip+.tgl-btn:after,.tgl-flip+.tgl-btn:before{display:inline-block;-webkit-transition:all .4s ease;transition:all .4s ease;width:100%;text-align:center;position:absolute;line-height:2em;font-weight:700;color:#fff;position:absolute;top:0;left:0;-webkit-backface-visibility:hidden;-ms-backface-visibility:hidden;backface-visibility:hidden;}
+        .tgl-flip+.tgl-btn:after{content: '\2714';font-size:30px;background:#02C66F;-webkit-transform:rotateY(-180deg);-ms-transform:rotateY(-180deg);transform:rotateY(-180deg)}
+        .tgl-flip+.tgl-btn:before{background:#cf1b24;content: '\2716';font-size:30px;}
+        .tgl-flip+.tgl-btn:active:before{-webkit-transform:rotateY(-20deg);-ms-transform:rotateY(-20deg);transform:rotateY(-20deg)}
+        .tgl-flip:checked+.tgl-btn:before{-webkit-transform:rotateY(180deg);-ms-transform:rotateY(180deg);transform:rotateY(180deg)}
+        .tgl-flip:checked+.tgl-btn:after{-webkit-transform:rotateY(0);-ms-transform:rotateY(0);transform:rotateY(0);left:0;background:#7FC6A6}
+        .tgl-flip:checked+.tgl-btn:active:after{-webkit-transform:rotateY(20deg);-ms-transform:rotateY(20deg);transform:rotateY(20deg)}
+    </style>
+<title>BLOKUS</title>
+</head>
+<body style="margin:0px 0px 0px 0px" onload="init({{play}})">
+    <div id = "start" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <h1 style="text-align: center;"> Link Start!</h1>
+            </div>
+        </div>
+    </div>
+    <div id = "status" class="modal fade" id="myModal" tabindex="-1" role="dialog" >
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <center>
+            <table id="mytable" cellspacing="0"> 
+            <caption> </caption> 
+            <tr> 
+                <th scope="col" abbr="rank">rank</th> 
+                <th scope="col" abbr="Name">Name</th> 
+                <th scope="col" abbr="remain">remain</th> 
+            </tr> 
+            <tr> 
+                <th scope="row" abbr="0" class="spec" id = "rank_0">1</th> 
+                <td id = "color_0"></td> 
+                <td id = "left_0"></td>
+            </tr> 
+            <tr> 
+                <th scope="row" abbr="1" class="specalt" id = "rank_1">2</th> 
+                <td id = "color_1" class="alt"></td> 
+                <td id = "left_1" class="alt"></td>
+            </tr> 
+            <tr> 
+                <th scope="row" abbr="2" class="spec" id = "rank_2">3</th> 
+                <td id = "color_2"></td> 
+                <td id = "left_2"></td>
+            </tr> 
+            <tr> 
+                <th scope="row" abbr="3" class="specalt" id = "rank_3">4</th> 
+                <td id = "color_3" class="alt"></td> 
+                <td id = "left_3" class="alt"></td>
+            </tr> 
+            </table>
+            </center>
+        </div>
+      </div>
+    </div>
+    <div id="playGround">
+        <canvas id="mask"></canvas>
+        <canvas id="last"></canvas>
+        <canvas id="board"></canvas>
+        <canvas id="shade" style="position:absolute;z-index:10"></canvas>
+    </div>
+    <div id = "n0" class = "name"></div>
+    <div id = "n1" class = "name"></div>
+    <div id = "n2" class = "name"></div>
+    <div id = "n3" class = "name"></div>
+
+    <div class="side-bar">  
+        
+        <!-- <button class="robot"><i class="fa fa-cog" style="font-size:45px; color:#fff;padding-left:13px;padding-top:11px;"></i></button>-->
+
+        <span class=''>
+            <input class='tgl tgl-flip' id='robot' type='checkbox' style="position:absolute;left:-9999px;" onclick="check()">
+            <label class='tgl-btn' for='robot'></label>
+        </span>
+
+        <a href="#" class="qq-group"><i class="fa fa-qq"></i><div class="chat-tips"> 
+        <img style="width:138px;height:138px;" src="http://i1.piimg.com/4851/237d7c69b1ac38fc.png" alt="QQ群二维码"></div></a> 
+
+        <a href="javascript:history.go(0);" class="again"><i class="fa fa-refresh"></i></a>
+
+        <a href="/room/{{room}}/ob" class="leave"><i class="fa fa-sign-out"></i></a>  
+    </div>
+</body>
+    <script Language="javascript">  
+        function check(){ 
+            robot = !robot;
+            if(document.getElementById("robot").checked){
+                if(round < 84 && round % 4 == owner && robot){
+                    Sta = availableRound();
+                    if(Sta.sta != -1){
+                        AddChess(Sta);
+                    }
+                }
+            }
+        } 
+ </script>
+</html>
