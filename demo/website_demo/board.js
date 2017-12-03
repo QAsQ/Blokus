@@ -102,19 +102,6 @@ function BoardFactory(colorTheme) {
     }
 
     var board = new PIXI.Sprite(graphics.generateTexture());
-    //var cellFlat = [];
-    //for (var x = 0; x < 20; x++) {
-    //    cellFlat.push([]);
-    //    for (var y = 0; y < 20; y++) {
-    //        var cell = CellFactory(
-    //            colorTheme.boardBackgroundColor,
-    //            new PIXI.Point(x, y)
-    //        );
-    //        board.addChild(cell);
-    //        cellFlat[x].push(cell);
-    //    }
-    //}
-    //board.cellFlat = cellFlat;
 
     //TODO Adhoc
     board.x = 5  * gCellSize;
@@ -190,6 +177,14 @@ function BoardFactory(colorTheme) {
                 }
             })
         });
+    };
+
+    board.isPossiblePosition = function (pieceId, position) {
+        if (pieceId > 20 || pieceId < 0)
+            return false;
+        var positionState = this.position
+        if (this.cellList[gPlayerId][pieceId].)
+        
     };
     return board;
 }
