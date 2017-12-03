@@ -1,9 +1,9 @@
 var app = new PIXI.Application(1280, 1920, { backgroundColor: 0xFFFFFF});
 document.body.appendChild(app.view);
 
-gCellSize = 50;
+gCellSize = 20;
 gBoardSize = gCellSize * 20;
-gPlayerid = 1;
+gPlayerId = 1;
 
 function ColorThemeFactory(type) {
     if (type === "default") {
@@ -58,6 +58,36 @@ function CellFactory(cellColor, position){
 }
 
 
+/**
+ *
+ * @param colorTheme
+ * @param state
+ * @returns {*}
+ * @constructor
+ *
+ *  board, piece manager
+ *      根据传入的 state 来创建自己
+ *      updateState 根据传入的 state 来更新
+ *           棋子状态
+ *           棋子位置
+ *  知道哪个棋子是当前棋子，可以处理棋子的旋转，翻转
+ *  在棋子被选择的时候更新当前棋子
+ *  在棋子移动的时候根据当前位置是否为可落下的位置更新（棋子的透明度？落下按钮的可用性？）
+ *  在棋子被松开的时候判断是否落下棋子并更新棋子
+ *
+ */
+/*
+state {
+  4 * 玩家的状态
+
+
+ 4 * 21 Chess State
+    是否被落下，落下的位置
+ 轮到的玩家
+
+
+}
+ */
 function BoardFactory(colorTheme) {
     var graphics = new PIXI.Graphics();
     graphics.lineColor = colorTheme.boardLineColor;
@@ -72,7 +102,6 @@ function BoardFactory(colorTheme) {
     }
 
     var board = new PIXI.Sprite(graphics.generateTexture());
-    board.zOrder = 0;
     //var cellFlat = [];
     //for (var x = 0; x < 20; x++) {
     //    cellFlat.push([]);
@@ -87,43 +116,86 @@ function BoardFactory(colorTheme) {
     //}
     //board.cellFlat = cellFlat;
 
-    function log_call_back(id, data) {
-        console.log(id);
-        console.log(data);
+    //TODO Adhoc
+    board.x = 5  * gCellSize;
+    board.y = 5  * gCellSize;
+
+    function DragStartCallBack (id, position) {
+        console.log(
+            "Drag start" + id,
+            Math.floor(position.x / gCellSize),
+            Math.floor(position.y / gCellSize)
+        );
+    }
+    function DragMoveCallBack(id, position) {
+        console.log(
+            "Drag move " + id,
+            Math.floor(position.x / gCellSize),
+            Math.floor(position.y / gCellSize)
+        );
+    }
+    function DragEndCallBack (id) {
+        console.log("DragEnd" + id);
     }
 
-    var cell_list = [
-        new PIXI.Point(0, 0),
-        new PIXI.Point(0, 1),
-        new PIXI.Point(0, 2)
-    ];
+    //Create piece
+    var pieceLists = [];
+    for(var playerId = 0; playerId < 4; playerId ++) {
+        var pieceList = [];
+        for (var pieceId = 0; pieceId <= 20; pieceId++) {
+            var piece = PieceFactory(
+                pieceId,
+                gPiecesCellList[pieceId],
+                colorTheme.pieceColor[playerId],
+                DragStartCallBack,
+                DragMoveCallBack,
+                DragEndCallBack
+            );
+            if (playerId === gPlayerId) {
+                piece.x = gPiecesLocate[pieceId].x * gCellSize;
+                piece.y = gPiecesLocate[pieceId].y * gCellSize;
+            }
+            else {
+                piece.visible = false;
+                piece.interactive = false;
+            }
+            pieceList.push(piece);
+            board.addChild(piece);
+        }
+        pieceLists.push(pieceList);
+    }
+    board.pieceLists = pieceLists;
+    //Create piece Done
 
-    var chess1 = PieceFactory(1, cell_list, colorTheme.pieceColor[gPlayerid],
-        log_call_back,
-        log_call_back,
-        log_call_back);
+    board.loadState = function(state) {
+        //TODO
+        //state.playerState;
+        var _pieceLists = this.pieceLists;
+        _pieceLists[0][2].visible = true;
+        state.pieceState.forEach(function (pieceStateList, playerId) {
+            var isCurrentPlayer = playerId == gPlayerId;
+            pieceStateList.forEach(function (pieceState, pieceId) {
+                console.log(1);
+                if (pieceState.isDown) {
+                    var currentPiece = _pieceLists[playerId][pieceId];
+                    currentPiece.interactive = false;
+                    currentPiece.visible = true;
+                    //TODO set piece layer
+                    //currentPiece.layer();
+                    currentPiece.SetState(pieceState.state);
+                    console.log(pieceState.x, pieceState.y);
+                    currentPiece.x = pieceState.x * gCellSize;
+                    currentPiece.y = pieceState.y * gCellSize;
 
-    chess1.zOrder = -1;
-    board.addChild(chess1);
-
-    var cell_list2 = [
-        new PIXI.Point(0, 0),
-        new PIXI.Point(1, 1),
-        new PIXI.Point(0, 1)
-    ];
-
-    var chess2 = PieceFactory(2, cell_list2,colorTheme.pieceColor[gPlayerid],
-        log_call_back,
-        log_call_back,
-        log_call_back);
-    chess2.x = 5 * gCellSize;
-    chess2.y = 5 * gCellSize;
-    board.addChild(chess2);
-
+                }
+            })
+        });
+    };
     return board;
 }
 
 var board = BoardFactory(ColorThemeFactory("default"));
+board.loadState(AdhocstateGenerate());
 app.stage.addChild(board);
 
 

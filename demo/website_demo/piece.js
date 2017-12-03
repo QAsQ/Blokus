@@ -6,7 +6,7 @@
  *
  *  A  Piece
  *  可以被拖动的棋子, 在移动的各个过程调用响应的回调函数
- * @param PieceId 棋子 Id
+ * @param pieceId 棋子 Id
  * @param cellList 棋子所占的格子
  * @param PieceColor 棋子的颜色
  * @param DragStartCallBack
@@ -15,7 +15,7 @@
  * @returns 返回一个棋子
  * @constructor
  */
-function PieceFactory(PieceId,
+function PieceFactory(pieceId,
                       cellList,
                       PieceColor,
                       DragStartCallBack,
@@ -28,7 +28,7 @@ function PieceFactory(PieceId,
         //TODO this function is not work yet
         event.currentTarget.UpdateInteraction(
             event.data.getLocalPosition(this));
-        DragStartCallBack(PieceId, this);
+        DragStartCallBack(pieceId, this.position);
     }
 
     function onDragMove() {
@@ -36,7 +36,7 @@ function PieceFactory(PieceId,
             var new_position = this.data.getLocalPosition(this.parent);
             this.x = new_position.x;
             this.y = new_position.y;
-            DragMoveCallBack(PieceId, this);
+            DragMoveCallBack(pieceId, this.position);
         }
     }
 
@@ -44,7 +44,7 @@ function PieceFactory(PieceId,
         this.alpha = 0.8;
         this.dragging = false;
         this.data = null;
-        DragEndCallBack(PieceId);
+        DragEndCallBack(pieceId);
     }
 
     function CellList_2_Polygon(cell_list, offset){
@@ -79,8 +79,8 @@ function PieceFactory(PieceId,
     var piece = new PIXI.Sprite(graphics.generateTexture());
     piece.interactive = true;
     piece.buttonMode = true;
-    piece.hitArea = polygon;
-    piece.alpah = 0.8;
+    //piece.hitArea = polygon;
+    piece.alpha = 0.8;
     piece.anchor = new PIXI.Point();
     piece.on('pointerdown', onDragStart)
          .on('pointerup', onDragEnd)
@@ -89,6 +89,15 @@ function PieceFactory(PieceId,
 
     piece.shape = polygon;
     piece.cellList = cellList;
+    piece.SetState = function (state) {
+        console.log("NOT IMPLEMENTED YET! state:" + state);
+    };
+    piece.Flip = function(){
+        console.log("this function :flip NOT IMPLEMENTED YET!");
+    };
+    piece.Rotate = function(){
+        console.log("this function :rotate NOT IMPLEMENTED YET!");
+    };
     piece.UpdateInteraction = function (v) {
         /**
          *  TODO
