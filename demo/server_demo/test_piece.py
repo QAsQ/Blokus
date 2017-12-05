@@ -14,10 +14,10 @@ def test_init():
         Position(0, 1, 1)
     ]
     for position in possible_position:
-        assert piece.possible_position(possible_position)
+        assert piece.possible_position(position)
 
     for position in impossible_position:
-        assert piece.possible_position(possible_position) == False
+        assert piece.possible_position(position) == False
 
 
 def test_update():
