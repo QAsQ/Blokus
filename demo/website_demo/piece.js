@@ -75,6 +75,17 @@ function PieceFactory(pieceId,
     var graphics = new PIXI.Graphics();
     graphics.beginFill(PieceColor, 1);
     graphics.drawPolygon(polygon);
+    // todo adhoc
+    graphics.lineStyle(1, 0xFFFFFF, 1);
+    graphics.endFill();
+    cellList.forEach(function (cells) {
+        graphics.drawRect(
+            cells.x * gCellSize,
+            cells.y * gCellSize,
+            gCellSize,
+            gCellSize
+        )
+    });
     graphics.endFill();
     var piece = new PIXI.Sprite(graphics.generateTexture());
     piece.interactive = true;

@@ -182,8 +182,8 @@ function BoardFactory(colorTheme) {
     board.isPossiblePosition = function (pieceId, position) {
         if (pieceId > 20 || pieceId < 0)
             return false;
-        var positionState = this.position
-        if (this.cellList[gPlayerId][pieceId].)
+        var positionState = this.position;
+        //if (this.cellList[gPlayerId][pieceId].)
         
     };
     return board;
