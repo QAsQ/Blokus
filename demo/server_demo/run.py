@@ -6,16 +6,17 @@ from flask_login import login_user, logout_user, current_user, login_required, l
 import time
 import re
 
-def get_timestamp():
-    return int(time.time())
-
 app = Flask(__name__)
 timestamp = int(time.time())
 board = Board(adhoc_piece_shape_set_generate())
 battle = Battle(timestamp, board)
 
+def get_timestamp():
+    return int(time.time())
+
+
 @app.route("/room/")
-def room_status(room):
+def get_room_status():
     pass
 
 

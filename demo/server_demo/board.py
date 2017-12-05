@@ -68,6 +68,12 @@ class Piece:
     def update_possible_position(self, piece_shape, is_same_player):
         pass
 
+    def get_state(self):
+        return {
+            "is_drop": self.is_drop,
+            "possible_position": self.possible_position
+        }
+
 
 class Board:
     def __init__(self,  piece_shape_set):
@@ -105,7 +111,6 @@ class Board:
             "position": position.to_dict()
         })
         self.pieces[player_id][piece_id].drop_to_board()
-        self.drop_history.append(self.drop_history)
 
     def auto_drop_piece(self, player_id):
         piece_id, position = self._get_one_possible_position(player_id)
