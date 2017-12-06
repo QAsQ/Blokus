@@ -8,10 +8,10 @@ def pri(matrix):
     print()
 
 def main():
-    for x in PieceShape:
+    for Now_Piece in PieceShape:
         Position_Matrix = [['.' for j in range(5)] for i in range(5)]
-        for P in x:
-            Position_Matrix[P.x][P.y]='*'
+        for point in Now_Piece:
+            Position_Matrix[point.x][point.y]='*'
         pri(Position_Matrix)
 
 if __name__ == '__main__':
