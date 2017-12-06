@@ -148,15 +148,15 @@ function BoardFactory(colorTheme) {
     //Create piece Done
 
     board.loadState = function(state) {
-        //TODO
-        //state.playerState;
+        //TODO state.playerState;
         var _pieceLists = this.pieceLists;
         _pieceLists[0][2].visible = true;
-        state.pieceState.forEach(function (pieceStateList, playerId) {
+        state.board.pieces.forEach(function (pieceStateList, playerId) {
+        console.log(playerId);
             var isCurrentPlayer = playerId == gPlayerId;
             pieceStateList.forEach(function (pieceState, pieceId) {
                 console.log(1);
-                if (pieceState.isDown) {
+                if (pieceState.is_drop) {
                     var currentPiece = _pieceLists[playerId][pieceId];
                     currentPiece.interactive = false;
                     currentPiece.visible = true;
