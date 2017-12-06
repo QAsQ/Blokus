@@ -48,7 +48,7 @@ def generate_piece_initialize_legal_position(piece_shape, player_id):
                 continue
             can_be_placed = 0
             for point in piece_shape:
-                if same_point(Point(point.x + dir_point[player_id].x, point.y + dir_point[player_id].y), begin_point[player_id]):
+                if same_point(Point(i + point.x + dir_point[player_id].x, j + point.y + dir_point[player_id].y), begin_point[player_id]):
                     can_be_placed = 1
                     break
             begin_position[i][j] = can_be_placed
