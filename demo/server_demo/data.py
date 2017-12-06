@@ -79,16 +79,9 @@ def lower_right_limit_generate():
         for state in range(8):
             x = 0
             y = 0
-            for i in range(20):
-                for j in range(20):
-                    is_legal = 1
-                    for piece_point in pieces[piece_id][state]:
-                        if i+piece_point.x>=20 or j+piece_point.y>=20:
-                            is_legal = 0
-                            break
-                    if is_legal == 1:
-                        x = max(x, i)
-                        y = max(y, j)
-            piece_limit.append(Point(x,y))
+            for piece_point in pieces[piece_id][state]:
+                x = max(x, piece_point.x)
+                y = max(y, piece_point.y)
+            piece_limit.append(Point(19-x,19-y))
         lower_right_limit.append(piece_limit)
     return lower_right_limit
