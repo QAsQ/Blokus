@@ -119,7 +119,7 @@ class Piece:
         for state in range(8):
             for x in range(20):
                 for y in range(20):
-                    if self.possible_position[state][x][y]:
+                    if self.possible_position[state][x][y] == 1:
                         return Position(state, x, y)
         return Position()
 
