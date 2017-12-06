@@ -1,4 +1,4 @@
-from data import Point, PieceShape
+from data import Point, PieceShape, adhoc_piece_shape_set_generate
 
 def pri(matrix):
     for i in range(5):
@@ -8,11 +8,13 @@ def pri(matrix):
     print()
 
 def main():
-    for Now_Piece in PieceShape:
-        Position_Matrix = [['.' for j in range(5)] for i in range(5)]
-        for point in Now_Piece:
-            Position_Matrix[point.x][point.y]='*'
-        pri(Position_Matrix)
+    Pieces = adhoc_piece_shape_set_generate()
+    for piece_id in range(21):
+        for state in range(8):
+            Position_Matrix = [['.' for j in range(5)] for i in range(5)]
+            for point in Pieces[piece_id][state]:
+                Position_Matrix[point.x][point.y]='*'
+            pri(Position_Matrix)
 
 if __name__ == '__main__':
     main()
