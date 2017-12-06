@@ -44,7 +44,16 @@ function PieceFactory(pieceId,
         this.alpha = 0.8;
         this.dragging = false;
         this.data = null;
-        DragEndCallBack(pieceId);
+        //TOOD
+        if (true)
+            DragEndCallBack(
+                pieceId, 
+                {
+                    state: this.state, 
+                    x: Math.floor(this.x / gCellSize + 0.5),
+                    y: Math.floor(this.y / gCellSize + 0.5),
+                }
+            );
     }
 
     function CellList_2_Polygon(cell_list, offset){
@@ -98,6 +107,7 @@ function PieceFactory(pieceId,
          .on('pointerupoutside', onDragEnd)
          .on('pointermove', onDragMove);
 
+    piece.state = 0;
     piece.shape = polygon;
     piece.cellList = cellList;
     piece.SetState = function (state) {

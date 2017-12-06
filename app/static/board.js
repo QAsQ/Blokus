@@ -72,16 +72,12 @@ function CellFactory(cellColor, position){
 /*
 state {
   4 * 玩家的状态
-
-
  4 * 21 Chess State
     是否被落下，落下的位置
  轮到的玩家
-
-
 }
  */
-function BoardFactory(colorTheme) {
+function BoardFactory(colorTheme, SendMessage) {
     var graphics = new PIXI.Graphics();
     graphics.lineColor = colorTheme.boardLineColor;
     graphics.lineWidth = 1;
@@ -114,8 +110,24 @@ function BoardFactory(colorTheme) {
             Math.floor(position.y / gCellSize)
         );
     }
-    function DragEndCallBack (id) {
+    function DragEndCallBack(id, position) {
         console.log("DragEnd" + id);
+        console.log("DragEnd" + position);
+        data = {
+            piece_id: id,
+            position: position
+        }
+        console.log(data);
+        $.ajax({
+            type: 'POST',
+            url:  "/v1/battle/1/player/"+gPlayerId, 
+            data: JSON.stringify(data), 
+            contentType: 'application/json; charset=UTF-8',
+            dataType: 'json', 
+            success: function(state) {
+                board.loadState(state);
+            }
+        });
     }
 
     //Create piece
@@ -150,25 +162,19 @@ function BoardFactory(colorTheme) {
     board.loadState = function(state) {
         //TODO state.playerState;
         var _pieceLists = this.pieceLists;
-        _pieceLists[0][2].visible = true;
-        state.board.pieces.forEach(function (pieceStateList, playerId) {
-        console.log(playerId);
-            var isCurrentPlayer = playerId == gPlayerId;
-            pieceStateList.forEach(function (pieceState, pieceId) {
-                console.log(1);
-                if (pieceState.is_drop) {
-                    var currentPiece = _pieceLists[playerId][pieceId];
-                    currentPiece.interactive = false;
-                    currentPiece.visible = true;
-                    //TODO set piece layer
-                    //currentPiece.layer();
-                    currentPiece.SetState(pieceState.state);
-                    console.log(pieceState.x, pieceState.y);
-                    currentPiece.x = pieceState.x * gCellSize;
-                    currentPiece.y = pieceState.y * gCellSize;
-
-                }
-            })
+        console.log(state);
+        state.board.history.forEach(function (piece) {
+            var isCurrentPlayer = piece.player_id == gPlayerId;
+                var currentPiece = _pieceLists[piece.player_id][piece.piece_id];
+                //currentPiece.possible_position =
+                currentPiece.interactive = false;
+                currentPiece.visible = true;
+                //TODO set piece layer
+                //currentPiece.layer();
+                currentPiece.SetState(piece.position.state);
+                console.log(piece.position.x, piece.position.y);
+                currentPiece.x = piece.position.x * gCellSize;
+                currentPiece.y = piece.position.y * gCellSize;
         });
     };
 

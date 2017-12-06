@@ -7,12 +7,16 @@ document.body.appendChild(app.view);
 
 gCellSize = 20;
 gBoardSize = gCellSize * 20;
-gPlayerId = 1;
+//gPlayerId = 1;
 
 var board = BoardFactory(ColorThemeFactory("default"));
 app.stage.addChild(board);
 
-$.get("/v1/battle/"+gPlayerId, {}, function(state){
-    board.loadState(state);
+$(function () {
+    window.setInterval(function () {
+        $.get("/v1/battle/1/player/"+gPlayerId, {}, function(state){
+            board.loadState(state);
+        });
+    }, 1000);
 });
 
