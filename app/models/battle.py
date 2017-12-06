@@ -44,7 +44,7 @@ class Battle:
         }
 
     def try_drop_piece(self, timestamp, player_id, piece_id, position):
-        if not self.start_time:
+        if not self.started:
             return False
         self._update_state(timestamp, player_id)
         return self.board.try_drop_piece(player_id, piece_id, position)

@@ -11,14 +11,13 @@ timestamp = int(time.time())
 board = Board(adhoc_piece_shape_set_generate())
 battle = Battle(timestamp, board)
 
-def get_timestamp():
-    return int(time.time())
 
-
-@app.route("/room/")
-def get_room_status():
-    pass
-
+@app.route("/v1/battle/<battle_id>", method=['GET', 'POST'])
+def battle(battle_id):
+    if request.method == 'GET':
+        return jsonify(battle.get_state(timestamp, 0))
+    elif request.method == 'POST':
+        pass
 
 if __name__ == '__main__':
     app.run()
