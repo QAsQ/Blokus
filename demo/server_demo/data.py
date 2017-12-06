@@ -64,10 +64,12 @@ def adhoc_piece_shape_set_generate():
             last_state = piece_state[i]
             piece_state.append(clockwise90(last_state))
         before_flip = piece_state[3]
-        piece_state = flip(before_flip)
+        piece_state.append(flip(before_flip))
         for i in range(3):
-            last_state = piece_state[i]
+            last_state = piece_state[4+i]
             piece_state.append(clockwise90(last_state))
+        piece_shape_set.append(piece_state)
+    return piece_shape_set
 
 def lower_right_limit_generate():
     pieces = adhoc_piece_shape_set_generate()
