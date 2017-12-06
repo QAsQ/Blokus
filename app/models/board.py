@@ -39,10 +39,19 @@ class Board:
             "position": position.to_dict()
         })
         self.pieces[player_id][piece_id].try_drop(position)
+        for piece_player_id, piece_list in enumerate(self.pieces):
+            for piece in piece_list:
+                piece.update_possible_position(
+                    self.piece_shape_set[piece_id][position.state], 
+                    position, 
+                    player_id == piece_player_id
+                )
+        return True
 
     def auto_drop_piece(self, player_id):
         piece_id, position = self._get_one_possible_position(player_id)
         if self.try_drop_piece(player_id, piece_id, position):
+            #bug
             self.drop_history.append({
                 "player_id": player_id,
                 "piece_id": piece_id,

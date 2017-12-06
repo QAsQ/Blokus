@@ -111,7 +111,7 @@ class Piece:
             return False
         if 0 > position.y or 20 < position.y:
             return False
-        return self.possible_position[position.state][position.x][position.y]
+        return self.possible_position[position.state][position.x][position.y] == 1
 
     def get_one_possible_position(self):
         if self.is_drop:

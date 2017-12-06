@@ -1,6 +1,6 @@
 from models.board import Board
 from models.piece import Position
-from models.data import adhoc_piece_shape_set_generate
+from models.data import piece_shape_set_generate
 from models.battle import Battle
 from flask import Flask, render_template, g, request, redirect, url_for, jsonify
 from flask_login import login_user, logout_user, current_user, login_required, login_manager, LoginManager
@@ -10,7 +10,7 @@ import re
 
 app = Flask(__name__)
 timestamp = int(time.time())
-board = Board(adhoc_piece_shape_set_generate())
+board = Board(piece_shape_set_generate())
 current_battle = Battle(timestamp, board)
 for player_id in range(4):
     assert current_battle.try_join_player(timestamp, player_id, {"user_id": player_id})
