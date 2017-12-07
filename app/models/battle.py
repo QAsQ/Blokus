@@ -1,7 +1,10 @@
+default_offline_time = 15
 class Battle:
-    def __init__(self, timestamp, board):
+    def __init__(self, timestamp, total_time, temp_time, board):
         self.board = board
         self.create_time = timestamp
+        self.total_time = total_time
+        self.temp_time = temp_time 
 
         self.started = False
         self.start_time = -1
@@ -18,6 +21,7 @@ class Battle:
             "info": player_info,
             "join_time": timestamp,
             "last_active_time": timestamp,
+            "time_left": self.total_time,
             "is_auto": False
         }
         if self._is_ready():
@@ -36,11 +40,17 @@ class Battle:
         self.player_state[player_id]['is_auto'] = False
         self.player_state[player_id]['last_active_time'] = timestamp
 
-    def get_state(self, timestamp, player_id):
+    def get_state(self, timestamp, player_id=-1):
         self._update_state(timestamp, player_id)
         return {
             "player_state": self.player_state,
             "board": self.board.get_state()
+            "battle_info":{
+                "total_time": self.total_time,
+                "temp_time": self.temp_time,
+                "is_start",
+                "started": False
+            }
         }
 
     def try_drop_piece(self, timestamp, player_id, piece_id, position):
@@ -49,7 +59,12 @@ class Battle:
         self._update_state(timestamp, player_id)
         return self.board.try_drop_piece(player_id, piece_id, position)
 
-    def _update_state(self, timestamp, player_id=-1):
+    def _update_state(self, timestamp, player_id):
+        if player_id != -1:
+            self.player_state[player_id]["last_active_time"] = timestamp
+        for player_state in self.player_state:
+            if player_state["last_active_time"] + default_offline_time < timestamp:
+                pass
         # update player to auto if is left
         # if player to auto, auto drop it
         pass

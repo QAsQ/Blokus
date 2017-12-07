@@ -30,7 +30,7 @@ class Board:
             return False
         if piece_id < 0 or piece_id >= len(self.piece_shape_set):
             return False
-        if not self.pieces[player_id][piece_id].is_possible_position(position):
+        if not self.pieces[player_id][piece_id].try_drop(position):
             return False
 
         self.drop_history.append({
@@ -38,7 +38,6 @@ class Board:
             "piece_id": piece_id,
             "position": position.to_dict()
         })
-        self.pieces[player_id][piece_id].try_drop(position)
         for piece_player_id, piece_list in enumerate(self.pieces):
             for piece in piece_list:
                 piece.update_possible_position(

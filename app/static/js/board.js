@@ -2,8 +2,7 @@ function ColorThemeFactory(type) {
     if (type === "default") {
         return {
             boardBackgroundColor: 0xffffff,
-            //boardLineColor: "#e6eae9",
-            boardLineColor: 0x000000,
+            boardLineColor: "#e6eae9",
             pieceColor: {
                 "0": 0xed1c24,
                 "1": 0x23b14d,
@@ -79,9 +78,9 @@ state {
  */
 function BoardFactory(colorTheme, SendMessage) {
     var graphics = new PIXI.Graphics();
+
     graphics.lineColor = colorTheme.boardLineColor;
     graphics.lineWidth = 1;
-
     //Draw board line
     for (var i = 0; i <= 20; i++) {
         graphics.moveTo(i * gCellSize, 0);
@@ -93,8 +92,8 @@ function BoardFactory(colorTheme, SendMessage) {
     var board = new PIXI.Sprite(graphics.generateTexture());
 
     //TODO Adhoc
-    board.x = 5  * gCellSize;
-    board.y = 5  * gCellSize;
+    board.x = 4  * gCellSize;
+    board.y = 4  * gCellSize;
 
     function DragStartCallBack (id, position) {
         console.log(

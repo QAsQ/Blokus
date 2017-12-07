@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Index</title>
-    <script src="{{ url_for('static',_external=True,filename='pixi.min.js') }}"></script>
-    <script src="{{ url_for('static',_external=True,filename='jquery.min.js') }}"></script>
-    <script src="{{ url_for('static',_external=True,filename='piece.js') }}"></script>
-    <script src="{{ url_for('static',_external=True,filename='data.js') }}"></script>
-    <script src="{{ url_for('static',_external=True,filename='board.js') }}"> </script>
+    <script src="{{ url_for('static',_external=True,filename='js/pixi.min.js') }}"></script>
+    <script src="{{ url_for('static',_external=True,filename='js/pixi-particles.min.js') }}"></script>
+    <script src="{{ url_for('static',_external=True,filename='js/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static',_external=True,filename='js/piece.js') }}"></script>
+    <script src="{{ url_for('static',_external=True,filename='js/data.js') }}"></script>
+    <script src="{{ url_for('static',_external=True,filename='js/board.js') }}"> </script>
+    <script src="{{ url_for('static',_external=True,filename='js/progress-bar.js') }}"> </script>
 </head>
 <body>
     <script> gPlayerId={{id}} </script>
-    <script src="{{ url_for('static',_external=True,filename='main.js') }}"> </script>
+    <script src="{{ url_for('static',_external=True,filename='js/main.js') }}"> </script>
 </body>
 </html>

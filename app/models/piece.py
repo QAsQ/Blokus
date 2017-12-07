@@ -103,6 +103,7 @@ class Piece:
         if not self.is_possible_position(position):
             return False
         self.is_drop = True
+        return True
 
     def is_possible_position(self, position):
         if 0 > position.state or position.state > 8:

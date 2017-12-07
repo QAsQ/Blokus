@@ -9,6 +9,7 @@ import json
 import re
 
 app = Flask(__name__)
+
 timestamp = int(time.time())
 board = Board(piece_shape_set_generate())
 current_battle = Battle(timestamp, board)
@@ -35,7 +36,7 @@ def battle(battle_id, player_id):
         return jsonify(current_battle.get_state(timestamp, 0))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
 
 
 
