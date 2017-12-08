@@ -26,28 +26,28 @@ def clockwise90(old_state):
     temp_state = []
     new_state = []
     for point in old_state:
-        temp_state.append((4-point.y, point.x))
+        temp_state.append((4-point[1], point[0]))
     x = 5
     y = 5
     for point in temp_state:
-        x = min(x, point.x)
-        y = min(y, point.y)
+        x = min(x, point[0])
+        y = min(y, point[1])
     for point in temp_state:
-        new_state.append((point.x-x, point.y-y))
+        new_state.append((point[0]-x, point[1]-y))
     return new_state
 
 def flip(old_state):
     temp_state = []
     new_state = []
     for point in old_state:
-        temp_state.append((4-point.x, point.y))
+        temp_state.append((4-point[0], point[1]))
     x = 5
     y = 5
     for point in temp_state:
-        x = min(x, point.x)
-        y = min(y, point.y)
+        x = min(x, point[0])
+        y = min(y, point[1])
     for point in temp_state:
-        new_state.append((point.x-x, point.y-y))
+        new_state.append((point[0]-x, point[1]-y))
     return new_state
 
 def piece_shape_set_generate():
@@ -75,8 +75,8 @@ def lower_right_limit_generate():
             x = 0
             y = 0
             for piece_point in pieces[piece_id][state]:
-                x = max(x, piece_point.x)
-                y = max(y, piece_point.y)
+                x = max(x, piece_point[0])
+                y = max(y, piece_point[1])
             piece_limit.append((19-x,19-y))
         lower_right_limit.append(piece_limit)
     return lower_right_limit

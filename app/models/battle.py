@@ -44,11 +44,10 @@ class Battle:
         self._update_state(timestamp, player_id)
         return {
             "player_state": self.player_state,
-            "board": self.board.get_state()
+            "board": self.board.get_state(),
             "battle_info":{
                 "total_time": self.total_time,
                 "temp_time": self.temp_time,
-                "is_start",
                 "started": False
             }
         }
