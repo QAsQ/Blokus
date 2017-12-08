@@ -1,4 +1,4 @@
-from models.piece import Piece, Position
+from piece import Piece, Position
 # board
 # can drop piece to board
 # can auto drop one piece to board
@@ -26,7 +26,7 @@ class Board:
         }
 
     def try_drop_piece(self, player_id, piece_id, position):
-        if player_id < 0 or player_id >= len(self.piece_shape_set):
+        if player_id < 0 or player_id >= 4:
             return False
         if piece_id < 0 or piece_id >= len(self.piece_shape_set):
             return False
@@ -56,6 +56,9 @@ class Board:
                 "piece_id": piece_id,
                 "position": position.to_dict()
             })
+    
+    def is_ended(self):
+        return len(self.history) >= len(self.piece_shape_set) * 4
 
     def _get_one_possible_position(self, player_id):
         position = Position()
