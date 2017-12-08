@@ -192,16 +192,16 @@ class Piece:
     def update_possible_position(self, piece_shape, position, is_same_player):
         for state in range(8):
             for temp_pos in piece_shape:
-                pos = (temp_pos[0] + position[0], temp_pos[1] + position[1])
+                pos = (temp_pos[0] + position.x , temp_pos[1] + position.y )
                 for act in self.action[state][pos[0]][pos[1]][2]:
                     self.possible_position[state][act[0]][act[1]] = 2
             if is_same_player == True:
                 for temp_pos in piece_shape:
-                    pos = (temp_pos[0] + position[0], temp_pos[1] + position[1])
+                    pos = (temp_pos[0] + position.x, temp_pos[1] + position.y)
                     for act in self.action[state][pos[0]][pos[1]][1]:
                         self.possible_position[state][act[0]][act[1]] = 2
                 for temp_pos in piece_shape:
-                    pos = (temp_pos[0] + position[0], temp_pos[1] + position[1])
+                    pos = (temp_pos[0] + position.x, temp_pos[1] + position.y)
                     for act in self.action[state][pos[0]][pos[1]][0]:
                         if self.possible_position[state][act[0]][act[1]] == 0:
                             self.possible_position[state][act[0]][act[1]] = 1

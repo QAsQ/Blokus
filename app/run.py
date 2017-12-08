@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 timestamp = int(time.time())
 board = Board(piece_shape_set_generate())
-current_battle = Battle(timestamp, board)
+current_battle = Battle(timestamp, 5, 5, board)
 for player_id in range(4):
     assert current_battle.try_join_player(timestamp, player_id, {"user_id": player_id})
 
