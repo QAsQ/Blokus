@@ -53,16 +53,13 @@ class Battle:
                 "start_time": self.start_time,
                 "total_time": self.total_time,
                 "temp_time": self.temp_time,
-                "started": False
+                "started": self.started 
             }
         }
 
     def try_drop_piece(self, timestamp, player_id, piece_id, position):
         self._update_state(timestamp, player_id)
 
-    def _update_state(self, timestamp, player_id=-1):
-        # update player to auto if is left
-        # if player to auto, auto drop it
         if not self.started or self.ended or self.current_player != player_id:
             return False
 
