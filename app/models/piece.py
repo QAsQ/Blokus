@@ -134,7 +134,7 @@ def legal(posi):
 
 def check_legal_posi(cor_x, cor_y, position):
     for point in position:
-        if legal((cor_x + point[0], cor_y + point[1])):
+        if legal((cor_x + point[0], cor_y + point[1])) == False:
             return False
     return True
 
