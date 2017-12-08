@@ -58,7 +58,7 @@ class Board:
             })
     
     def is_ended(self):
-        return len(self.history) >= len(self.piece_shape_set) * 4
+        return len(self.drop_history) >= len(self.piece_shape_set) * 4
 
     def _get_one_possible_position(self, player_id):
         position = Position()

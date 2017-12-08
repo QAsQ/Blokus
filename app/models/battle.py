@@ -60,8 +60,9 @@ class Battle:
     def try_drop_piece(self, timestamp, player_id, piece_id, position):
         self._update_state(timestamp, player_id)
 
-        if not self.started or self.ended or self.current_player != player_id:
-            return False
+        #if not self.started or self.ended or self.current_player != player_id:
+        #    return False
+        #print("here!")
 
         if self.board.try_drop_piece(player_id, piece_id, position):
             self.current_player = (self.current_player + 1) % 4
