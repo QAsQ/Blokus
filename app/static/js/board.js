@@ -1,42 +1,3 @@
-function ColorThemeFactory(type) {
-    if (type === "default") {
-        return {
-            boardBackgroundColor: 0xffffff,
-            boardLineColor: "#e6eae9",
-            pieceColor: {
-                "0": 0xed1c24,
-                "1": 0x23b14d,
-                "2": 0x00a2e8,
-                "3": 0xffc90d,
-               "-1": 0xb7b7b7
-            },
-            legal: "#6f645e",
-            horn: "#d5d7d5",
-            rim: "#875f5f",
-            unlegal: "#e1d9c4",
-            can: "#f5f9f8",
-            frameColor: "#ffffff",
-            shade: "#e6eae9",
-            corner: function (o) {
-                switch (o) {
-                    case -1:
-                        return "#e6eae9";
-                    case 0:
-                        return "#cf1b24";
-                    case 1:
-                        return "#239546";
-                    case 2:
-                        return "#0091cf";
-                    case 3:
-                        return "#ebb60d";
-                }
-                return null;
-            }
-        }
-    }
-    return null;
-}
-
 function CellFactory(cellColor, position){
     var graphics = new PIXI.Graphics();
     graphics.beginFill(cellColor, 1);
@@ -48,7 +9,6 @@ function CellFactory(cellColor, position){
     );
     return new PIXI.Sprite(graphics.generateTexture());
 }
-
 
 /**
  *
@@ -76,7 +36,7 @@ state {
  轮到的玩家
 }
  */
-function BoardFactory(colorTheme, SendMessage) {
+function BoardFactory(app, colorTheme, SendMessage) {
     var graphics = new PIXI.Graphics();
 
     graphics.lineColor = colorTheme.boardLineColor;
@@ -128,6 +88,22 @@ function BoardFactory(colorTheme, SendMessage) {
             }
         });
     }
+    board.progressBars = []
+    for (var player_id = 0; player_id < 4; player_id++)
+    {
+        progressBar = ProgressBarFactory(
+            app,
+            gProgressBarEndPointList[player_id * 2],
+            gProgressBarEndPointList[player_id * 2 + 1],
+            3, //width
+            colorTheme.pieceColor[player_id.toString()]
+        )
+        board.addChild(progressBar)
+        progressBar.deactivate();
+        progressBar.setProgressRate(1);
+        board.progressBars.push(progressBar);
+    }
+
 
     //Create piece
     var pieceLists = [];
@@ -161,7 +137,7 @@ function BoardFactory(colorTheme, SendMessage) {
     board.loadState = function(state) {
         //TODO state.playerState;
         var _pieceLists = this.pieceLists;
-        console.log(state);
+        //console.log(state);
         state.board.history.forEach(function (piece) {
             var isCurrentPlayer = piece.player_id == gPlayerId;
                 var currentPiece = _pieceLists[piece.player_id][piece.piece_id];

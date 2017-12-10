@@ -85,57 +85,92 @@ function ParticleFactory(app, direction, particleColor) {
 	return emitterContainer
 };
 
-function ProgressBarFactory(app, startPoint, endPoint, width, progressBarColor){
+function ProgressBarFactory(app, stPoint, edPoint, width, progressBarColor){
     var graphics = new PIXI.Graphics();
     graphics.beginFill(progressBarColor, 1);
-    graphics.drawRect(0, 0, 1, 1)
+	graphics.drawRect(0, 0, 1, 1)
+
+	startPoint = Point(stPoint.x * gCellSize, stPoint.y * gCellSize);
+	endPoint = Point(edPoint.x * gCellSize, edPoint.y * gCellSize);
 
     function distance(pointA, pointB){
         return Math.sqrt((pointA.x - pointB.x) * (pointA.x - pointB.x) + (pointA.y - pointB.y) * (pointA.y - pointB.y))
-    }
-    
-    function anchor(startPoint, endPoint){
-        return Math.atan2(endPoint.y - startPoint.y, endPoint.x - startPoint.x)
-    }
+	}
+	
+	function fromTime(time){
+		minute = Math.floor(time / 60)
+		seconds = (time % 60)
+		if (seconds <= 9)
+			seconds = "0" + seconds.toString()
+		return minute + ":" + seconds
+	}
+
+    var angle = Math.atan2(endPoint.y - startPoint.y, endPoint.x - startPoint.x)
+
+
+	var progressBarContainer = new PIXI.Container();
 
 	var progressBar = new PIXI.Sprite(graphics.generateTexture());
 
     progressBar.x = startPoint.x
 	progressBar.y = startPoint.y
-    progressBar.scale.x = distance(startPoint, endPoint);
-    progressBar.scale.y = width
-    progressBar.rotation = anchor(startPoint, endPoint)
-
+	var length = distance(startPoint, endPoint);
+	progressBar.scale.x = length;
+    progressBar.scale.y = width;
+	progressBar.rotation = angle;
 
 	progressBar.start = startPoint
 	progressBar.end = endPoint
+	progressBarContainer.addChild(progressBar)
+	progressBarContainer.progressBar = progressBar;
 
-    progressBar.extremity = ParticleFactory(
+    progressBarContainer.extremity = ParticleFactory(
 		app,
 		progressBar.rotation,
 		progressBarColor
 	);
-    progressBar.extremity.rotation = anchor(startPoint, endPoint)
-	progressBar.extremity.x = endPoint.x
-	progressBar.extremity.y = endPoint.y
-	progressBar.extremity.visible = false
 
-	progressBar.activate = function(){
+	progressBarContainer.extremity.rotation = angle
+	progressBarContainer.extremity.x = endPoint.x
+	progressBarContainer.extremity.y = endPoint.y
+	progressBarContainer.extremity.visible = false
+
+	var progressBarText = new PIXI.Text('1:15/10:12');  
+	progressBarText.rotation = angle
+	//Todo,not such right, need fix
+	if (Math.PI * 0.5 < angle && angle < Math.PI * 1.5)
+	{
+		var unitX = (endPoint.x - startPoint.x) / length;
+		var unitY = (endPoint.y - startPoint.y) / length;
+		progressBarText.scale.x *= -1;
+		progressBarText.scale.y *= -1;
+		progressBarText.x = startPoint.x + unitX * progressBarText.width;
+		progressBarText.y = startPoint.y + unitY * progressBarText.width;
+	}
+	else
+	{
+		progressBarText.x = startPoint.x;  
+		progressBarText.y = startPoint.y;  
+	}
+	progressBarContainer.addChild(progressBarText);
+
+	progressBarContainer.activate = function(){
 		this.extremity.visible = true
 	}
-	progressBar.deactivate = function(){
+	progressBarContainer.deactivate = function(){
 		this.extremity.visible = false
 	}
-	progressBar.setProgressRate = function(rate){
+	//todo update set progress rate to set time
+	progressBarContainer.setProgressRate = function(rate){
 		var newEnd = {
-			x: this.start.x + (this.end.x - this.start.x) * rate,
-			y: this.start.y + (this.end.y - this.start.y) * rate
+			x: this.progressBar.start.x + (this.progressBar.end.x - this.progressBar.start.x) * rate,
+			y: this.progressBar.start.y + (this.progressBar.end.y - this.progressBar.start.y) * rate
 		}
 
-		this.scale.x = distance(this.start, newEnd)
+		this.progressBar.scale.x = distance(this.progressBar.start, newEnd)
 		this.extremity.x = newEnd.x
 		this.extremity.y = newEnd.y
 	}
 
-    return progressBar;
+    return progressBarContainer;
 }
