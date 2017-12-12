@@ -34,8 +34,8 @@ def same_point(point1, point2):
 
 
 def generate_piece_initialize_legal_position(piece_shape, player_id):
-    begin_point = [(-1, -1), (20, -1), (20, 20), (-1, 20)]
-    dir_point = [(-1, -1), (1, -1), (1, 1), (-1, 1)]
+    begin_point = [(-1, -1), (-1, 20), (20, 20), (20, -1)]
+    dir_point = [(-1, -1), (-1, 1), (1, 1), (1, -1)]
     begin_position = [[0 for j in range(20)] for i in range(20)]
     for i in range(20):
         for j in range(20):

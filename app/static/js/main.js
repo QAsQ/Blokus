@@ -17,8 +17,7 @@ app.stage.addChild(board);
 $(function () {
     window.setInterval(function () {
         $.get("/v1/battle/1/player/"+gPlayerId, {}, function(state){
-            board.loadState(state);
-            console.log(state.player_state)
+                board.loadState(state);
         });
     }, 1000);
 });

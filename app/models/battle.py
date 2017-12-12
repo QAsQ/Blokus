@@ -1,4 +1,4 @@
-default_offline_time = 15
+default_offline_time = 200
 class Battle:
     def __init__(self, timestamp, total_time, temp_time, board):
         self.board = board
@@ -51,7 +51,8 @@ class Battle:
         return {
             "player_state": self.player_state,
             "board": self.board.get_state(),
-            "battle_info":{
+            "battle":{
+                "current_player": self.current_player,
                 "start_time": self.start_time,
                 "total_time": self.total_time,
                 "temp_time": self.temp_time,
@@ -93,7 +94,7 @@ class Battle:
         if player_id != -1:
             self.player_state[player_id]["last_active_time"] = timestamp
         
-        while self.current_time < timestamp and self.ended == False:
+        while self.current_time < timestamp and not self.ended:
             if self._current_player()["is_auto"]:
                 self._auto_drop_piece()
             else:
