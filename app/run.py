@@ -3,7 +3,6 @@ from models.piece import Position
 from models.data import piece_shape_set_generate
 from models.battle import Battle
 from flask import Flask, render_template, g, request, redirect, url_for, jsonify
-from flask_login import login_user, logout_user, current_user, login_required, login_manager, LoginManager
 import time
 import json
 import re
@@ -19,7 +18,7 @@ for player_id in range(4):
 
 @app.route("/battle/<int:battle_id>/player/<int:player_id>", methods=['GET'])
 def index(battle_id, player_id):
-    return render_template("index.html", id=player_id)
+    return render_template("Index.html", id=player_id)
 
 @app.route("/v1/battle/<int:battle_id>/player/<int:player_id>", methods=['GET', 'POST'])
 def battle(battle_id, player_id):

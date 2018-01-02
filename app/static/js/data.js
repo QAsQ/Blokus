@@ -7,12 +7,12 @@ function Point(x, y) {
 }
 
 var gPiecesLocate = [
-    Point(29,5),Point(28,5),Point(29,17),Point(32,5),Point(32,20)
-    ,Point(29,16),Point(41,8),Point(35,17),Point(34,8),Point(37,5)
-    ,Point(35,5),Point(37,17),Point(31,14),Point(35,8),Point(41,13)
-    ,Point(29,10),Point(33,10),Point(37,14),Point(37,13),Point(31,10)
-    ,Point(29,6)
-];
+    Point(34,0),Point(31,0),Point(24,0),Point(27,0),Point(37,5),
+    Point(29,3),Point(24,3),Point(35,3),Point(32,3),Point(32,14),
+    Point(24,15),Point(27,8),Point(29,16),Point(35,8),Point(24,8),
+    Point(37,12),Point(31,8),Point(26,13),Point(35,16),Point(29,10),
+    Point(26,3)
+]
 
 var gPiecesCellList= [
     [Point(0, 0)],

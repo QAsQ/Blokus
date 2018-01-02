@@ -2,8 +2,13 @@
  * Created by QAQ on 2017/12/6.
  */
 
-gWidth = 1000
-gHeight = 600
+gWidth = 800
+gHeight = 400
+
+/*
+gWidth = 1920
+gHeight = 1080
+*/
 
 var app = new PIXI.Application(gWidth, gHeight, { backgroundColor: 0xD6DAD9});
 document.body.appendChild(app.view);

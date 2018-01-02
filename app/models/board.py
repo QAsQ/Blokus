@@ -1,4 +1,4 @@
-from piece import Piece, Position
+from models.piece import Piece, Position
 # board
 # can drop piece to board
 # can auto drop one piece to board

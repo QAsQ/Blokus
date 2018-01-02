@@ -44,6 +44,10 @@ function PieceFactory(pieceId,
         this.alpha = 0.8;
         this.dragging = false;
         this.data = null;
+        /*
+        this.x = Math.floor(this.x / gCellSize + 0.5) * gCellSize
+        this.y = Math.floor(this.y / gCellSize + 0.5) * gCellSize
+        */
         //TOOD
         if (true)
             DragEndCallBack(

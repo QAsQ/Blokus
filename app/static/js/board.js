@@ -72,6 +72,13 @@ function BoardFactory(app, colorTheme, SendMessage) {
     function DragEndCallBack(id, position) {
         console.log("DragEnd" + id);
         console.log("DragEnd" + position);
+        /*
+        output_str = ''
+        board.pieceLists[gPlayerId].forEach(function(value, index){
+            output_str += "(" + (value.x / gCellSize) + ","  + (value.y / gCellSize) + "),";
+        });
+        console.log(output_str);
+        */
         data = {
             piece_id: id,
             position: position
