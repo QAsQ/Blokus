@@ -7,11 +7,11 @@ function Point(x, y) {
 }
 
 var gPiecesLocate = [
-    Point(34,0),Point(31,0),Point(24,0),Point(27,0),Point(37,5),
-    Point(29,3),Point(24,3),Point(35,3),Point(32,3),Point(32,14),
-    Point(24,15),Point(27,8),Point(29,16),Point(35,8),Point(24,8),
-    Point(37,12),Point(31,8),Point(26,13),Point(35,16),Point(29,10),
-    Point(26,3)
+    Point(34,0),Point(31,0),Point(24,0),Point(27,0),Point(36,3),
+    Point(26,3),Point(24,3),Point(32,3),Point(29,3),Point(35,15),
+    Point(24,16),Point(26,8),Point(29,16),Point(37,8),Point(24,8),
+    Point(36,11),Point(30,8),Point(31,13),Point(26,13),Point(28,10),
+    Point(34,8),
 ]
 
 var gPiecesCellList= [
@@ -35,7 +35,7 @@ var gPiecesCellList= [
     [Point(0, 0), Point(1, 0), Point(2, 0), Point(0, 1), Point(2, 1)],
     [Point(0, 0), Point(0, 1), Point(1, 1), Point(1, 2), Point(2, 1)],
     [Point(1, 0), Point(1, 1), Point(1, 2), Point(0, 1), Point(2, 1)],
-    [Point(0, 0), Point(0, 1), Point(0, 2), Point(0, 1), Point(1, 1)]
+    [Point(0, 0), Point(0, 1), Point(0, 2), Point(0, 3), Point(1, 1)]
 ];
 
 gProgressBarEndPointList= [
