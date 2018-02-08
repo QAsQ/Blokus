@@ -129,8 +129,8 @@ function BoardFactory(app, colorTheme, SendMessage) {
                 piece.y = gPiecesLocate[pieceId].y * gCellSize;
             }
             else {
-                piece.visible = false;
-                piece.interactive = false;
+                piece.SetVisible(false)
+                piece.SetInteractive(false)
             }
             pieceList.push(piece);
             board.addChild(piece);
@@ -144,31 +144,31 @@ function BoardFactory(app, colorTheme, SendMessage) {
         //update progressBar
         for (var playerId = 0; playerId < 4; playerId ++) {
             var currentProgressBar = this.progressBars[playerId];
-            currentProgressBar.setActivate(
-                playerId === state.battle.current_player
-            );
+            currentProgressBar.setActivate(playerId === state.battle.current_player);
             currentProgressBar.setProgressRate(state.player_state[playerId].total_time_left, state.battle.total_time);
         }
         //TODO state.playerState;
         var _pieceLists = this.pieceLists;
-        //console.log(state);
         for (var playerId = 0; playerId < 4; playerId ++)
-            for (var pieceId = 0; pieceId < 21; pieceId ++)
-                _pieceLists[playerId][pieceId].visible = playerId === gPlayerId;
+            for (var pieceId = 0; pieceId < 21; pieceId ++){
+                console.log(playerId+ " " + gPlayerId)
+                _pieceLists[playerId][pieceId].SetVisible(playerId === gPlayerId);
+                _pieceLists[playerId][pieceId].SetInteractive(playerId === gPlayerId);
+            }
 
         state.board.history.forEach(function (piece) {
             var isCurrentPlayer = piece.player_id == gPlayerId;
-                var currentPiece = _pieceLists[piece.player_id][piece.piece_id];
-                //currentPiece.possible_position =
-                currentPiece.interactive = false;
-                currentPiece.visible = true;
-                //TODO set piece layer
-                //currentPiece.layer();
-                currentPiece.SetState(piece.position.state);
-                currentPiece.x = piece.position.x * gCellSize;
-                currentPiece.y = piece.position.y * gCellSize;
+            console.log(piece.player_id , piece.piece_id)
+            var currentPiece = _pieceLists[piece.player_id][piece.piece_id];
+
+            currentPiece.SetInteractive(false);
+            currentPiece.SetVisible(true);
+            //TODO set piece layer
+            //currentPiece.layer();
+            currentPiece.SetState(piece.position.state);
+            currentPiece.x = piece.position.x * gCellSize;
+            currentPiece.y = piece.position.y * gCellSize;
         });
-        //this.progressBars[0].setActivate(true);
     };
 
     board.isPossiblePosition = function (pieceId, position) {

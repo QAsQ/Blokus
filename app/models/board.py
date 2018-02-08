@@ -62,7 +62,7 @@ class Board:
 
     def _get_one_possible_position(self, player_id):
         position = Position()
-        for piece_id in range(21):
+        for piece_id in range(20, 0, -1):
             for position.state in range(8):
                 position = self.pieces[player_id][piece_id].get_one_possible_position()
                 if position.state != -1:

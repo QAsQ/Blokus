@@ -16,7 +16,7 @@
  * @constructor
  */
 function PieceFactory(pieceId,
-                      cellList,
+                      shape,
                       PieceColor,
                       DragStartCallBack,
                       DragMoveCallBack,
@@ -83,47 +83,80 @@ function PieceFactory(pieceId,
         });
         return new PIXI.Polygon(vertex_list);
     }
-    var polygon = CellList_2_Polygon(cellList, new PIXI.Point());
 
-    var graphics = new PIXI.Graphics();
-    graphics.beginFill(PieceColor, 1);
-    graphics.drawPolygon(polygon);
-    // todo adhoc
-    graphics.lineStyle(1, 0xFFFFFF, 1);
-    graphics.endFill();
-    cellList.forEach(function (cells) {
-        graphics.drawRect(
-            cells.x * gCellSize,
-            cells.y * gCellSize,
-            gCellSize,
-            gCellSize
-        )
-    });
-    graphics.endFill();
-    var piece = new PIXI.Sprite(graphics.generateTexture());
-    piece.interactive = true;
-    piece.buttonMode = true;
-    //piece.hitArea = polygon;
-    piece.alpha = 0.8;
-    piece.anchor = new PIXI.Point();
-    piece.on('pointerdown', onDragStart)
-         .on('pointerup', onDragEnd)
-         .on('pointerupoutside', onDragEnd)
-         .on('pointermove', onDragMove);
+    var pieces = new PIXI.Container();
+    pieces.piece = []
 
-    piece.state = 0;
-    piece.shape = polygon;
-    piece.cellList = cellList;
-    piece.SetState = function (state) {
-        console.log("NOT IMPLEMENTED YET! state:" + state);
+    shape.forEach(function(cellList, state){
+        var polygon = CellList_2_Polygon(cellList, new PIXI.Point());
+
+        var graphics = new PIXI.Graphics();
+        graphics.beginFill(PieceColor, 1);
+        graphics.drawPolygon(polygon);
+        // todo adhoc
+        graphics.lineStyle(1, 0xFFFFFF, 1);
+        graphics.endFill();
+        cellList.forEach(function (cells) {
+            graphics.drawRect(
+                cells.x * gCellSize,
+                cells.y * gCellSize,
+                gCellSize,
+                gCellSize
+            )
+        });
+        graphics.endFill();
+
+        var piece = new PIXI.Sprite(graphics.generateTexture());
+        //piece.hitArea = polygon;
+        piece.shape = polygon;
+        piece.cellList = cellList;
+        piece.visible = false
+        piece.state = state 
+
+        piece.on('pointerdown', onDragStart)
+            .on('pointerup', onDragEnd)
+            .on('pointerupoutside', onDragEnd)
+            .on('pointermove', onDragMove);
+
+        pieces.piece.push(piece)
+        pieces.addChild(piece)
+    })
+
+    pieces.alpha = 0.8;
+    pieces.anchor = new PIXI.Point();
+
+    pieces.SetState = function (state) {
+        console.log("Set state " + state);
+        old_visible = false;
+        old_interactive = false;
+        if(this.state) {
+            old_visible = this.piece[this.state].visible;
+            old_interactive = this.piece[this.state].interactive;
+
+            this.piece[this.state].visible = false;
+            this.piece[this.state].interactive = false;
+        }
+        this.state = state
+        this.piece[state].visible = old_visible
+        this.piece[state].interactive = old_interactive
     };
-    piece.Flip = function(){
+    pieces.SetState(0);
+
+    pieces.SetVisible = function(visible) {
+        this.piece[this.state].visible = visible
+    }
+
+    pieces.SetInteractive = function(interactive){
+        this.piece[this.state].interactive = interactive
+    }
+
+    pieces.Flip = function(){
         console.log("this function :flip NOT IMPLEMENTED YET!");
     };
-    piece.Rotate = function(){
+    pieces.Rotate = function(){
         console.log("this function :rotate NOT IMPLEMENTED YET!");
     };
-    piece.UpdateInteraction = function (v) {
+    pieces.UpdateInteraction = function (v) {
         /**
          *  TODO
          *  Move adhoc 200
@@ -136,6 +169,6 @@ function PieceFactory(pieceId,
         //this.y += v.y;
     };
 
-    return piece;
+    return pieces;
 }
 
