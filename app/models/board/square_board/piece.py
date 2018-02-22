@@ -4,11 +4,13 @@ class Position:
         self.x = x
         self.y = y
 
-    def from_dict(self, data):
-        self.state = data["state"]
-        self.x = data["x"]
-        self.y = data["y"]
-        return self
+    @staticmethod
+    def from_dict(data):
+        ret = Position()
+        ret.state = data["state"]
+        ret.x = data["x"]
+        ret.y = data["y"]
+        return ret
 
     def to_dict(self):
         return {

@@ -1,4 +1,5 @@
 from .board.board_factory import BoardFactory
+from .board.square_board.piece import Position
 default_offline_time = 200
 
 class Battle:
@@ -62,9 +63,10 @@ class Battle:
             }
         }
 
-    def try_drop_piece(self, timestamp, player_id, piece_id, position):
+    def try_drop_piece(self, timestamp, player_id, piece_id, dict_position):
         self._update_state(timestamp, player_id)
 
+        position = Position.from_dict(dict_position)
         if not self.started or self.ended or self.current_player != player_id:
             return False
 

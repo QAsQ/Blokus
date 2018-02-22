@@ -37,6 +37,15 @@ state {
 }
  */
 function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
+    console.log(PIXI.display);
+    var placedGroup = new PIXI.display.Group(-1, false); 
+    var boardGroup = new PIXI.display.Group(0, false);
+    var pieceGroup = new PIXI.display.Group(1, false);
+    var draggedGroup = new PIXI.display.Group(2, false);
+    [placedGroup, boardGroup, pieceGroup, draggedGroup].forEach(function(value, index, array){
+        app.stage.addChild(new PIXI.display.Layer(value));
+    });
+
     var graphics = new PIXI.Graphics();
 
     graphics.lineColor = colorTheme.boardLineColor;
@@ -48,8 +57,11 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
         graphics.moveTo(0, i * gCellSize);
         graphics.lineTo(gCellSize * 20, i * gCellSize);
     }
+    var boardShape = new PIXI.Sprite(graphics.generateTexture());
+    boardShape.parentGroup = boardGroup;
 
-    var board = new PIXI.Sprite(graphics.generateTexture());
+    var board = new PIXI.Container();
+    board.addChild(boardShape);
 
     //TODO Adhoc
     board.x = 4  * gCellSize;
@@ -70,8 +82,8 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
         );
     }
     function DragEndCallBack(id, position) {
-        console.log("DragEnd" + id);
-        console.log("DragEnd" + position);
+        console.log("DragEnd " + id);
+        console.log("DragEnd " + position);
         data = {
             piece_id: id,
             position: position
@@ -79,8 +91,7 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
         TryDropPiece(data);
     }
     board.progressBars = []
-    for (var player_id = 0; player_id < 4; player_id++)
-    {
+    for (var player_id = 0; player_id < 4; player_id++) {
         progressBar = ProgressBarFactory(
             app,
             gProgressBarEndPointList[player_id * 2],
@@ -88,6 +99,7 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
             3, //width
             colorTheme.pieceColor[player_id.toString()]
         )
+        progressBar.parentGroup = boardGroup
         board.addChild(progressBar)
         progressBar.setProgressRate(1);
         board.progressBars.push(progressBar);
@@ -106,6 +118,7 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
                 DragMoveCallBack,
                 DragEndCallBack
             );
+            piece.parentGroup = pieceGroup;
             if (playerId === gPlayerId) {
                 piece.x = gPiecesLocate[pieceId].x * gCellSize;
                 piece.y = gPiecesLocate[pieceId].y * gCellSize;
@@ -129,27 +142,26 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
             currentProgressBar.setActivate(playerId === state.battle.current_player);
             currentProgressBar.setProgressRate(state.player_state[playerId].total_time_left, state.battle.total_time);
         }
+        
         //TODO state.playerState;
         var _pieceLists = this.pieceLists;
         for (var playerId = 0; playerId < 4; playerId ++)
             for (var pieceId = 0; pieceId < 21; pieceId ++){
-                console.log(playerId+ " " + gPlayerId)
                 _pieceLists[playerId][pieceId].SetVisible(playerId === gPlayerId);
                 _pieceLists[playerId][pieceId].SetInteractive(playerId === gPlayerId);
             }
 
         state.board.history.forEach(function (piece) {
             var isCurrentPlayer = piece.player_id == gPlayerId;
-            console.log(piece.player_id , piece.piece_id)
             var currentPiece = _pieceLists[piece.player_id][piece.piece_id];
 
             currentPiece.SetInteractive(false);
             currentPiece.SetVisible(true);
-            //TODO set piece layer
-            //currentPiece.layer();
             currentPiece.SetState(piece.position.state);
             currentPiece.x = piece.position.x * gCellSize;
             currentPiece.y = piece.position.y * gCellSize;
+
+            currentPiece.parentGroup = placedGroup;
         });
     };
 
@@ -162,5 +174,3 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
     };
     return board;
 }
-
-

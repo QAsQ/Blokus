@@ -11,6 +11,7 @@ gHeight = 1080
 */
 
 var app = new PIXI.Application(gWidth, gHeight, { backgroundColor: 0xD6DAD9});
+app.stage = new PIXI.display.Stage();
 document.body.appendChild(app.view);
 
 gCellSize = Math.floor(Math.min(gWidth, gHeight) / 28)
@@ -35,9 +36,8 @@ $.get("/boards/normal", {}, function(boardData){
     var board = BoardFactory(app, ColorThemeFactory("default"), TryDropPiece, boardData)
     app.stage.addChild(board);
 
-
     $(function () {
-        data = {
+        var data = {
             "player_id": gPlayerId
         }
         window.setInterval(function () {

@@ -45,12 +45,14 @@ class Board:
     def auto_drop_piece(self, player_id):
         piece_id, position = self._get_one_possible_position(player_id)
         if self.try_drop_piece(player_id, piece_id, position):
-            #bug
             self.drop_history.append({
                 "player_id": player_id,
                 "piece_id": piece_id,
                 "position": position.to_dict()
             })
+        else:
+            #bug
+            pass
     
     def is_ended(self):
         return len(self.drop_history) >= len(self.piece_shape_set) * 4

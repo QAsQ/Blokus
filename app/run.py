@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 # Test only
 timestamp = int(time.time())
-current_battle = Battle(timestamp, 5, 2, BoardFactory.createBoard("normal"))
+current_battle = Battle(timestamp, 1, 1, BoardFactory.createBoard("normal"))
 for player_id in range(4):
     assert current_battle.try_join_player(timestamp, player_id, {"user_id": player_id})
 # Test only end
