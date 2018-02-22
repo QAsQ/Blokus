@@ -1,12 +1,7 @@
-from models.piece import Piece, Position
-# board
-# can drop piece to board
-# can auto drop one piece to board
-# own state?
-#  own chess state
-#       is_drop
-#  know every chess's possible position
+from .piece import Piece, Position
+from .data import piece_initial_pos
 
+# 维护一个棋盘的状态，不维护游戏进程
 class Board:
     def __init__(self,  piece_shape_set):
         # player_id, piece_id, state, x, y
@@ -17,7 +12,7 @@ class Board:
             for piece_id in range(21):
                 # TODO should not income player_id
                 self.pieces[player_id].append(
-                    Piece(self.piece_shape_set[piece_id], player_id))
+                    Piece(self.piece_shape_set[piece_id], player_id, piece_initial_pos[player_id][piece_id]))
         self.drop_history = []
 
     def get_state(self):

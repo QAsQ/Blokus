@@ -23,19 +23,18 @@ function PieceFactory(pieceId,
                       DragEndCallBack) {
     function onDragStart(event) {
         this.data = event.data;
+        this.anchorPoint = this.data.getLocalPosition(this);
         this.alpha = 1;
         this.dragging = true;
         //TODO this function is not work yet
-        event.currentTarget.UpdateInteraction(
-            event.data.getLocalPosition(this));
         DragStartCallBack(pieceId, this.position);
     }
 
     function onDragMove() {
         if (this.dragging) {
             var new_position = this.data.getLocalPosition(this.parent);
-            this.x = new_position.x;
-            this.y = new_position.y;
+            this.x = new_position.x - this.anchorPoint.x;
+            this.y = new_position.y - this.anchorPoint.y;
             DragMoveCallBack(pieceId, this.position);
         }
     }
@@ -44,11 +43,6 @@ function PieceFactory(pieceId,
         this.alpha = 0.8;
         this.dragging = false;
         this.data = null;
-        /*
-        this.x = Math.floor(this.x / gCellSize + 0.5) * gCellSize
-        this.y = Math.floor(this.y / gCellSize + 0.5) * gCellSize
-        */
-        //TOOD
         if (true)
             DragEndCallBack(
                 pieceId, 
@@ -61,26 +55,19 @@ function PieceFactory(pieceId,
     }
 
     function CellList_2_Polygon(cell_list, offset){
-        var vertex_list = [];
+        var vertex_list = [new PIXI.Point(0, 0)];
         cell_list.forEach(function (cell) {
             [[0, 0], [0, 1], [1, 1], [1, 0], [0 ,0]].forEach(function (point) {
                 vertex_list.push(
                     new PIXI.Point(
-                        (cell.x + point[0]) * gCellSize + offset.x,
-                        (cell.y + point[1]) * gCellSize + offset.y
+                        (cell[0] + point[0]) * gCellSize + offset.x,
+                        (cell[1] + point[1]) * gCellSize + offset.y
                     )
                 )
             })
+            vertex_list.push(new PIXI.Point(0, 0));
         });
 
-        cell_list.reverse().forEach(function (cell) {
-            vertex_list.push(
-                new PIXI.Point(
-                    cell.x * gCellSize + offset.x,
-                    cell.y * gCellSize + offset.y
-                )
-            )
-        });
         return new PIXI.Polygon(vertex_list);
     }
 
@@ -110,44 +97,35 @@ function PieceFactory(pieceId,
         //piece.hitArea = polygon;
         piece.shape = polygon;
         piece.cellList = cellList;
-        piece.visible = false
-        piece.state = state 
+        piece.visible = false;
 
-        piece.on('pointerdown', onDragStart)
-            .on('pointerup', onDragEnd)
-            .on('pointerupoutside', onDragEnd)
-            .on('pointermove', onDragMove);
-
-        pieces.piece.push(piece)
-        pieces.addChild(piece)
+        pieces.piece.push(piece);
+        pieces.addChild(piece);
     })
 
     pieces.alpha = 0.8;
     pieces.anchor = new PIXI.Point();
+    pieces.interactive = true
+    pieces
+        .on('pointerdown', onDragStart)
+        .on('pointerup', onDragEnd)
+        .on('pointerupoutside', onDragEnd)
+        .on('pointermove', onDragMove);
 
     pieces.SetState = function (state) {
-        console.log("Set state " + state);
-        old_visible = false;
-        old_interactive = false;
-        if(this.state) {
-            old_visible = this.piece[this.state].visible;
-            old_interactive = this.piece[this.state].interactive;
-
+        if (typeof(this.state) !== "undefined")
             this.piece[this.state].visible = false;
-            this.piece[this.state].interactive = false;
-        }
-        this.state = state
-        this.piece[state].visible = old_visible
-        this.piece[state].interactive = old_interactive
+        this.state = state;
+        this.piece[state].visible = true;
     };
     pieces.SetState(0);
 
     pieces.SetVisible = function(visible) {
-        this.piece[this.state].visible = visible
+        pieces.visible = visible
     }
 
     pieces.SetInteractive = function(interactive){
-        this.piece[this.state].interactive = interactive
+        pieces.interactive = interactive
     }
 
     pieces.Flip = function(){
@@ -155,18 +133,6 @@ function PieceFactory(pieceId,
     };
     pieces.Rotate = function(){
         console.log("this function :rotate NOT IMPLEMENTED YET!");
-    };
-    pieces.UpdateInteraction = function (v) {
-        /**
-         *  TODO
-         *  Move adhoc 200
-         *  add hit Area offset
-         */
-        //this.anchor.x += v.x / 200;
-        //this.anchor.y += v.y / 200;
-
-        //this.x += v.x;
-        //this.y += v.y;
     };
 
     return pieces;

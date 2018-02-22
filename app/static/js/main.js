@@ -16,13 +16,34 @@ document.body.appendChild(app.view);
 gCellSize = Math.floor(Math.min(gWidth, gHeight) / 28)
 gBoardSize = gCellSize * 20;
 
-board = BoardFactory(app, ColorThemeFactory("default"))
-app.stage.addChild(board);
-
-$(function () {
-    window.setInterval(function () {
-        $.get("/v1/battle/1/player/"+gPlayerId, {}, function(state){
+$.get("/boards/normal", {}, function(boardData){
+    console.log(boardData)
+    function TryDropPiece(data){
+        data.player_id = gPlayerId
+        $.ajax({
+            type: 'POST',
+            url:  "/battles/1", 
+            data: JSON.stringify(data), 
+            contentType: 'application/json; charset=UTF-8',
+            dataType: 'json', 
+            success: function(state) {
                 board.loadState(state);
+            }
         });
-    }, 1000);
+    }
+
+    var board = BoardFactory(app, ColorThemeFactory("default"), TryDropPiece, boardData)
+    app.stage.addChild(board);
+
+
+    $(function () {
+        data = {
+            "player_id": gPlayerId
+        }
+        window.setInterval(function () {
+            $.get("/battles/1", data, function(state){
+                    board.loadState(state);
+            });
+        }, 1000);
+    });
 });

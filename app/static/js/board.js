@@ -36,7 +36,7 @@ state {
  轮到的玩家
 }
  */
-function BoardFactory(app, colorTheme, SendMessage) {
+function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
     var graphics = new PIXI.Graphics();
 
     graphics.lineColor = colorTheme.boardLineColor;
@@ -72,28 +72,11 @@ function BoardFactory(app, colorTheme, SendMessage) {
     function DragEndCallBack(id, position) {
         console.log("DragEnd" + id);
         console.log("DragEnd" + position);
-        /*
-        output_str = ''
-        board.pieceLists[gPlayerId].forEach(function(value, index){
-            output_str += "(" + (value.x / gCellSize) + ","  + (value.y / gCellSize) + "),";
-        });
-        console.log(output_str);
-        */
         data = {
             piece_id: id,
             position: position
         }
-        console.log(data);
-        $.ajax({
-            type: 'POST',
-            url:  "/v1/battle/1/player/"+gPlayerId, 
-            data: JSON.stringify(data), 
-            contentType: 'application/json; charset=UTF-8',
-            dataType: 'json', 
-            success: function(state) {
-                board.loadState(state);
-            }
-        });
+        TryDropPiece(data);
     }
     board.progressBars = []
     for (var player_id = 0; player_id < 4; player_id++)
@@ -110,7 +93,6 @@ function BoardFactory(app, colorTheme, SendMessage) {
         board.progressBars.push(progressBar);
     }
 
-
     //Create piece
     var pieceLists = [];
     for(var playerId = 0; playerId < 4; playerId ++) {
@@ -118,7 +100,7 @@ function BoardFactory(app, colorTheme, SendMessage) {
         for (var pieceId = 0; pieceId <= 20; pieceId++) {
             var piece = PieceFactory(
                 pieceId,
-                gPiecesCellList[pieceId],
+                piecesCellList[pieceId],
                 colorTheme.pieceColor[playerId],
                 DragStartCallBack,
                 DragMoveCallBack,

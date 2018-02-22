@@ -14,30 +14,6 @@ var gPiecesLocate = [
     Point(34,8),
 ]
 
-var gPiecesCellList= [
-    [Point(0, 0)],
-    [Point(0, 0), Point(1, 0)],
-    [Point(0, 0), Point(0, 1), Point(1, 0)],
-    [Point(0, 0), Point(1, 0), Point(2, 0)],
-    [Point(0, 0), Point(0, 1), Point(1, 0), Point(1, 1)],
-    [Point(0, 0), Point(0, 1), Point(0, 2), Point(1, 1)],
-    [Point(0, 0), Point(0, 1), Point(0, 2), Point(0, 3)],
-    [Point(0, 0), Point(1, 0), Point(2, 0), Point(0, 1)],
-    [Point(0, 0), Point(0, 1), Point(1, 1), Point(1, 2)],
-    [Point(0, 0), Point(0, 1), Point(1, 0), Point(2, 0), Point(3, 0)],
-    [Point(0, 0), Point(0, 1), Point(0, 2), Point(1, 1), Point(2, 1)],
-    [Point(0, 0), Point(0, 1), Point(0, 2), Point(1, 0), Point(2, 0)],
-    [Point(0, 0), Point(1, 0), Point(1, 1), Point(2, 1), Point(3, 1)],
-    [Point(0, 0), Point(0, 1), Point(1, 1), Point(2, 1), Point(2, 2)],
-    [Point(0, 0), Point(0, 1), Point(0, 2), Point(0, 3), Point(0, 4)],
-    [Point(0, 0), Point(0, 1), Point(0, 2), Point(1, 0), Point(1, 1)],
-    [Point(0, 0), Point(1, 0), Point(1, 1), Point(2, 1), Point(2, 2)],
-    [Point(0, 0), Point(1, 0), Point(2, 0), Point(0, 1), Point(2, 1)],
-    [Point(0, 0), Point(0, 1), Point(1, 1), Point(1, 2), Point(2, 1)],
-    [Point(1, 0), Point(1, 1), Point(1, 2), Point(0, 1), Point(2, 1)],
-    [Point(0, 0), Point(0, 1), Point(0, 2), Point(0, 3), Point(1, 1)]
-];
-
 gProgressBarEndPointList= [
     Point(0, -2), Point(20, -2), 
     Point(-2, 20), Point(-2, 0), 

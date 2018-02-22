@@ -1,4 +1,6 @@
+from .board.board_factory import BoardFactory
 default_offline_time = 200
+
 class Battle:
     def __init__(self, timestamp, total_time, temp_time, board):
         self.board = board
