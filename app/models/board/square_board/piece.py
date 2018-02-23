@@ -22,13 +22,26 @@ class Position:
 def same_point(point1, point2):
     return point1[0] == point2[0] and point1[1] == point2[1]
 
+# 0-lack of corner
+# 1-can be placed
+# 2-occupied or share edge with same color or illegal or out of board
+lack_of_corner = 0
+can_be_placed = 1
+illegal = 2
+
+# 0 - share_corner
+# 1 - share_edge
+# 2 - occupy
+share_corner = 0
+share_edge = 1
+occupy = 2
+
 # 维护单个棋子(包括八个状态）在棋盘的各个位置上的状态
 class Piece:
     def __init__(self, piece_shape_set, player_id, initialize_position=None):
         self.shape_set = piece_shape_set
-        self.possible_position = []
-        self.action = []
 
+        self.possible_position = []
         if initialize_position is None:
             for state in range(8):
                 self.possible_position.append(
@@ -40,6 +53,7 @@ class Piece:
         else:
             self.possible_position = initialize_position
 
+        self.action = []
         for state in range(8):
             self.action.append(
                 self._action_generate(
@@ -47,6 +61,16 @@ class Piece:
                 )
             )
         self.is_drop = False
+
+        self.state_update_table = [
+            [[0, 1, 2],
+             [0, 1, 2],
+             [2, 2, 2]],
+
+            [[1, 1, 2],
+             [2, 2, 2],
+             [2, 2, 2]]
+        ]
 
     def try_drop(self, position):
         if self.is_drop:
@@ -63,7 +87,7 @@ class Piece:
             return False
         if 0 > position.y or 20 < position.y:
             return False
-        return self.possible_position[position.state][position.x][position.y] == 1
+        return self.possible_position[position.state][position.x][position.y] == can_be_placed
 
     def get_one_possible_position(self):
         if self.is_drop:
@@ -75,71 +99,60 @@ class Piece:
                         return Position(state, x, y)
         return Position()
 
-    # 0-lack of corner
-    # 1-can be placed
-    # 2-occupied or share edge with same color or illegal or out of board
     def update_possible_position(self, piece_shape, position, is_same_player):
         for state in range(8):
-            for temp_pos in piece_shape:
-                pos = (temp_pos[0] + position.x , temp_pos[1] + position.y )
-                for act in self.action[state][pos[0]][pos[1]][2]:
-                    self.possible_position[state][act[0]][act[1]] = 2
-            if is_same_player == True:
-                for temp_pos in piece_shape:
-                    pos = (temp_pos[0] + position.x, temp_pos[1] + position.y)
-                    for act in self.action[state][pos[0]][pos[1]][1]:
-                        self.possible_position[state][act[0]][act[1]] = 2
-                for temp_pos in piece_shape:
-                    pos = (temp_pos[0] + position.x, temp_pos[1] + position.y)
-                    for act in self.action[state][pos[0]][pos[1]][0]:
-                        if self.possible_position[state][act[0]][act[1]] == 0:
-                            self.possible_position[state][act[0]][act[1]] = 1
+            for one_cell in piece_shape:
+                for act in self.action[state]:
+                    self._update_one_position(
+                        state, 
+                        one_cell[0] + position.x + act[0],
+                        one_cell[1] + position.y + act[1],
+                        act[2],
+                        is_same_player
+                    )
+    
+    def _update_one_position(self, state, x, y, action, is_same_player):
+        if x < 0 or x >= 20:
+            return
+        if y < 0 or y >= 20:
+            return
+        self.possible_position[state][x][y] = self.state_update_table[is_same_player][action][self.possible_position[state][x][y]]
+
+    def _action_generate(self, piece_shape):
+        irrelevant = -1
+        def get_act(x, y, ano_pos):
+            dx = abs(x + ano_pos[0])
+            dy = abs(y + ano_pos[1])
+            if dx + dy == 0:
+                return occupy
+            if dx <= 1 and dy <= 1:
+                if dx + dy == 2:
+                    return share_corner
+                else:
+                    return share_edge
+            return irrelevant
+
+        res_action = []
+        for x in range(-5, 6):
+            for y in range(-5, 6):
+                action = irrelevant
+                for ano_pos in piece_shape:
+                    action = max(action, get_act(x, y, ano_pos))
+                    if action == occupy:
+                        break
+                if action == irrelevant:
+                    continue
+                res_action.append((x, y, action))
+
+        return res_action
 
     def get_state(self):
         return {
             "is_drop": self.is_drop,
         }
 
-    # 0 - share_corner
-    # 1 - share_edge
-    # 2 - occupy
-    def _action_generate(self, position):
-        def legal(posi):
-            if posi[0] >= 20 or posi[1] >= 20:
-                return False
-            else:
-                return True
-
-        def check_legal_posi(cor_x, cor_y, position):
-            for point in position:
-                if legal((cor_x + point[0], cor_y + point[1])) == False:
-                    return False
-            return True
-
-        dir_point = [(-1, -1), (1, -1), (1, 1), (-1, 1), (-1, 0), (1, 0), (0, 1), (0, -1)]
-        result_action = [[[[], [], []] for j in range(20)] for i in range(20)]
-        for i in range(20):
-            for j in range(20):
-                if check_legal_posi(i, j, position) == False:
-                    continue
-                for pos in position:
-                    now_pos = (pos[0] + i, pos[1] + j)
-                    for k in range(4):
-                        temp_pos = (now_pos[0] + dir_point[k][0], now_pos[1] + dir_point[k][1])
-                        if legal(temp_pos):
-                            result_action[temp_pos[0]][temp_pos[1]][0].append((i, j))
-                    for k in range(4, 8):
-                        temp_pos = (now_pos[0] + dir_point[k][0], now_pos[1] + dir_point[k][1])
-                        if legal(temp_pos):
-                            result_action[temp_pos[0]][temp_pos[1]][1].append((i, j))
-                    result_action[now_pos[0]][now_pos[1]][2].append((i, j))
-        return result_action
-
 
     def _generate_piece_initialize_legal_position(self, piece_shape, player_id):
-        # 0-lack of corner
-        # 1-can be placed
-        # 2-occupied or share edge with same color or illegal or out of board
 
         def can_place(piece_set, coordinate_x, coordinate_y):
             for piece_point in piece_set:

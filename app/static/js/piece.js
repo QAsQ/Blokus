@@ -27,7 +27,7 @@ function PieceFactory(pieceId,
         this.alpha = 1;
         this.dragging = true;
         //TODO this function is not work yet
-        DragStartCallBack(pieceId, this.position);
+        DragStartCallBack(pieceId, this.State());
     }
 
     function onDragMove() {
@@ -35,7 +35,7 @@ function PieceFactory(pieceId,
             var new_position = this.data.getLocalPosition(this.parent);
             this.x = new_position.x - this.anchorPoint.x;
             this.y = new_position.y - this.anchorPoint.y;
-            DragMoveCallBack(pieceId, this.position);
+            DragMoveCallBack(pieceId, this.State());
         }
     }
 
@@ -46,11 +46,7 @@ function PieceFactory(pieceId,
         if (true)
             DragEndCallBack(
                 pieceId, 
-                {
-                    state: this.state, 
-                    x: Math.floor(this.x / gCellSize + 0.5),
-                    y: Math.floor(this.y / gCellSize + 0.5),
-                }
+                this.State()
             );
     }
 
@@ -119,6 +115,14 @@ function PieceFactory(pieceId,
         this.piece[state].visible = true;
     };
     pieces.SetState(0);
+
+    pieces.State = function() {
+        return {
+            state: this.state, 
+            x: Math.floor(this.x / gCellSize + 0.5),
+            y: Math.floor(this.y / gCellSize + 0.5),
+        };
+    }
 
     pieces.SetVisible = function(visible) {
         pieces.visible = visible

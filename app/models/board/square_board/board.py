@@ -50,16 +50,16 @@ class Board:
                 "piece_id": piece_id,
                 "position": position.to_dict()
             })
+            return True
         else:
-            #bug
-            pass
+            return False
     
     def is_ended(self):
         return len(self.drop_history) >= len(self.piece_shape_set) * 4
 
     def _get_one_possible_position(self, player_id):
         position = Position()
-        for piece_id in range(20, 0, -1):
+        for piece_id in range(20, -1, -1):
             for position.state in range(8):
                 position = self.pieces[player_id][piece_id].get_one_possible_position()
                 if position.state != -1:

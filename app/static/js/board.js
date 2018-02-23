@@ -82,8 +82,6 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
         );
     }
     function DragEndCallBack(id, position) {
-        console.log("DragEnd " + id);
-        console.log("DragEnd " + position);
         data = {
             piece_id: id,
             position: position
