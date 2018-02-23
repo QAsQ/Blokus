@@ -67,7 +67,9 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
     board.x = 4  * gCellSize;
     board.y = 4  * gCellSize;
 
+    current_piece = -1
     function DragStartCallBack (id, position) {
+        current_piece = id;
         console.log(
             "Drag start" + id,
             Math.floor(position.x / gCellSize),
@@ -175,5 +177,19 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
         //if (this.cellList[gPlayerId][pieceId].)
         
     };
+
+    window.addEventListener(
+        "keydown", 
+        function(event){
+            if (current_piece === -1)    
+                return
+            if (event.key == "w" || event.key == "s")
+                board.pieceLists[gPlayerId][current_piece].Flip();
+            if (event.key == "a" || event.key == "d")
+                board.pieceLists[gPlayerId][current_piece].Rotate(event.key == 'a');
+        },
+        false
+    );
+
     return board;
 }

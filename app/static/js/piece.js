@@ -133,10 +133,12 @@ function PieceFactory(pieceId,
     }
 
     pieces.Flip = function(){
-        console.log("this function :flip NOT IMPLEMENTED YET!");
+        var new_state = this.state ^ 1
+        this.SetState(new_state);
     };
-    pieces.Rotate = function(){
-        console.log("this function :rotate NOT IMPLEMENTED YET!");
+    pieces.Rotate = function(clock){
+        var new_state = (this.state + ((this.state % 2) ^ clock ? 2 : 6)) % 8
+        this.SetState(new_state);
     };
 
     return pieces;

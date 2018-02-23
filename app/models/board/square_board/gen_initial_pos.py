@@ -1,4 +1,4 @@
-from data import PieceShape, piece_shape_set_generate
+from .data import piece_shape_set
 
 def can_place(piece_set, coordinate_x, coordinate_y):
     for piece_point in piece_set:
@@ -119,11 +119,12 @@ def check_legal_posi(cor_x, cor_y, position):
             return False
     return True
 
-f = open('out.txt', 'w')
+f = open('initial_pos.py', 'w')
 
 piece_pos = []
-piece_shape_set = piece_shape_set_generate()
-f.writelines('[')
+
+f.writelines('# player_id(range(4)) & piece_id(range(21)) & piece_state(range(8)) & i(range(20)) & j(range(20))\n')
+f.writelines('piece_initial_pos = [')
 for player_id in range(4):
     f.write('[')
     for piece_id in range(21):

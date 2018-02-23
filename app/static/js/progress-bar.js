@@ -136,7 +136,7 @@ function ProgressBarFactory(stPoint, edPoint, width, progressBarColor, tempBarCo
 	var progressBarText = new PIXI.Text(
 		"",
 		new PIXI.TextStyle({
-            fontSize: 12
+            fontSize: 15
         })
 	);  
 	progressBarText.updText= function(text){
@@ -169,7 +169,7 @@ function ProgressBarFactory(stPoint, edPoint, width, progressBarColor, tempBarCo
 	progressBarContainer.setProgressRate = function(total_time_left, temp_time_left, total_time, temp_time){
 		this.progressBarText.updText(
 			formTime(total_time_left + temp_time_left) + " / " +
-			formTime(total_time) + "+" + formTime(temp_time) 
+			formTime(temp_time) + "+" + formTime(total_time) 
 		);
 		var total_rate = total_time_left / (total_time + temp_time);
 		var total_end = {
