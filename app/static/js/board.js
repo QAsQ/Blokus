@@ -91,11 +91,11 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
     board.progressBars = []
     for (var player_id = 0; player_id < 4; player_id++) {
         progressBar = ProgressBarFactory(
-            app,
             gProgressBarEndPointList[player_id * 2],
             gProgressBarEndPointList[player_id * 2 + 1],
             3, //width
-            colorTheme.pieceColor[player_id.toString()]
+            colorTheme.pieceColor[player_id.toString()],
+            colorTheme.tempColor
         )
         progressBar.parentGroup = boardGroup
         board.addChild(progressBar)
@@ -138,7 +138,12 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
         for (var playerId = 0; playerId < 4; playerId ++) {
             var currentProgressBar = this.progressBars[playerId];
             currentProgressBar.setActivate(playerId === state.battle.current_player);
-            currentProgressBar.setProgressRate(state.player_state[playerId].total_time_left, state.battle.total_time);
+            currentProgressBar.setProgressRate(
+                state.player_state[playerId].total_time_left, 
+                state.player_state[playerId].temp_time_left, 
+                state.battle.total_time,
+                state.battle.temp_time
+            )
         }
         
         //TODO state.playerState;

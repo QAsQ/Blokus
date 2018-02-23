@@ -1,4 +1,4 @@
-function ParticleFactory(app, direction, particleColor) {
+function ParticleFactory(direction, particleColor) {
 	particle_config = {
 		"alpha": {
 			"start": 1,
@@ -70,7 +70,6 @@ function ParticleFactory(app, direction, particleColor) {
 
 	// Create the new emitter and attach it to the stage
 	var emitterContainer = new PIXI.Container();
-	//app.stage.addChild(emitterContainer);
 
 	var emitter = new PIXI.particles.Emitter(
 		emitterContainer,
@@ -83,12 +82,16 @@ function ParticleFactory(app, direction, particleColor) {
 	update();
 
 	return emitterContainer
-};
+}
 
-function ProgressBarFactory(app, stPoint, edPoint, width, progressBarColor){
-    var graphics = new PIXI.Graphics();
+function ProgressBarFactory(stPoint, edPoint, width, progressBarColor, tempBarColor){
+	var graphics = new PIXI.Graphics();
     graphics.beginFill(progressBarColor, 1);
 	graphics.drawRect(0, 0, 1, 1)
+	var progressBar = new PIXI.Sprite(graphics.generateTexture());
+    graphics.beginFill(tempBarColor, 1);
+	graphics.drawRect(0, 0, 1, 1)
+	var tempBar = new PIXI.Sprite(graphics.generateTexture());
 
 	var startPoint = Point(stPoint.x * gCellSize, stPoint.y * gCellSize);
 	var endPoint = Point(edPoint.x * gCellSize, edPoint.y * gCellSize);
@@ -104,28 +107,22 @@ function ProgressBarFactory(app, stPoint, edPoint, width, progressBarColor){
 			seconds = "0" + seconds.toString()
 		return minute + ":" + seconds
 	}
-
     var angle = Math.atan2(endPoint.y - startPoint.y, endPoint.x - startPoint.x)
-
 
 	var progressBarContainer = new PIXI.Container();
 
-	var progressBar = new PIXI.Sprite(graphics.generateTexture());
-
-    progressBar.x = startPoint.x
-	progressBar.y = startPoint.y
+    tempBar.x = progressBar.x = startPoint.x
+	tempBar.y = progressBar.y = startPoint.y
 	var length = distance(startPoint, endPoint);
-	progressBar.scale.x = length;
-    progressBar.scale.y = width;
-	progressBar.rotation = angle;
+	tempBar.scale.x = progressBar.scale.x = length;
+    tempBar.scale.y = progressBar.scale.y = width;
+	tempBar.rotation = progressBar.rotation = angle;
 
-	progressBar.start = startPoint;
-	progressBar.end = endPoint;
 	progressBarContainer.addChild(progressBar)
+	progressBarContainer.addChild(tempBar)
 	progressBarContainer.progressBar = progressBar;
 
     progressBarContainer.extremity = ParticleFactory(
-		app,
 		progressBar.rotation,
 		progressBarColor
 	);
@@ -136,7 +133,12 @@ function ProgressBarFactory(app, stPoint, edPoint, width, progressBarColor){
 	progressBarContainer.extremity.y = endPoint.y
 	progressBarContainer.extremity.visible = false
 
-	var progressBarText = new PIXI.Text();  
+	var progressBarText = new PIXI.Text(
+		"",
+		new PIXI.TextStyle({
+            fontSize: 12
+        })
+	);  
 	progressBarText.updText= function(text){
 		//Todo,not such right, need fix
 		progressBarText.setText(text);
@@ -164,18 +166,29 @@ function ProgressBarFactory(app, stPoint, edPoint, width, progressBarColor){
 		this.extremity.visible = active;
 	}
 	//todo update set progress rate to set time
-	progressBarContainer.setProgressRate = function(total_time_left, total_time){
-		this.progressBarText.updText(formTime(total_time_left) + "/" + formTime(total_time));
-		var rate = total_time_left / total_time;
-		var newEnd = {
-			x: this.progressBar.start.x + (this.progressBar.end.x - this.progressBar.start.x) * rate,
-			y: this.progressBar.start.y + (this.progressBar.end.y - this.progressBar.start.y) * rate
+	progressBarContainer.setProgressRate = function(total_time_left, temp_time_left, total_time, temp_time){
+		this.progressBarText.updText(
+			formTime(total_time_left + temp_time_left) + " / " +
+			formTime(total_time) + "+" + formTime(temp_time) 
+		);
+		var total_rate = total_time_left / (total_time + temp_time);
+		var total_end = {
+			x: startPoint.x + (endPoint.x - startPoint.x) * total_rate,
+			y: startPoint.y + (endPoint.y - startPoint.y) * total_rate
 		}
+		this.progressBar.scale.x = distance(startPoint, total_end)
 
-		this.progressBar.scale.x = distance(this.progressBar.start, newEnd)
-		this.extremity.x = newEnd.x
-		this.extremity.y = newEnd.y
+		var temp_rate = (total_time_left + temp_time_left) / (total_time + temp_time);
+		var temp_end = {
+			x: startPoint.x + (endPoint.x - startPoint.x) * temp_rate,
+			y: startPoint.y + (endPoint.y - startPoint.y) * temp_rate 
+		}
+		tempBar.x = total_end.x
+		tempBar.y = total_end.y
+		tempBar.scale.x = distance(total_end, temp_end);
+
+		this.extremity.x = temp_end.x
+		this.extremity.y = temp_end.y
 	}
-
     return progressBarContainer;
 }

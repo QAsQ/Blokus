@@ -42,7 +42,8 @@ $.get("/boards/normal", {}, function(boardData){
         }
         window.setInterval(function () {
             $.get("/battles/1", data, function(state){
-                    board.loadState(state);
+                //console.log(state);
+                board.loadState(state);
             });
         }, 1000);
     });

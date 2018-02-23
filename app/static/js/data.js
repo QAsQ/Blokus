@@ -34,6 +34,7 @@ function ColorThemeFactory(type) {
                 "3": 0xffc90d,
                "-1": 0xb7b7b7
             },
+            tampColor: 0xafafaf,
             legal: "#6f645e",
             horn: "#d5d7d5",
             rim: "#875f5f",
