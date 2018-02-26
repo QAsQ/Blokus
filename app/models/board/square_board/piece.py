@@ -143,7 +143,6 @@ class Piece:
                 if action == irrelevant:
                     continue
                 res_action.append((x, y, action))
-
         return res_action
 
     def get_state(self):

@@ -21,7 +21,6 @@ gProgressBarEndPointList= [
     Point(22, 0), Point(22, 20)
 ]
 
-
 function ColorThemeFactory(type) {
     if (type === "default") {
         return {
@@ -60,52 +59,4 @@ function ColorThemeFactory(type) {
         }
     }
     return null;
-}
-
-function AdhocstateGenerate() {
-    var state = {};
-    state.playerstate = [];
-    for (var i = 0; i < 4; i++){
-        state.playerstate.push({
-            remainingTime: {
-                totalTime: 12,
-                temporaryTime: 5
-            },
-            wasAuto: false
-        });
-    }
-    state.pieceState = [];
-    for (var i = 0; i < 4; i++ ){
-        var pieceState = [];
-        for (var j  = 0; j <= 20; j++)
-        {
-            pieceState.push({
-                isDown:false,
-                state: 0,
-                x: 0,
-                y: 0
-            })
-        }
-        state.pieceState.push(pieceState);
-    }
-    state.pieceState[0][2] = {
-        isDown: true,
-        state: 0,
-        x: 3,
-        y: 2
-    };
-    state.pieceState[1][12] = {
-        isDown: true,
-        state: 0,
-        x: 1,
-        y: 12
-    };
-
-    state.pieceState[1][5] = {
-        isDown: true,
-        state: 0,
-        x: 9,
-        y: 10
-    };
-    return state;
 }

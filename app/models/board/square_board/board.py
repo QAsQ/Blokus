@@ -15,8 +15,9 @@ class Board:
                     Piece(self.piece_shape_set[piece_id], player_id, piece_initial_pos[player_id][piece_id]))
         self.drop_history = []
 
-    def get_state(self):
+    def get_info(self):
         return {
+            "type": "square_standard",
             "history": self.drop_history
         }
 

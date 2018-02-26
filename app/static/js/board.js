@@ -1,13 +1,337 @@
-function CellFactory(cellColor, position){
-    var graphics = new PIXI.Graphics();
-    graphics.beginFill(cellColor, 1);
-    graphics.drawRect(
-        position.x * gCellSize,
-        position.y * gCellSize,
-        gCellSize,
-        gCellSize
-    );
-    return new PIXI.Sprite(graphics.generateTexture());
+function ParticleFactory(direction, particleColor) {
+	particle_config = {
+		"alpha": {
+			"start": 1,
+			"end": 0
+		},
+		"scale": {
+			"start": 0.1,
+			"end": 0.01,
+			"minimumScaleMultiplier": 1
+		},
+		"color": {
+			"start": particleColor.toString(16),
+			"end": "#FFFFFF"
+		},
+		"speed": {
+			"start": 50,
+			"end": 10,
+			"minimumSpeedMultiplier": 1
+		},
+		"acceleration": {
+			"x": 0,
+			"y": 0
+		},
+		"maxSpeed": 0,
+		"startRotation": {
+			"min": -15,
+			"max": 15
+		},
+		"noRotation": false,
+		"rotationSpeed": {
+			"min": 0,
+			"max": 0
+		},
+		"lifetime": {
+			"min": 0.5,
+			"max": 1.5
+		},
+		"blendMode": "normal",
+		"frequency": 0.001,
+		"emitterLifetime": -1,
+		"maxParticles": 500,
+		"pos": {
+			"x": 0,
+			"y": 0
+		},
+		"addAtBack": false,
+		"spawnType": "rect",
+		"spawnRect": {
+			"x": 0,
+			"y": 0,
+			"w": 3,
+			"h": 3
+		}
+	}
+    var emitter = null
+    // Calculate the current time
+    
+	var elapsed = Date.now();
+
+    var updateId;
+    var update = function(){
+	    updateId = requestAnimationFrame(update);
+        var now = Date.now();
+        if (emitter)
+            emitter.update((now - elapsed) * 0.0025);
+        
+		elapsed = now;
+    };
+
+	// Create the new emitter and attach it to the stage
+	var emitterContainer = new PIXI.Container();
+
+	var emitter = new PIXI.particles.Emitter(
+		emitterContainer,
+		//[PIXI.Texture.fromImage("/static/images/Sparks.png")],
+		[PIXI.Texture.fromImage("/static/images/image.png")],
+		particle_config
+	);
+	emitter.particleConstructor = PIXI.particles.PathParticle;
+	
+	update();
+
+	return emitterContainer
+}
+
+function ProgressBarFactory(stPoint, edPoint, width, progressBarColor, tempBarColor){
+	var graphics = new PIXI.Graphics();
+    graphics.beginFill(progressBarColor, 1);
+	graphics.drawRect(0, 0, 1, 1)
+	var progressBar = new PIXI.Sprite(graphics.generateTexture());
+    graphics.beginFill(tempBarColor, 1);
+	graphics.drawRect(0, 0, 1, 1)
+	var tempBar = new PIXI.Sprite(graphics.generateTexture());
+
+	var startPoint = Point(stPoint.x * gCellSize, stPoint.y * gCellSize);
+	var endPoint = Point(edPoint.x * gCellSize, edPoint.y * gCellSize);
+
+    function distance(pointA, pointB){
+        return Math.sqrt((pointA.x - pointB.x) * (pointA.x - pointB.x) + (pointA.y - pointB.y) * (pointA.y - pointB.y))
+	}
+	
+	function formTime(time){
+		minute = Math.floor(time / 60)
+		seconds = (time % 60)
+		if (seconds <= 9)
+			seconds = "0" + seconds.toString()
+		return minute + ":" + seconds
+	}
+    var angle = Math.atan2(endPoint.y - startPoint.y, endPoint.x - startPoint.x)
+
+	var progressBarContainer = new PIXI.Container();
+
+    tempBar.x = progressBar.x = startPoint.x
+	tempBar.y = progressBar.y = startPoint.y
+	var length = distance(startPoint, endPoint);
+	tempBar.scale.x = progressBar.scale.x = length;
+    tempBar.scale.y = progressBar.scale.y = width;
+	tempBar.rotation = progressBar.rotation = angle;
+
+	progressBarContainer.addChild(progressBar)
+	progressBarContainer.addChild(tempBar)
+	progressBarContainer.progressBar = progressBar;
+
+    progressBarContainer.extremity = ParticleFactory(
+		progressBar.rotation,
+		progressBarColor
+	);
+
+	progressBarContainer.addChild(progressBarContainer.extremity);
+	progressBarContainer.extremity.rotation = angle
+	progressBarContainer.extremity.x = endPoint.x
+	progressBarContainer.extremity.y = endPoint.y
+	progressBarContainer.extremity.visible = false
+
+	var progressBarText = new PIXI.Text(
+		"",
+		new PIXI.TextStyle({
+            fontSize: 15
+        })
+	);  
+	progressBarText.updText= function(text){
+		//Todo,not such right, need fix
+		progressBarText.setText(text);
+		progressBarText.rotation = angle
+		if (Math.PI * 0.5 < angle && angle < Math.PI * 1.5)
+		{
+			var unitX = (endPoint.x - startPoint.x) / length;
+			var unitY = (endPoint.y - startPoint.y) / length;
+			progressBarText.scale.x = -1;
+			progressBarText.scale.y = -1;
+			progressBarText.x = startPoint.x + unitX * progressBarText.width;
+			progressBarText.y = startPoint.y + unitY * progressBarText.width;
+		}
+		else
+		{
+			progressBarText.x = startPoint.x;  
+			progressBarText.y = startPoint.y;  
+		}
+	}
+	progressBarText.updText('NaN/NaN');
+	progressBarContainer.addChild(progressBarText);
+	progressBarContainer.progressBarText = progressBarText;
+
+	progressBarContainer.setActivate = function(active){
+		this.extremity.visible = active;
+	}
+	//todo update set progress rate to set time
+	progressBarContainer.setProgressRate = function(total_time_left, temp_time_left, total_time, temp_time){
+		this.progressBarText.updText(
+			formTime(total_time_left + temp_time_left) + " / " +
+			formTime(temp_time) + "+" + formTime(total_time) 
+		);
+		var total_rate = total_time_left / (total_time + temp_time);
+		var total_end = {
+			x: startPoint.x + (endPoint.x - startPoint.x) * total_rate,
+			y: startPoint.y + (endPoint.y - startPoint.y) * total_rate
+		}
+		this.progressBar.scale.x = distance(startPoint, total_end)
+
+		var temp_rate = (total_time_left + temp_time_left) / (total_time + temp_time);
+		var temp_end = {
+			x: startPoint.x + (endPoint.x - startPoint.x) * temp_rate,
+			y: startPoint.y + (endPoint.y - startPoint.y) * temp_rate 
+		}
+		tempBar.x = total_end.x
+		tempBar.y = total_end.y
+		tempBar.scale.x = distance(total_end, temp_end);
+
+		this.extremity.x = temp_end.x
+		this.extremity.y = temp_end.y
+	}
+    return progressBarContainer;
+}
+
+/**
+ *  A  Piece
+ *  可以被拖动的棋子, 在移动的各个过程调用响应的回调函数
+ * @param pieceId 棋子 Id
+ * @param cellList 棋子所占的格子
+ * @param PieceColor 棋子的颜色
+ * @param DragStartCallBack
+ * @param DragMoveCallBack
+ * @param DragEndCallBack
+ * @returns 返回一个棋子
+ * @constructor
+ */
+function PieceFactory(pieceId,
+                      shape,
+                      PieceColor,
+                      DragStartCallBack,
+                      DragMoveCallBack,
+                      DragEndCallBack) {
+    function onDragStart(event) {
+        this.data = event.data;
+        this.anchorPoint = this.data.getLocalPosition(this);
+        this.alpha = 1;
+        this.dragging = true;
+        //TODO this function is not work yet
+        DragStartCallBack(pieceId, this.State());
+    }
+
+    function onDragMove() {
+        if (this.dragging) {
+            var new_position = this.data.getLocalPosition(this.parent);
+            this.x = new_position.x - this.anchorPoint.x;
+            this.y = new_position.y - this.anchorPoint.y;
+            DragMoveCallBack(pieceId, this.State());
+        }
+    }
+
+    function onDragEnd() {
+        this.alpha = 0.8;
+        this.dragging = false;
+        this.data = null;
+        if (true)
+            DragEndCallBack(
+                pieceId, 
+                this.State()
+            );
+    }
+
+    function CellList_2_Polygon(cell_list, offset){
+        var vertex_list = [new PIXI.Point(0, 0)];
+        cell_list.forEach(function (cell) {
+            [[0, 0], [0, 1], [1, 1], [1, 0], [0 ,0]].forEach(function (point) {
+                vertex_list.push(
+                    new PIXI.Point(
+                        (cell[0] + point[0]) * gCellSize + offset.x,
+                        (cell[1] + point[1]) * gCellSize + offset.y
+                    )
+                )
+            })
+            vertex_list.push(new PIXI.Point(0, 0));
+        });
+
+        return new PIXI.Polygon(vertex_list);
+    }
+
+    var pieces = new PIXI.Container();
+    pieces.piece = []
+
+    shape.forEach(function(cellList, state){
+        var polygon = CellList_2_Polygon(cellList, new PIXI.Point());
+
+        var graphics = new PIXI.Graphics();
+        graphics.beginFill(PieceColor, 1);
+        graphics.drawPolygon(polygon);
+        // todo adhoc
+        graphics.lineStyle(1, 0xFFFFFF, 1);
+        graphics.endFill();
+        cellList.forEach(function (cells) {
+            graphics.drawRect(
+                cells.x * gCellSize,
+                cells.y * gCellSize,
+                gCellSize,
+                gCellSize
+            )
+        });
+        graphics.endFill();
+
+        var piece = new PIXI.Sprite(graphics.generateTexture());
+        //piece.hitArea = polygon;
+        piece.shape = polygon;
+        piece.cellList = cellList;
+        piece.visible = false;
+
+        pieces.piece.push(piece);
+        pieces.addChild(piece);
+    })
+
+    pieces.alpha = 0.8;
+    pieces.anchor = new PIXI.Point();
+    pieces.interactive = true
+    pieces
+        .on('pointerdown', onDragStart)
+        .on('pointerup', onDragEnd)
+        .on('pointerupoutside', onDragEnd)
+        .on('pointermove', onDragMove);
+
+    pieces.SetState = function (state) {
+        if (typeof(this.state) !== "undefined")
+            this.piece[this.state].visible = false;
+        this.state = state;
+        this.piece[state].visible = true;
+    };
+    pieces.SetState(0);
+
+    pieces.State = function() {
+        return {
+            state: this.state, 
+            x: Math.floor(this.x / gCellSize + 0.5),
+            y: Math.floor(this.y / gCellSize + 0.5),
+        };
+    }
+
+    pieces.SetVisible = function(visible) {
+        pieces.visible = visible
+    }
+
+    pieces.SetInteractive = function(interactive){
+        pieces.interactive = interactive
+    }
+
+    pieces.Flip = function(){
+        var new_state = this.state ^ 1
+        this.SetState(new_state);
+    };
+    pieces.Rotate = function(clock){
+        var new_state = (this.state + ((this.state % 2) ^ clock ? 2 : 6)) % 8
+        this.SetState(new_state);
+    };
+
+    return pieces;
 }
 
 /**
@@ -27,14 +351,6 @@ function CellFactory(cellColor, position){
  *  在棋子移动的时候根据当前位置是否为可落下的位置更新（棋子的透明度？落下按钮的可用性？）
  *  在棋子被松开的时候判断是否落下棋子并更新棋子
  *
- */
-/*
-state {
-  4 * 玩家的状态
- 4 * 21 Chess State
-    是否被落下，落下的位置
- 轮到的玩家
-}
  */
 function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
     console.log(PIXI.display);
