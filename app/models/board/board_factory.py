@@ -5,7 +5,6 @@ class BoardFactory:
     
     @staticmethod
     def createBoard(boardType):
-        print(boardType)
         if boardType == "square_standard":
             return NormalBoard(piece_shape_set)
         return False

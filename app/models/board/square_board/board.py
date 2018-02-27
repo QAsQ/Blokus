@@ -1,5 +1,6 @@
 from .piece import Piece, Position
 from .data import piece_initial_pos
+import copy
 
 # 维护一个棋盘的状态，不维护游戏进程
 class Board:
@@ -12,16 +13,23 @@ class Board:
             for piece_id in range(21):
                 # TODO should not income player_id
                 self.pieces[player_id].append(
-                    Piece(self.piece_shape_set[piece_id], player_id, piece_initial_pos[player_id][piece_id]))
+                    Piece(
+                        self.piece_shape_set[piece_id], 
+                        player_id, 
+                        copy.deepcopy(piece_initial_pos[player_id][piece_id])
+                    )
+                )
         self.drop_history = []
 
     def get_info(self):
         return {
-            "type": "square_standard",
+            "board_type": "square_standard",
             "history": self.drop_history
         }
 
-    def try_drop_piece(self, player_id, piece_id, position):
+    def try_drop_piece(self, player_id, piece_id, dict_position):
+        position = Position.from_dict(dict_position)
+
         if player_id < 0 or player_id >= 4:
             return False
         if piece_id < 0 or piece_id >= len(self.piece_shape_set):
@@ -41,22 +49,22 @@ class Board:
                     position, 
                     player_id == piece_player_id
                 )
+        
         return True
 
     def auto_drop_piece(self, player_id):
         piece_id, position = self._get_one_possible_position(player_id)
         if self.try_drop_piece(player_id, piece_id, position):
-            self.drop_history.append({
-                "player_id": player_id,
-                "piece_id": piece_id,
-                "position": position.to_dict()
-            })
             return True
         else:
             return False
     
     def is_ended(self):
-        return len(self.drop_history) >= len(self.piece_shape_set) * 4
+        for player_id in range(4):
+            piece_id, _ = self._get_one_possible_position(player_id)
+            if piece_id != -1:
+                return False
+        return True
 
     def _get_one_possible_position(self, player_id):
         position = Position()
@@ -64,6 +72,6 @@ class Board:
             for position.state in range(8):
                 position = self.pieces[player_id][piece_id].get_one_possible_position()
                 if position.state != -1:
-                    return piece_id, position
-        return -1, position
+                    return piece_id, position.to_dict()
+        return -1, position.to_dict()
 
