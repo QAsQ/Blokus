@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block head %}
+<script>
+$(document).ready(function() {
+        var battle_inferface = new Vue({
+            el: "#battle_inferface",
+            data: {
+                battle_data: data_gen(),
+                chat_logs: gen_chatlogs()
+            }
+        });
+        $('.ui.progress')
+            .progress();
+        $('.chat-box').scrollTop(
+            $('.chat-box')[0].scrollHeight
+        );
+        $('.ui.button.toggle').state({
+            text: {
+                inactive : '托管',
+                active   : '托管中'
+            }
+        });
+    });
+</script>
+<div class="ui hidden divider"></div>
+<battle-interface
+        id="battle_inferface"
+        :battle_data="battle_data"
+        :chat_logs="chat_logs">
+</battle-interface>
+{% endblock %}

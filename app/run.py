@@ -31,9 +31,10 @@ def userlist_pate():
 def user_page(user_id):
     pass
 
-@app.route("/battle/<int:battle_id>")
-def battle_page(battle_id):
-    pass
+@app.route("/battle")
+def battle_page():
+    battle_id = request.args.get('battle_id')
+    return render_template("battle.html")
 
 @app.route("/table/<int:table_id>")
 def table(table_id):

@@ -1,11 +1,11 @@
 function data_gen(){
     current_timestamp =  Math.floor(new Date().valueOf() / 1000) - 120;
     return {
-        users_info:[
-            { username: "QAQ", winning_rate: 13.5 },
-            { username: "QvQ", winning_rate: 1.5 },
-            { username: "QwQ", winning_rate: 3.5 },
-            { username: "oAo", winning_rate: 13 }
+        players_info:[
+            { is_auto: false, user_id: 12, username: "QAQ", winning_rate: 13.5 },
+            { is_auto: true, user_id: 12, username: "QvQ", winning_rate: 1.5 },
+            { user_id: -1},
+            { is_auto: false, user_id: 12, username: "oAo", winning_rate: 13 }
         ],
         battle_info:{
             battle_name: "Battle_QAQ",
@@ -16,7 +16,8 @@ function data_gen(){
             create_time: current_timestamp + 1,
             start_time: current_timestamp,
             current_user: 1,
-            current_time: current_timestamp
+            current_time: current_timestamp,
+            battle_process: 78
         },
         board_info:{
             board_type: "standard"
@@ -24,8 +25,17 @@ function data_gen(){
     }
 }
 
-function gen_chatlog(){
+function gen_chatlogs(){
     return [
+        "lizi: wtf",
+        "lizi: wtf",
+        "lizi: wtf",
+        "lizi: wtf",
+        "lizi: wtf",
+        "lizi: wtf",
+        "lizi: wtf",
+        "lizi: wtf",
+        "lizi: wtf",
         "lizi: wtf",
         "yyn: hahahaha",
         "quailty: 干得漂亮",
@@ -35,14 +45,14 @@ function gen_chatlog(){
 }
 
 
-Vue.component("userinfo-item", {
-    props: ['user_info', 'player_id'],
+Vue.component("playerinfo-item", {
+    props: ['player_info', 'player_id'],
     template: `
         <div class='item'>
             <img class='ui avatar image' :src='image_path'>
             <div class='content'>
-                <div class='header'> {{user_info.username}}</div>
-                <div class='description'>胜率:{{user_info.winning_rate}}%</div>
+                <div class='header'> {{player_info.username}}</div>
+                <div class='description'>胜率:{{player_info.winning_rate}}%</div>
             </div>
         </div>`,
     computed: {
@@ -52,14 +62,14 @@ Vue.component("userinfo-item", {
     }
 });
 
-Vue.component("userinfo-list", {
-    props: ['users_info'],
+Vue.component("playerinfo-list", {
+    props: ['players_info'],
     template:`
         <div class='ui big list'>
-            <userinfo-item v-for="(user_info, index) in users_info" :key="index"
+            <playerinfo-item v-for="(player_info, index) in players_info" :key="index"
                 :player_id="index"
-                :user_info="user_info" >
-            </userinfo-item>
+                :player_info="player_info" >
+            </playerinfo-item>
         </div>`
 });
 
@@ -67,8 +77,8 @@ Vue.component("battle-info", {
     props: ['battle_info', 'board_info'],
     template:`
         <div class="ui card">
-            <div class="ui middle image">
-                <img src="standard.png">
+            <div class="ui small image">
+                <img src="static/common/images/standard.png">
             </div>
             <div class="content">
                 <div class="header">{{battle_type}}</div>
@@ -132,7 +142,7 @@ Vue.component("battle-item", {
     template:`
         <div class="item">
             <div class="ui image">
-                <img class="ui avatar image" src="favicon.ico">
+                <img class="ui avatar image" src="static/favicon.ico">
             </div>
             <div class="content">
                 <div class="ui header"> {{battle_data.battle_info.battle_name}} </div>
@@ -143,7 +153,7 @@ Vue.component("battle-item", {
             </div>
             <div class="ui popup">
                 <div class='header'>用户信息</div>
-                <userinfo-list :users_info="battle_data.users_info"></userinfo-list>
+                <playerinfo-list :players_info="battle_data.players_info"></playerinfo-list>
             </div>
         </div>`
 });
@@ -184,7 +194,7 @@ Vue.component("playerinfo-item",{
             return this.player_info.username
         },
         image_path: function () {
-            return (1 << this.player_id) + '.png'
+            return "static/common/images/" + (1 << this.player_id) + '.png'
         },
         user_state: function () {
             if (this.player_info.user_id == -1)
@@ -269,30 +279,3 @@ Vue.component("battle-interface", {
         }
     }
 });
-
-function data_gen(){
-    current_timestamp =  Math.floor(new Date().valueOf() / 1000) - 120;
-    return {
-        players_info:[
-            { is_auto: false, user_id: 12, username: "QAQ", winning_rate: 13.5 },
-            { is_auto: true, user_id: 12, username: "QvQ", winning_rate: 1.5 },
-            { user_id: -1},
-            { is_auto: false, user_id: 12, username: "oAo", winning_rate: 13 }
-        ],
-        battle_info:{
-            battle_name: "Battle_QAQ",
-            accuracy_time: 120,
-            additional_time: 10,
-            started: true,
-            ended: false,
-            create_time: current_timestamp + 1,
-            start_time: current_timestamp,
-            current_user: 1,
-            current_time: current_timestamp,
-            battle_process: 78
-        },
-        board_info:{
-            board_type: "standard"
-        }
-    }
-}
