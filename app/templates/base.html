@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blokus</title>
+    <script src="static/jquery/jquery.min.js"></script>
+    <script src='static/vue/vue.js'></script>
+    <script src="static/vue/vue-component.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/semantic-ui/semantic.min.css">
+    <script src="static/semantic-ui/semantic.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/base/base.css">
+    <link rel="shortcut icon" href="static/favicon.ico">
+    <script>
+        $(document).ready(function() {
+            $('.ui.sidebar') .sidebar('attach events', '.toc.item');
+        });
+    </script>
+</head>
+
+<body>
+<div class="ui vertical inverted sidebar menu">
+    <a class="active item">主页</a>
+    <a class="item">在线对局</a>
+    <a class="item">玩家排名</a>
+    <a class="item">登陆</a>
+    <a class="item">注册</a>
+</div>
+
+<div class="pusher">
+    <div class="masthead segment background">
+        <div class="ui vertical masthead aligned segment">
+            <div class="ui container">
+                <div class="ui large secondary tabular menu">
+                    <a class="toc item">
+                        <i class="sidebar icon"></i>
+                    </a>
+                    <a class="active item" href="/index.html">
+                        <img class="logo" src="static/favicon.ico"></a>
+                    <a class="item" href="/battles.html">在线对局</a>
+                    <a class="item">玩家排名</a>
+                    <div class="right item">
+                        <a class="ui button">登陆</a>
+                        <a class="ui button">注册</a>
+                    </div>
+                </div>
+            </div>
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+    <div class="ui vertical footer segment">
+        <div class="ui container">
+            <div class="ui stackable divided equal height stackable grid">
+                <div class="five wide column">
+                    <h4 class="ui header">关于</h4>
+                    <div class="ui list">
+                        <a href="https://github.com/QAsQ/Blokus" class="item">
+                            <i class="github icon"></i> Github</a>
+                        <div class="item">Copyright © 2018 QAsQ</div>
+                    </div>
+                </div>
+                <div class="five wide column">
+                    <h4 class="ui header">联系我们</h4>
+                    <div class="ui list">
+                        <div class="item"><i class="qq icon"></i> Blokus玩家群: 97257869</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,17 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Index</title>
-    <script src="{{ url_for('static',_external=True,filename='js/pixi.min.js') }}"></script>
-    <script src="{{ url_for('static',_external=True,filename='js/pixi-layers.js') }}"> </script>
-    <script src="{{ url_for('static',_external=True,filename='js/pixi-particles.min.js') }}"></script>
-    <script src="{{ url_for('static',_external=True,filename='js/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static',_external=True,filename='js/data.js') }}"></script>
-    <script src="{{ url_for('static',_external=True,filename='js/board.js') }}"> </script>
-</head>
-<body>
-    <script> gPlayerId={{id}}</script>
-    <script src="{{ url_for('static',_external=True,filename='js/main.js') }}"> </script>
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+<div class="ui tab active" data-tab="index">
+    <div class="ui text center aligned container">
+        <h1 class="ui header">
+            Blokus 2.0
+        </h1>
+        <h2>你<del>从来没有</del>玩过的<del>全新</del>版本
+        </h2>
+        <div class="ui huge teal button">立即体验<i class="right arrow icon"></i></div>
+    </div>
+</div>
+{% endblock %}

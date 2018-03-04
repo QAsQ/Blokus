@@ -15,9 +15,9 @@ if db_config['username'] is not None and db_config['password'] is not None:
     db.authenticate(db_config['name'], db_config['password'])
 init_generate(db, ["battles", "users"])
 
-@app.route("/index")
+@app.route("/")
 def index():
-    pass
+    return render_template("index.html")
 
 @app.route("/battle-list")
 def battle_list():
@@ -29,6 +29,18 @@ def user_list():
 
 @app.route("/users/<int:user_id>")
 def users(user_id):
+    pass
+
+@app.route("/battle/<int:battle_id>")
+def battle_html(battle_id):
+    pass
+
+@app.route("/table/<int:table_id>")
+def table(table_id):
+    pass
+
+@app.route("/api/users", methods=['GET', 'POST'])
+def user():
     pass
 
 @app.route("/api/boards/<string:boardType>", methods=['GET'])
