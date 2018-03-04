@@ -16,23 +16,23 @@ if db_config['username'] is not None and db_config['password'] is not None:
 init_generate(db, ["battles", "users"])
 
 @app.route("/")
-def index():
+def index_page():
     return render_template("index.html")
 
-@app.route("/battle-list")
-def battle_list():
-    pass
+@app.route("/battles")
+def battles_page():
+    return render_template("battles.html")
 
 @app.route("/rank-list")
-def user_list():
+def userlist_pate():
     pass
 
 @app.route("/users/<int:user_id>")
-def users(user_id):
+def user_page(user_id):
     pass
 
 @app.route("/battle/<int:battle_id>")
-def battle_html(battle_id):
+def battle_page(battle_id):
     pass
 
 @app.route("/table/<int:table_id>")
