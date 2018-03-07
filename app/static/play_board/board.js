@@ -73,8 +73,7 @@ function ParticleFactory(direction, particleColor) {
 
 	var emitter = new PIXI.particles.Emitter(
 		emitterContainer,
-		//[PIXI.Texture.fromImage("/static/images/Sparks.png")],
-		[PIXI.Texture.fromImage("/static/images/image.png")],
+		[PIXI.Texture.fromImage("/static/pixi/images/image.png")],
 		particle_config
 	);
 	emitter.particleConstructor = PIXI.particles.PathParticle;
@@ -136,7 +135,7 @@ function ProgressBarFactory(stPoint, edPoint, width, progressBarColor, tempBarCo
 	var progressBarText = new PIXI.Text(
 		"",
 		new PIXI.TextStyle({
-            fontSize: 15
+            fontSize: 1
         })
 	);  
 	progressBarText.updText= function(text){
@@ -353,7 +352,6 @@ function PieceFactory(pieceId,
  *
  */
 function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
-    console.log(PIXI.display);
     var placedGroup = new PIXI.display.Group(-1, false); 
     var boardGroup = new PIXI.display.Group(0, false);
     var pieceGroup = new PIXI.display.Group(1, false);
@@ -455,24 +453,24 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
         //update progressBar
         for (var playerId = 0; playerId < 4; playerId ++) {
             var currentProgressBar = this.progressBars[playerId];
-            currentProgressBar.setActivate(playerId === state.battle.current_player);
+            currentProgressBar.setActivate(playerId === state.battle_info.current_player);
             currentProgressBar.setProgressRate(
-                state.player_state[playerId].total_time_left, 
-                state.player_state[playerId].temp_time_left, 
-                state.battle.total_time,
-                state.battle.temp_time
+                state.players_info[playerId].accuracy_time_left, 
+                state.players_info[playerId].additional_time_left, 
+                state.battle_info.accuracy_time,
+                state.battle_info.additional_time
             )
         }
         
         //TODO state.playerState;
         var _pieceLists = this.pieceLists;
-        for (var playerId = 0; playerId < 4; playerId ++)
+        for (var playerId = 0; playerId < 4; playerId ++){
             for (var pieceId = 0; pieceId < 21; pieceId ++){
                 _pieceLists[playerId][pieceId].SetVisible(playerId === gPlayerId);
                 _pieceLists[playerId][pieceId].SetInteractive(playerId === gPlayerId);
             }
-
-        state.board.history.forEach(function (piece) {
+        }
+        state.board_info.history.forEach(function (piece) {
             var isCurrentPlayer = piece.player_id == gPlayerId;
             var currentPiece = _pieceLists[piece.player_id][piece.piece_id];
 
@@ -506,6 +504,32 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
         },
         false
     );
+
+    return board;
+}
+
+function generateBoard(canvas, boardData, colorTheme){
+    gWidth = canvas.width;
+    gHeight = canvas.height;
+
+    var app = new PIXI.Application(
+        gWidth, 
+        gHeight, 
+        {
+            backgroundColor: 0xffffff, 
+            view:canvas
+        }
+    );
+
+    gCellSize = Math.floor(Math.min(gWidth, gHeight) / 28)
+    gBoardSize = gCellSize * 20;
+
+    function TryDropPiece(){
+
+    }
+
+    var board = BoardFactory(app, colorTheme, TryDropPiece, boardData)
+    app.stage.addChild(board);
 
     return board;
 }

@@ -18,9 +18,13 @@
                 }
             });
 
+            new Vue({
+                el: "#timer_type_selector",
+            });
+
             $('.ui.dropdown').dropdown();
-            $('.image').popup({inline:true});
-            $('.header').popup({inline: true});
+            $('[name="head"]').popup({inline:true});
+            $('[name="content"]').popup({inline: true});
             $('.ui.sticky').sticky({
                     offset: 50,
                     context: '#battle_list'}
@@ -28,6 +32,7 @@
         }
     );
 </script>
+<div class="ui divider"></div>
 <div class="ui stackable grid two column container">
     <div class="ui column">
         <div class="ui sticky">
@@ -94,32 +99,8 @@
                     </div>
                 </div>
             </div>
-            <div class="ui  divider"> </div>
-            <div class="ui left labeled button">
-                <div class="ui basic label">
-                    计时类型
-                </div>
-                <div class="ui basic inline dropdown button">
-                    <div class="text">标准</div>
-                    <i class="dropdown icon"></i>
-                    <div class="menu">
-                        <div class="active item" data-text="标准">标准</div>
-                        <div class="item" data-text="快速">快速</div>
-                        <div class="item" data-text="自定义">自定义</div>
-                    </div>
-                </div>
-            </div>
-            <div class="ui hidden divider"></div>
-            <div class="fluid ui left right labeled padded input">
-                <input type="text">
-                <a class="ui basic label">秒</a>
-            </div>
-            <div class="fluid ui left right labeled input">
-                <a class="ui basic label">额外时间</a>
-                <input type="text">
-                <a class="ui basic label">秒/步</a>
-            </div>
-            <div class="ui header">预计游戏时间: 45分钟</div>
+            <div class="ui divider"> </div>
+            <timer-type-selector id="timer_type_selector"></timer-type-selector>
         </div>
     </div>
 

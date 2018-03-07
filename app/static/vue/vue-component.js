@@ -20,7 +20,8 @@ function data_gen(){
             battle_process: 78
         },
         board_info:{
-            board_type: "standard"
+            board_type: "standard",
+            history: []
         }
     }
 }
@@ -76,8 +77,8 @@ Vue.component("playerinfo-list", {
 Vue.component("battle-info", {
     props: ['battle_info', 'board_info'],
     template:`
-        <div class="ui card">
-            <div class="ui small image">
+        <div class="ui fluid card">
+            <div class="ui image">
                 <img src="static/common/images/standard.png">
             </div>
             <div class="content">
@@ -141,11 +142,11 @@ Vue.component("battle-item", {
     props: ['battle_data'],
     template:`
         <div class="item">
-            <div class="ui image">
+            <div class="ui image" name="head">
                 <img class="ui avatar image" src="static/favicon.ico">
             </div>
             <div class="content">
-                <div class="ui header"> {{battle_data.battle_info.battle_name}} </div>
+                <div class="ui header" name="content"> {{battle_data.battle_info.battle_name}} </div>
                 <div class="ui popup">
                     <battle-info :battle_info="battle_data.battle_info" :board_info="battle_data.board_info">
                     </battle-info>
@@ -252,12 +253,12 @@ Vue.component("control-panel", {
 });
 
 Vue.component("battle-interface", {
-    props: ['battle_data', 'chat_logs'],
+    props: ['board_data', 'battle_data', 'chat_logs'],
     template: `
         <div class="ui grid container stackable">
             <div class="ui center aligned eleven wide column">
                 <div class="ui segment">
-                    <canvas height="260px" class="ui container"></canvas>
+                    <canvas id="board" height="450px" width="700px"></canvas>
                 </div>
                 <div class="ui small grey progress"
                     :class="{disabled: !running}"
@@ -272,10 +273,83 @@ Vue.component("battle-interface", {
                 :chat_logs="chat_logs">
             </control-panel>
         </div>`,
+    created: function(){
+        self = this
+        $.get("/api/boards/square_standard", {}, function(boardData){
+            self.board = generateBoard($("#board")[0], boardData, ColorThemeFactory("default"));
+        })
+    },
+    watch: {
+        'battle_data.board_info': function(){
+            this.board.loadState(this.battle_data)
+        }
+    },
     computed: {
         running: function () {
             return this.battle_data.battle_info.started &&
                     !this.battle_data.battle_info.ended
         }
+    }
+});
+
+function timer_type_gen(){
+    return [
+        {
+            name:"标准",
+            accuracy_time: 120,
+            additional_time: 10,
+            default: true
+        },
+        {
+            name:"标准",
+            accuracy_time: 50,
+            additional_time: 10
+        },
+        {
+            name:"自定义",
+            accuracy_time: 120,
+            additional_time: 10
+        }
+    ]
+}
+
+Vue.component("timer-type-selector", {
+    props: ["timer_type"],
+    template: `
+        <div>
+            <div class="ui left labeled button">
+                <div class="ui basic label">
+                    计时类型
+                </div>
+                <div class="ui basic inline dropdown button">
+                    <div class="text">标准</div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <div class="active item" data-text="标准">标准</div>
+                        <div class="item" data-text="快速">快速</div>
+                        <div class="item" data-text="自定义">自定义</div>
+                    </div>
+                </div>
+            </div>
+            <div class="ui hidden divider"></div>
+            <div class="fluid ui left right labeled input">
+                <a class="ui basic label">计时</a>
+                <input type="text">
+                <a class="ui basic label">秒</a>
+            </div>
+            <div class="fluid ui left right labeled input">
+                <a class="ui basic label">额外时间</a>
+                <input type="text">
+                <a class="ui basic label">秒/步</a>
+            </div>
+            <div class="ui header">预计游戏时间: 45分钟</div>
+        </div>`,
+    methods:{
+        show_type: function(){
+
+        }
+    },
+    computed: {
+        
     }
 });

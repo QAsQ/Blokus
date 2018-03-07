@@ -5,7 +5,7 @@ from .db_utility import id_generate
 default_offline_time = 300
 
 class Battle:
-    def __init__(self, timestamp, battle_info, board, db, player_info=None, battle_id=None):
+    def __init__(self, timestamp, battle_info, board, db, players_info=None, battle_id=None):
         self.db = db.battles
 
         self.board = board
@@ -20,27 +20,27 @@ class Battle:
         self.current_time = battle_info.get("current_time", -1)
 
         self.default_player_info = {"user_id": -1}
-        if player_info is None:
-            self.player_info = [self.default_player_info for _ in range(4)]
+        if players_info is None:
+            self.players_info = [self.default_player_info for _ in range(4)]
         else:
-            self.player_info = player_info
+            self.players_info = players_info
 
         if battle_id is None:
             self.id = id_generate(db, "battles")
-            self.db.insert(self.get_state(0))
+            self.db.insert(self.get_state(-1))
         else:
             self.id = battle_id
 
     def try_join_player(self, timestamp, player_id, user_id):
-        if self.player_info[player_id]["user_id"] != -1:
+        if self.players_info[player_id]["user_id"] != -1:
             return {"message" : "user already in"}
         
         #todo 
-        player_info = {}
+        user_info = {}
 
-        self.player_info[player_id] = {
+        self.players_info[player_id] = {
             "user_id": user_id,
-            "info": player_info,
+            "info": user_info,
             "join_time": timestamp,
             "last_active_time": timestamp,
             "accuracy_time_left": self.accuracy_time,
@@ -62,25 +62,35 @@ class Battle:
 
     def remove_player(self, timestamp, player_id):
         if not self.started:
-            self.player_info[player_id] = self.default_player_info
+            self.players_info[player_id] = self.default_player_info
         else:
-            self.player_info[player_id]['is_auto'] = True
-            self.player_info[player_id]['last_active_time'] = timestamp
+            self.players_info[player_id]['is_auto'] = True
+            self.players_info[player_id]['last_active_time'] = timestamp
         
         self._update_player(player_id)
 
     def remove_auto(self, timestamp, player_id):
-        self.player_info[player_id]['is_auto'] = False
-        self.player_info[player_id]['last_active_time'] = timestamp
+        self.players_info[player_id]['is_auto'] = False
+        self.players_info[player_id]['last_active_time'] = timestamp
 
         self._update_player(player_id)
     
-    def get_state(self, timestamp, player_id=-1):
+    def get_state(self, timestamp, user_id=-1):
+        def get_player_id():
+            if user_id == -1:
+                return -1
+            for player_id in range(len(self.players_info)):
+                if user_id == self.players_info[player_id]['user_id']:
+                    return player_id
+            return -1
+
+        player_id = get_player_id()
         self._update_info(timestamp, player_id)
+        print("update_done")
 
         return {
             "battle_id": self.id,
-            "player_info": self.player_info,
+            "players_info": self.players_info,
             "board_info": self.board.get_info(),
             "battle_info": self._get_battle_info()
         }
@@ -123,7 +133,7 @@ class Battle:
         )
     
     def _update_player(self, player_id):
-        self._update("player_info.{}".format(player_id), self.player_info[player_id])
+        self._update("players_info.{}".format(player_id), self.players_info[player_id])
 
     def _update_info(self, timestamp, player_id):
         if not self.started or self.ended:
@@ -132,7 +142,7 @@ class Battle:
         def current_player():
             if self.current_player == -1:
                 return None
-            return self.player_info[self.current_player]
+            return self.players_info[self.current_player]
     
         def auto_drop_piece():
             self.board.auto_drop_piece(self.current_player)
@@ -141,10 +151,10 @@ class Battle:
             self.current_player %= 4
 
         if player_id != -1:
-            self.player_info[player_id]["last_active_time"] = timestamp
+            self.players_info[player_id]["last_active_time"] = timestamp
         
         while self.current_time < timestamp and not self.ended:
-            for player_info in self.player_info:
+            for player_info in self.players_info:
                 if player_info["last_active_time"] + default_offline_time < timestamp:
                     player_info['is_auto'] = True
 
@@ -168,12 +178,12 @@ class Battle:
                 current_player()["accuracy_time_left"] = 0
                 auto_drop_piece()
             
-        self._update("player_info", self.player_info)
+        self._update("players_info", self.players_info)
         self._update("board_info", self.board.get_info())
         self._update("battle_info", self._get_battle_info())
 
     def _is_ready(self):
-        for player_info in self.player_info:
+        for player_info in self.players_info:
             if player_info['user_id'] == -1:
                 return False
         return True
@@ -203,7 +213,7 @@ class BattleFactory():
             battle_info['create_time'], 
             battle_info, 
             board, 
-            player_info=battle_data['player_info'], 
+            players_info=battle_data['players_info'], 
             db=db, 
             battle_id=battle_id
         )

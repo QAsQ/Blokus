@@ -30,10 +30,13 @@ def output_json(data):
 
 
 def output_battle(battle):
-	for player_info in battle['player_info']:
+	for player_info in battle['players_info']:
 		output_json(player_info)
 	print("history_len {}".format(len(battle['board_info']['history'])))
-	output_json(battle['board_info']['history'][-1])
+	if len(battle['board_info']['history']) == 0:
+		print("not drop yet")
+	else:
+		output_json(battle['board_info']['history'][-1])
 	output_json(battle['battle_info'])
 	print("=" * 30)
 
@@ -70,7 +73,7 @@ def get_battles(param):
 
 def get_one_battle(param):
 	r = requests.get(api_head + "battles/{}".format(param.battle_id),
-					params={"player_id": 0})
+					params={"user_id": param.user_id})
 	if param.debug:
 		print(r.text)
 	battle = json.loads(r.text)

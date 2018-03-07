@@ -75,12 +75,14 @@ def battles():
 def battle(battle_id):
     if request.method == 'GET':
         succ, battle = BattleFactory.load_battle(battle_id, db)
-        player_id = int(request.args.get('player_id'))
+        user_id = int(request.args.get('user_id'))
         if not succ:
             return jsonify({"message": battle})
-        return jsonify(battle.get_state(int(time.time()), player_id))
+        print(jsonify(battle.get_state(int(time.time()), user_id)))
+        return jsonify(battle.get_state(int(time.time()), user_id))
     else:
     #POST
+        #todo check user_id match player_id
         request_json = request.get_json(force=True)
         battle.try_drop_piece(
             int(time.time()), 

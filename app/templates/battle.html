@@ -1,14 +1,51 @@
 {% extends "base.html" %}
 {% block head %}
+<script src="static/pixi/pixi.min.js"></script>
+<script src="static/pixi/pixi-particles.min.js"></script>
+<script src="static/pixi/pixi-layers.js"></script>
+<script src="static/play_board/board.js"></script>
+<script src="static/play_board/data.js"></script>
 <script>
+
 $(document).ready(function() {
-        var battle_inferface = new Vue({
+    gUserId = 0
+
+    function getPlayerId(battle_data){
+        for (var id = 0; id < battle_data.players_info.length; id++)
+            if (gUserId === battle_data.players_info[id].user_id)
+                return id
+        return -1
+    }
+
+    get_board_data = function(){
+        return $.get("/api/boards/square_standard");
+    }
+
+    get_battle_data = function(){
+        return $.ajax({
+            type: "get",
+            url:  "/api/battles/0", 
+            data: {user_id: gUserId},
+            contentType: 'application/json; charset=UTF-8',
+            dataType: 'json'
+        });
+    }
+
+    $.when(get_board_data(), get_battle_data())
+    .then(function(board_data, battle_data){
+        console.log(battle_data)
+        gPlayerId = getPlayerId(battle_data[0]);
+
+        battle_inferface = new Vue({
             el: "#battle_inferface",
             data: {
-                battle_data: data_gen(),
-                chat_logs: gen_chatlogs()
+                board_data: board_data[0],
+                battle_data: battle_data[0],
+                chat_logs: gen_chatlogs(),
+                board: null
             }
         });
+
         $('.ui.progress')
             .progress();
         $('.chat-box').scrollTop(
@@ -21,6 +58,31 @@ $(document).ready(function() {
             }
         });
     });
+
+    window.setInterval(
+        function (){
+            $.ajax({
+                type: "GET",
+                url: "/api/battles/0",
+                contentType: "applicaton/json",
+                data: {user_id: gUserId},
+                timeout: 1000,
+                error: function (xhr, textStatus){
+                    if (textStatus == 'timeout'){
+                        console.log("TIME OUT");
+                    }
+                    else{
+                        console.log(textStatus);
+                    }
+                }, 
+                success: function(battle_data){
+                    battle_inferface.battle_data = battle_data;
+                }
+            });
+        }, 
+        1000
+    )
+});
 </script>
 <div class="ui hidden divider"></div>
 <battle-interface
