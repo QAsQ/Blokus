@@ -20,3 +20,11 @@ def id_generate(db, category):
     )
     return value[category]
 
+def id_clear(data_list):
+    ret = []
+
+    for data in data_list:
+        data.pop("_id")
+        ret.append(data)
+
+    return ret

@@ -258,7 +258,7 @@ Vue.component("battle-interface", {
         <div class="ui grid container stackable">
             <div class="ui center aligned eleven wide column">
                 <div class="ui segment">
-                    <canvas id="board" height="450px" width="700px"></canvas>
+                    <canvas id="board" height="600px" width="700px"></canvas>
                 </div>
                 <div class="ui small grey progress"
                     :class="{disabled: !running}"

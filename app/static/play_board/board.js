@@ -520,6 +520,7 @@ function generateBoard(canvas, boardData, colorTheme){
             view:canvas
         }
     );
+    app.stage = new PIXI.display.Stage();
 
     gCellSize = Math.floor(Math.min(gWidth, gHeight) / 28)
     gBoardSize = gCellSize * 20;
