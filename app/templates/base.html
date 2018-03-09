@@ -13,6 +13,10 @@
     <script>
         $(document).ready(function() {
             $('.ui.sidebar') .sidebar('attach events', '.toc.item');
+            $('.ui.modal').modal({
+                duration: 300,
+                transition: 'horizontal flip'
+            })
         });
     </script>
 </head>
@@ -22,8 +26,8 @@
     <a class="active item">主页</a>
     <a class="item">在线对局</a>
     <a class="item">玩家排名</a>
-    <a class="item" onclick="$('#login').modal({offset: 120}).modal('show')">登录</a>
-    <a class="item">注册</a>
+    <a class="item" onclick="$('#login').modal('show')">登录</a>
+    <a class="item" onclick="$('#login').modal('show')">注册</a>
 </div>
 
 <div class="pusher">
@@ -39,8 +43,12 @@
                     <a class="item" href="/battles">在线对局</a>
                     <a class="item">玩家排名</a>
                     <div class="right item">
-                        <a class="ui button" onclick="$('#login').modal('show')">登录</a>
-                        <a class="ui button">注册</a>
+                        <a class="ui labeled icon teal button" href="javascript:void(0)" onclick="$('#login').modal('show')">
+                            <i class="sign in icon"></i>
+                            登录</a>
+                        <a class="ui labeled icon teal button" href="javascript:void(0)" onclick="$('#regiester').modal('show')">
+                            <i class="add user icon"></i>
+                            注册</a>
                     </div>
                 </div>
             </div>
@@ -74,16 +82,16 @@
 </div>
 
 <div class="ui mini modal" id="login">
-    <h2 class="ui image center aligned header">
-        <img src="static/favicon.ico" class="ui mini image">
-        <div class="content"> Blokus </div>
-    </h2>
+    <div class="ui header">
+        <i class="teal sign in icon"></i>
+        <div class="content"> 登录 Blokus </div>
+    </div>
     <form class="ui middle form">
         <div class="ui segment">
             <div class="field">
                 <div class="ui left icon input">
                     <i class="user icon"></i>
-                    <input type="text" name="username" placeholder="用户名">
+                    <input type="text" name="username" placeholder="用户名 或 邮箱">
                 </div>
             </div>
             <div class="field">
@@ -97,9 +105,48 @@
         <div class="ui error message"></div>
     </form>
     <div class="ui message">
-        还没有账号？<a href="/sign_up">点此注册</a>
+        还没有账号？<a href="javascript:void(0)" onclick="$('#regiester').modal('show')">点此注册</a>
     </div>
 </div>
 
+<div class="ui mini modal" id="regiester">
+    <div class="ui header">
+        <i class="teal add user icon"></i>
+        <div class="content"> 注册账号 </div>
+    </div>
+    <form class="ui large form">
+        <div class="ui segment">
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="mail icon"></i>
+                    <input type="text" name="email" placeholder="邮箱地址">
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="user icon"></i>
+                    <input type="text" name="username" placeholder="用户名">
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="lock icon"></i>
+                    <input type="password" name="password" placeholder="密码">
+                </div>
+            </div>
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="lock icon"></i>
+                    <input type="password" name="password" placeholder="确认密码">
+                </div>
+            </div>
+            <div class="ui fluid large teal submit button">注册</div>
+        </div>
+        <div class="ui error message"></div>
+    </form>
+    <div class="ui message">
+        已有账号？<a href="javascript:void(0)" onclick="$('#login').modal('toggle')">点此登陆</a>
+    </div>
+</div>
 </body>
 </html>
