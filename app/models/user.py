@@ -1,22 +1,17 @@
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_login import UserMixin
-
-###load user from db 
-# have id or username & passwd
-
-### create user to db 
-# have username & passwd
-
-### update user info
-# from one ended battle
-# from one created battle
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from flask import current_app
+import json
 
 class User(UserMixin):
-    def __init__(self, user_data, db):
+    def __init__(self, db, user_data):
 
         self.username = user_data["username"]
+        self.email = user_data["email"]
         self.password = user_data['password']
         self.user_id = user_data["user_id"]
+        self.confirmed = user_data['confirmed']
         self.user_info = user_data["user_info"]
 
         self.db = db.users
@@ -25,9 +20,26 @@ class User(UserMixin):
         return {
             "user_id": self.user_id,
             "username": self.username,
+            "email": self.email,
             "password": self.password,
             "user_info": self.user_info
         }
+    
+    def generate_confirmation_token(self, expiration=3600):
+        s = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return s.dumps({'user_id': self.user_id})
+
+    def confirm(self, token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+            if data.get('user_id') != self.user_id:
+                return False
+        except:
+            return False
+
+        self.confirmed = True
+        self.db.update({"user_id": self.user_id}, {"confirmed": True})
 
     @staticmethod
     def load(db, user_data):
@@ -47,19 +59,24 @@ class User(UserMixin):
         return User.load(db, user_data)
     
     @staticmethod
-    def create(db, id_generate, username, password):
+    def create(db, id_generate, username, email, password):
         if db.users.find_one({"username": username}) is not None:
-            return False
+            return False, "username exist"
+
+        if db.users.find_one({"email": email}) is not None:
+            return False, "email exist"
 
         user_data = {
             "username": username,
+            "email": email,
             "password": generate_password_hash(password),
             "user_id": id_generate(db, "users"),
+            "confirmed": False,
             "user_info": {}
         }
 
-        db.insert(user_data)
-        return True
+        db.users.insert(user_data)
+        return True, User.load(db, user_data)
 
     def check_password(self, password):
         if self.password is None:

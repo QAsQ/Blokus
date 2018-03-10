@@ -2,19 +2,21 @@ from models.battle import Battle, BattleFactory
 from models.board import BoardFactory
 from models.db_utility import init_generate, id_clear, id_generate
 from models.user import User
-from flask import Flask, render_template, g, request, redirect, url_for, jsonify
+from flask import Flask, render_template, g, request, redirect, url_for, jsonify, flash
 from flask_login import LoginManager, current_user, login_user, login_required
 from pymongo import MongoClient
-from config import db_config
+from config import db_config, app_config
 import time
 import json
 import re
 
-app = Flask(__name__)
 db = MongoClient(host=db_config['host'], port=db_config['port'])[db_config['db_name']]
 if db_config['username'] is not None and db_config['password'] is not None:
     db.authenticate(db_config['name'], db_config['password'])
 init_generate(db, ["battles", "users"])
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = app_config['secret_key']
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -50,32 +52,55 @@ def table(table_id):
     pass
 
 @app.route("/api/users", methods=['GET', 'POST'])
-def user():
+def users():
     if request.method == 'GET':
-        #TODO remove password please
-        return jsonify(id_clear(db.users.find(proj)))
-    elif request.method == 'POST':
-        request_json = request.get_json(force=True)
+        try:
+            query = json.loads(request.args.get("query", ""))
+            sort = json.loads(request.args.get("sort", "[]"))
+        except Exception as e:
+            return {'message': repr(e)}
 
-        user = User.create(
+        projection = {"password" : False}
+        #TODO remove password please
+        return jsonify(id_clear(db.users.find(
+            filter=query,
+            projection=projection,
+            sort=sort)))
+
+    elif request.method == 'POST':
+        request_json = request.form.to_dict()
+
+        for field in ['username', 'email', 'password']:
+            if field not in request_json:
+                return False
+
+        state, user = User.create(
             db, 
             id_generate, 
             request_json['username'], 
+            request_json['email'], 
             request_json['password']
         )
 
-        if user == False:
+        if state == False:
             return False
 
         login_user(user)
-        return True
+        flash("true")
 
-@app.route("/api/user/login")
+        return redirect('/')
+        
+
+@app.route("/api/users/online", methods=['POST', 'DELETE'])
 def login():
-    request_json = request.get_json(force=True)
-    user = User.load_from_name(db, request_json['username'])
-    if not user.check_password(request_json['password']):
-        return False
+    if request.method == 'POST':
+        request_json = request.get_json(force=True)
+        user = User.load_from_name(db, request_json['username'])
+        if not user.check_password(request_json['password']):
+            return False
+    elif request.method == 'DELETE':
+        #logout
+        pass
     
     login_user(user)
     return redirect(request.args.get('next','/'));
@@ -108,7 +133,6 @@ def battle(battle_id):
         user_id = int(request.args.get('user_id'))
         if not succ:
             return jsonify({"message": battle})
-        print(jsonify(battle.get_state(int(time.time()), user_id)))
         return jsonify(battle.get_state(int(time.time()), user_id))
     elif request.method == 'POST':
         #todo check user_id match player_id

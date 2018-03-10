@@ -6,3 +6,7 @@ db_config = {
     'password': None
 }
 
+app_config = {
+   'secret_key': 'test_only'
+}
+
