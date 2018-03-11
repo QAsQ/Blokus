@@ -1,3 +1,7 @@
+def auth_db(db, db_config):
+    if db_config['username'] is not None and db_config['password'] is not None:
+        db.authenticate(db_config['name'], db_config['password'])
+
 def init_generate(db, category_list):
     db_counter = db.counter.find_one({"_id": 0})
     counter = {}

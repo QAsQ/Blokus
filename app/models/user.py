@@ -54,17 +54,17 @@ class User(UserMixin):
         return User.load(db, user_data)
     
     @staticmethod
-    def load_from_name(db, username):
-        user_data = db.users.find_one({"username": username})
+    def load_from_email(db, email):
+        user_data = db.users.find_one({"email": email})
         return User.load(db, user_data)
     
     @staticmethod
     def create(db, id_generate, username, email, password):
         if db.users.find_one({"username": username}) is not None:
-            return False, "username exist"
+            return "username used"
 
         if db.users.find_one({"email": email}) is not None:
-            return False, "email exist"
+            return "email used"
 
         user_data = {
             "username": username,
@@ -76,7 +76,7 @@ class User(UserMixin):
         }
 
         db.users.insert(user_data)
-        return True, User.load(db, user_data)
+        return User.load(db, user_data)
 
     def check_password(self, password):
         if self.password is None:

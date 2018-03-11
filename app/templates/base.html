@@ -11,11 +11,85 @@
     <link rel="stylesheet" type="text/css" href="static/base/base.css">
     <link rel="shortcut icon" href="static/favicon.ico">
     <script>
+        gUserId = {% if current_user.get_id() %} current_user.get_id() {% else %} -1 {% endif %}
+    </script>
+    <script>
         $(document).ready(function() {
             $('.ui.sidebar') .sidebar('attach events', '.toc.item');
             $('.ui.modal').modal({
                 duration: 300,
                 transition: 'horizontal flip'
+            })
+            $.fn.form.settings.rules.same_as_password = function(confirm_password) {
+                return confirm_password === $('#regiester_form').form("get value", "password")
+            }
+            $.fn.form.settings.rules.not_used = function(value, type) {
+                var data = {}
+                data[type] = value
+                var result = false
+                $.ajax({
+                    type: "get",
+                    url:  "/api/users", 
+                    data: {query: JSON.stringify(data)},
+                    contentType: 'application/json; charset=UTF-8',
+                    async: false,
+                    success: function(data){
+                        result = data.length === 0
+                    }
+                })
+                return result
+            }
+            $('#login_form').form({
+                fields: {
+                    email : {
+                        identifier: 'email',
+                        rules: [
+                            {type: 'empty', prompt: '邮箱不能为空'},
+                            {type: 'email', prompt: '邮箱格式不正确'}
+                        ]
+                    },
+                    password: {
+                        identifier: 'password',
+                        rules: [
+                            {type: 'empty', prompt: '密码不能为空'}
+                        ]
+                    }  
+                }
+            })
+            $('#regiester_form').form({
+                fields: {
+                    email: {
+                        identifier: 'email',
+                        rules: [
+                            {type: 'empty', prompt: '邮箱不能为空'},
+                            {type: 'email', prompt: '邮箱格式不正确'},
+                            {type: 'not_used[email]', prompt: '该邮箱已被使用'}
+                        ]
+                    },
+                    username: {
+                        identifier: 'username',
+                        rules: [
+                            {type: 'empty', prompt: '用户名不能为空'},
+                            {type: 'minLength[3]', prompt: '用户名长度要长于3个字符'},
+                            {type: 'maxLength[15]', prompt: '用户名长度要短于15个字符'},
+                            {type: 'not_used[username]', prompt: '该用户名已被使用'}
+                        ]
+                    },
+                    password: {
+                        identifier: 'password',
+                        rules: [
+                            {type: 'empty', prompt: '密码不能为空'},
+                            {type: 'minLength[6]', prompt: '密码长度要长于6个字符'},
+                            {type: 'maxLength[32]', prompt: '密码长度要短于32个字符'}
+                        ]
+                    },
+                    confirm_password: {
+                        identifier: 'confirm_password',
+                        rules: [
+                            {type: 'same_as_password', prompt: '两次输入的密码不一致'}
+                        ]
+                    }
+                }
             })
         });
     </script>
@@ -86,12 +160,12 @@
         <i class="teal sign in icon"></i>
         <div class="content"> 登录 Blokus </div>
     </div>
-    <form class="ui middle form">
+    <form class="ui form" id="login_form">
         <div class="ui segment">
             <div class="field">
                 <div class="ui left icon input">
-                    <i class="user icon"></i>
-                    <input type="text" name="username" placeholder="用户名 或 邮箱">
+                    <i class="mail icon"></i>
+                    <input type="text" name="email" placeholder="邮箱">
                 </div>
             </div>
             <div class="field">
@@ -114,12 +188,12 @@
         <i class="teal add user icon"></i>
         <div class="content"> 注册账号 </div>
     </div>
-    <form class="ui large form">
+    <form class="ui form" id='regiester_form' method="POST" action="/api/users">
         <div class="ui segment">
             <div class="field">
                 <div class="ui left icon input">
                     <i class="mail icon"></i>
-                    <input type="text" name="email" placeholder="邮箱地址">
+                    <input type="text" name="email" placeholder="邮箱">
                 </div>
             </div>
             <div class="field">
@@ -137,7 +211,7 @@
             <div class="field">
                 <div class="ui left icon input">
                     <i class="lock icon"></i>
-                    <input type="password" name="password" placeholder="确认密码">
+                    <input type="password" name="confirm_password" placeholder="确认密码">
                 </div>
             </div>
             <div class="ui fluid large teal submit button">注册</div>

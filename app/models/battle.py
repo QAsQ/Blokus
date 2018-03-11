@@ -34,8 +34,7 @@ class Battle:
     def try_join_player(self, timestamp, player_id, user_id):
         if self.players_info[player_id]["user_id"] != -1:
             return {"message" : "user already in"}
-        
-        #todo 
+
         user_info = {}
 
         self.players_info[player_id] = {
@@ -193,21 +192,21 @@ buffer = {}
 class BattleFactory():
     @staticmethod
     def create_battle(start_timestamp, battle_info, board_type, db):
-        return True, Battle(start_timestamp, battle_info, BoardFactory.createBoard(board_type), db=db)
+        return Battle(start_timestamp, battle_info, BoardFactory.createBoard(board_type), db=db)
     
     @staticmethod
     def load_battle(battle_id, db):
         if battle_id in buffer:
-            return True, buffer[battle_id]
+            return buffer[battle_id]
         battle_data = db.battles.find_one({"battle_id": battle_id})
         if battle_data is None:
-            return False, "battles not exists"
+            return "battles not exists"
         battle_info = battle_data['battle_info']
         board = BoardFactory.createBoard(battle_data['board_info']['board_type'])
         for one_step in battle_data['board_info']['history']:
             drop_res = board.try_drop_piece(one_step['player_id'], one_step['piece_id'], one_step['position'])
             if not drop_res:
-                return False, "battle info error(board history)"
+                return "battle info error(history)"
 
         battle = Battle(
             battle_info['create_time'], 
@@ -219,7 +218,7 @@ class BattleFactory():
         )
 
         buffer[battle_id] = battle
-        return True, battle
+        return battle
             
 
         
