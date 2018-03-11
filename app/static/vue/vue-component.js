@@ -46,27 +46,53 @@ function gen_chatlogs(){
 }
 
 Vue.component("user-item", {
-    props: ['user_id', 'username'],
+    props: ['user'],
     template: `
         <div>
-            <a v-if="!logged" class="ui labeled icon teal button" href="javascript:void(0)" onclick="$('#login').modal('show')">
+            <a v-show="!logged" class="ui labeled icon teal button" href="javascript:void(0)" onclick="$('#login').modal('show')">
                 <i class="sign in icon"></i>
                 登录</a>
-            <a v-if="!logged" class="ui labeled icon teal button" href="javascript:void(0)" onclick="$('#regiester').modal('show')">
+            <a v-show="!logged" class="ui labeled icon teal button" href="javascript:void(0)" onclick="$('#regiester').modal('show')">
                 <i class="add user icon"></i>
                 注册</a>
-            <div v-if="logged" class="ui secondary basic right labeled icon button dropdown">
-                <div class="text">{{username}}</div>
+            <a v-show="logged" class="ui basic black right labeled icon dropdown">
+                <div class="text">{{user.username}}</div>
                 <i class="dropdown icon"></i>
                 <div class="menu">
                     <div class="item"><i class="user icon"></i>个人主页</div>
-                    <div class="item"><i class="sign out icon"></i>退出登录</div>
+                    <div class="item"><i class="sign out icon" v-on:click="logout"></i>退出登录</div>
                 </div>
-            </div>
+            </a>
         </div>`,
+    methods: {
+        logout: function(){
+            $.ajax({
+                type: "DELETE",
+                url: "/api/users/online",
+                success: function(data){
+                    if (data.message == "success"){
+                        $("#hit_nag_message").text("退出登录成功")
+                        $("#hit_nag").nag('show')
+                        $("#hit_nag").nag('clear')
+                        user_item.user = data.result 
+                    }
+                    else{
+                        $("#hit_nag_message").text(data.message)
+                        $("#hit_nag").nag('show')
+                        $("#hit_nag").nag('clear')
+                    }
+                },
+                error: function(data){
+                    $("#hit_nag_message").text("请求失败，请检查网络连接")
+                    $("#hit_nag").nag('show')
+                    $("#hit_nag").nag('clear')
+                }
+            })
+        }
+    },
     computed: {
         logged: function(){
-            return this.user_id !== -1
+            return this.user.user_id !== -1
         }
     }
 });

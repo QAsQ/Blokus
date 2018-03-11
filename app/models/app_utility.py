@@ -1,10 +1,15 @@
 from flask import jsonify
 
 def success(result):
-    return jsonify({
-        "message": "success",
-        "result": result
-    })
+    if result == "":
+        return jsonify({
+            "message": "success"
+        })
+    else:
+        return jsonify({
+            "message": "success",
+            "result": result
+        })
 
 def failure(messsage):
     return jsonify({

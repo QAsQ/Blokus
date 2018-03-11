@@ -11,18 +11,50 @@
     <link rel="stylesheet" type="text/css" href="static/base/base.css">
     <link rel="shortcut icon" href="static/favicon.ico">
     <script>
-        gUserId = {% if current_user.get_id() %} current_user.get_id() {% else %} -1 {% endif %}
-        username = {{ current_user.username }} + ""
-    </script>
-    <script>
         $(document).ready(function() {
             user_item = new Vue({
                 el: "#user_item",
                 data: {
-                    "user_id": gUserId,
-                    "username": username
+                    user: {{ current_user.dump()|tojson|safe }}
                 }
-            })
+            });
+            function Callback(form, url, modal, message){
+                return function(){
+                    form.addClass("loading")
+                    var res = false
+                    
+                    $.ajax({
+                        type: "POST",
+                        url:  url, 
+                        data: JSON.stringify(form.form('get values')),
+                        contentType: 'application/json; charset=UTF-8',
+                        async: false,
+                        success: function(data){
+                            form.removeClass("loading")
+                            if (data.message == "success"){
+                                form.addClass("success")
+                                user_item.user = data.result 
+                                modal.modal('hide')
+                                res = true
+                            }
+                            else{
+                                form
+                                    .removeClass("success")
+                                    .addClass("error")
+                                message.text(data.message)
+                            }
+                        },
+                        error: function(data){
+                            form
+                                .removeClass("loading")
+                                .removeClass("success")
+                                .addClass("error")
+                            message.text("请求失败")
+                        }
+                    })
+                    return res
+                }
+            }
             $('.ui.sidebar') .sidebar('attach events', '.toc.item');
             $('.ui.modal').modal({
                 duration: 300,
@@ -43,8 +75,9 @@
                     contentType: 'application/json; charset=UTF-8',
                     async: false,
                     success: function(data){
-                        result = data.length === 0
-                    }
+                        result = data.message == "success" 
+                                 && data.result.length === 0
+                    }                
                 })
                 return result
             }
@@ -63,7 +96,13 @@
                             {type: 'empty', prompt: '密码不能为空'}
                         ]
                     }  
-                }
+                },
+                onSuccess: Callback(
+                    $("#login_form"),
+                    "/api/users/online",
+                    $('#login'),
+                    $("#login_message")
+                )
             })
             $('#regiester_form').form({
                 fields: {
@@ -98,7 +137,13 @@
                             {type: 'same_as_password', prompt: '两次输入的密码不一致'}
                         ]
                     }
-                }
+                },
+                onSuccess: Callback(
+                    $("#regiester_form"),
+                    "/api/users",
+                    $('#regiester'),
+                    $("#regiester_message")
+                )
             })
         });
     </script>
@@ -110,12 +155,17 @@
     <a class="item">在线对局</a>
     <a class="item">玩家排名</a>
     <a class="item" onclick="$('#login').modal('show')">登录</a>
-    <a class="item" onclick="$('#login').modal('show')">注册</a>
+    <a class="item" onclick="$('#regiester').modal('show')">注册</a>
 </div>
 
 <div class="pusher">
     <div class="masthead segment background">
         <div class="ui vertical masthead aligned segment">
+            <div class="ui inline cookie nag" id='hit_nag'>
+                <span class='title' id="hit_nag_message">
+                </span>
+                <i class="close icon"></i>
+            </div>
             <div class="ui container">
                 <div class="ui large secondary tabular menu">
                     <a class="toc item">
@@ -126,7 +176,7 @@
                     <a class="item" href="/battles">在线对局</a>
                     <a class="item">玩家排名</a>
                     <div class="right item">
-                        <user-item id="user_item" :user_id="user_id" :username="username"></user-item>
+                        <user-item id="user_item" :user="user"></user-item>
                     </div>
                 </div>
             </div>
@@ -164,7 +214,7 @@
         <i class="teal sign in icon"></i>
         <div class="content"> 登录 Blokus </div>
     </div>
-    <form class="ui form" id="login_form">
+    <form class="ui form" id="login_form" action="javascript:void(0)">
         <div class="ui segment">
             <div class="field">
                 <div class="ui left icon input">
@@ -180,7 +230,7 @@
             </div>
             <div class="ui fluid large teal submit button">登录</div>
         </div>
-        <div class="ui error message"></div>
+        <div class="ui error message" id='login_message'></div>
     </form>
     <div class="ui message">
         还没有账号？<a href="javascript:void(0)" onclick="$('#regiester').modal('show')">点此注册</a>
@@ -192,7 +242,7 @@
         <i class="teal add user icon"></i>
         <div class="content"> 注册账号 </div>
     </div>
-    <form class="ui form" id='regiester_form' method="POST" action="/api/users">
+    <form class="ui form" id='regiester_form' action="javascript:void(0)">
         <div class="ui segment">
             <div class="field">
                 <div class="ui left icon input">
@@ -220,7 +270,7 @@
             </div>
             <div class="ui fluid large teal submit button">注册</div>
         </div>
-        <div class="ui error message"></div>
+        <div class="ui error message" id="regiester_message"></div>
     </form>
     <div class="ui message">
         已有账号？<a href="javascript:void(0)" onclick="$('#login').modal('toggle')">点此登陆</a>

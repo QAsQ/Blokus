@@ -4,7 +4,7 @@ import re
 from pymongo import MongoClient
 
 from flask import Flask, render_template, g, request, redirect, url_for, jsonify, flash
-from flask_login import LoginManager, current_user, login_user, login_required
+from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 
 from models.battle import Battle, BattleFactory
 from models.board import BoardFactory
@@ -23,6 +23,7 @@ app.config['SECRET_KEY'] = app_config['secret_key']
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.anonymous_user = User.anonymous_user(db)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -68,7 +69,7 @@ def users():
             sort=sort)))
 
     elif request.method == 'POST':
-        request_json = request.form.to_dict()
+        request_json = request.get_json(force=True)
 
         check_res = field_checker(request_json, ['username', 'email', 'password'])
         if check_res is not None:
@@ -81,14 +82,11 @@ def users():
             request_json['email'], 
             request_json['password']
         )
-
         if isinstance(user, str):
             return failure(user)
-
         login_user(user)
-        flash(u'登录成功')
 
-        return redirect('/')
+        return success(user.dump())
 
 @app.route("/api/users/online", methods=['POST', 'DELETE'])
 def login():
@@ -103,11 +101,12 @@ def login():
 
         login_user(user)
 
-        return redirect(request.args.get('next','/'))
+        return success(user.dump())
 
     elif request.method == 'DELETE':
-        #logout
-        pass
+        logout_user()
+
+        return success(current_user.dump())
         
 @app.route("/api/boards/<string:boardType>", methods=['GET'])
 def boards(boardType):

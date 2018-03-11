@@ -7,24 +7,29 @@ import json
 class User(UserMixin):
     def __init__(self, db, user_data):
 
+        self.user_id = user_data["user_id"]
         self.username = user_data["username"]
         self.email = user_data["email"]
         self.password = user_data['password']
-        self.user_id = user_data["user_id"]
         self.confirmed = user_data['confirmed']
         self.user_info = user_data["user_info"]
 
         self.db = db.users
 
-    def dump(self):
-        return {
+    def dump(self, with_password=False):
+        dict_data = {
             "user_id": self.user_id,
             "username": self.username,
             "email": self.email,
-            "password": self.password,
+            "confirmed": self.confirmed,
             "user_info": self.user_info
         }
-    
+
+        if with_password:
+            dict_data["password"] = self.password
+
+        return dict_data
+
     def generate_confirmation_token(self, expiration=3600):
         s = Serializer(current_app.config['SECRET_KEY'], expiration)
         return s.dumps({'user_id': self.user_id})
@@ -47,6 +52,20 @@ class User(UserMixin):
             return None
 
         return User(db, user_data)
+
+    @staticmethod
+    def anonymous_user(db):
+        def generater():
+            return User.load(db, {
+                "user_id": -1,
+                "username": "not login",
+                "email": "anonymous@blokus.io",
+                "confirmed": True,
+                "password": "",
+                "user_info": {}
+            })
+        
+        return generater
 
     @staticmethod
     def load_from_id(db, user_id):
