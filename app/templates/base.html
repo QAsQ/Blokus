@@ -12,14 +12,23 @@
     <link rel="shortcut icon" href="static/favicon.ico">
     <script>
         gUserId = {% if current_user.get_id() %} current_user.get_id() {% else %} -1 {% endif %}
+        username = {{ current_user.username }} + ""
     </script>
     <script>
         $(document).ready(function() {
+            user_item = new Vue({
+                el: "#user_item",
+                data: {
+                    "user_id": gUserId,
+                    "username": username
+                }
+            })
             $('.ui.sidebar') .sidebar('attach events', '.toc.item');
             $('.ui.modal').modal({
                 duration: 300,
                 transition: 'horizontal flip'
             })
+            $('.ui.dropdown').dropdown({action: 'hide'})
             $.fn.form.settings.rules.same_as_password = function(confirm_password) {
                 return confirm_password === $('#regiester_form').form("get value", "password")
             }
@@ -117,12 +126,7 @@
                     <a class="item" href="/battles">在线对局</a>
                     <a class="item">玩家排名</a>
                     <div class="right item">
-                        <a class="ui labeled icon teal button" href="javascript:void(0)" onclick="$('#login').modal('show')">
-                            <i class="sign in icon"></i>
-                            登录</a>
-                        <a class="ui labeled icon teal button" href="javascript:void(0)" onclick="$('#regiester').modal('show')">
-                            <i class="add user icon"></i>
-                            注册</a>
+                        <user-item id="user_item" :user_id="user_id" :username="username"></user-item>
                     </div>
                 </div>
             </div>

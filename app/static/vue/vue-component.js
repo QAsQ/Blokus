@@ -45,6 +45,31 @@ function gen_chatlogs(){
     ]
 }
 
+Vue.component("user-item", {
+    props: ['user_id', 'username'],
+    template: `
+        <div>
+            <a v-if="!logged" class="ui labeled icon teal button" href="javascript:void(0)" onclick="$('#login').modal('show')">
+                <i class="sign in icon"></i>
+                登录</a>
+            <a v-if="!logged" class="ui labeled icon teal button" href="javascript:void(0)" onclick="$('#regiester').modal('show')">
+                <i class="add user icon"></i>
+                注册</a>
+            <div v-if="logged" class="ui secondary basic right labeled icon button dropdown">
+                <div class="text">{{username}}</div>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <div class="item"><i class="user icon"></i>个人主页</div>
+                    <div class="item"><i class="sign out icon"></i>退出登录</div>
+                </div>
+            </div>
+        </div>`,
+    computed: {
+        logged: function(){
+            return this.user_id !== -1
+        }
+    }
+});
 
 Vue.component("playerinfo-item", {
     props: ['player_info', 'player_id'],
