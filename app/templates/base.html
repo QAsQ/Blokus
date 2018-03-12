@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Blokus</title>
     <script src="static/jquery/jquery.min.js"></script>
+    <script src="static/jquery/js.cookie.js"></script>
     <script src='static/vue/vue.js'></script>
     <script src="static/vue/vue-component.js"></script>
     <link rel="stylesheet" type="text/css" href="static/semantic-ui/semantic.min.css">
@@ -18,7 +19,7 @@
                     user: {{ current_user.dump()|tojson|safe }}
                 }
             });
-            function Callback(form, url, modal, message){
+            function Callback(form, url, modal, message, hit_message){
                 return function(){
                     form.addClass("loading")
                     var res = false
@@ -36,6 +37,7 @@
                                 user_item.user = data.result 
                                 modal.modal('hide')
                                 res = true
+                                show_message(hit_message)
                             }
                             else{
                                 form
@@ -101,7 +103,8 @@
                     $("#login_form"),
                     "/api/users/online",
                     $('#login'),
-                    $("#login_message")
+                    $("#login_message"),
+                    "登录成功"
                 )
             })
             $('#regiester_form').form({
@@ -142,7 +145,8 @@
                     $("#regiester_form"),
                     "/api/users",
                     $('#regiester'),
-                    $("#regiester_message")
+                    $("#regiester_message"),
+                    "注册成功"
                 )
             })
         });

@@ -45,6 +45,12 @@ function gen_chatlogs(){
     ]
 }
 
+function show_message(message){
+    $("#hit_nag_message").text(message)
+    $("#hit_nag").nag('clear')
+    $("#hit_nag").nag('show')
+}
+
 Vue.component("user-item", {
     props: ['user'],
     template: `
@@ -61,7 +67,7 @@ Vue.component("user-item", {
                 <div class="menu">
                     <a class="item" :href="my_index"><i class="user icon"></i>我的主页</a>
                     <div class="item"><i class="setting icon"></i>设置</div>
-                    <div class="item"><i class="sign out icon" v-on:click="logout"></i>退出</div>
+                    <div class="item" v-on:click="logout"><i class="sign out icon"></i>退出</div>
                 </div>
             </a>
         </div>`,
@@ -72,21 +78,15 @@ Vue.component("user-item", {
                 url: "/api/users/online",
                 success: function(data){
                     if (data.message == "success"){
-                        $("#hit_nag_message").text("退出登录成功")
-                        $("#hit_nag").nag('show')
-                        $("#hit_nag").nag('clear')
+                        show_message("退出登录成功")
                         user_item.user = data.result 
                     }
                     else{
-                        $("#hit_nag_message").text(data.message)
-                        $("#hit_nag").nag('show')
-                        $("#hit_nag").nag('clear')
+                        show_message(data.message)
                     }
                 },
                 error: function(data){
-                    $("#hit_nag_message").text("请求失败，请检查网络连接")
-                    $("#hit_nag").nag('show')
-                    $("#hit_nag").nag('clear')
+                    show_message("请求失败，请检查网络连接")
                 }
             })
         }
