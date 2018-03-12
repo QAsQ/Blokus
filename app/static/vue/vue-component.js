@@ -97,6 +97,47 @@ Vue.component("user-item", {
     }
 });
 
+Vue.component("user-data", {
+    props: ['user'],
+    template: `
+    <div class="ui centered grid">
+        <div class="row">
+            <h1 class='ui header' style="font-size: 10em"> {{user.username}} </h1>
+        </div>
+        <div class="segment">
+            <div class="ui statistic">
+                <div class="value">
+                    {{rate_of_victory}}
+                </div>
+                <div class="label">胜率</div>
+            </div>
+            <div class="ui huge statistic">
+                <div class="value">
+                    {{user.user_info.rating}}
+                </div>
+                <div class="label">rating</div>
+            </div>
+            <div class="ui statistic">
+                <div class="value">
+                    {{user.user_info.number_of_victory}}
+                </div>
+                <div class="label">获胜场次</div>
+            </div>
+            <div class="ui statistic">
+                <div class="value">
+                    {{user.user_info.number_of_battles}}
+                </div>
+                <div class="label">总场次</div>
+            </div>
+        </div>
+    </div>`,
+    computed: {
+        rate_of_victory: function(){
+            return (this.user.user_info.rate_of_victory * 100).toFixed(2) + "%"
+        }
+    }
+})
+
 Vue.component("playerinfo-item", {
     props: ['player_info', 'player_id'],
     template: `

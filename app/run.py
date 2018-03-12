@@ -42,9 +42,18 @@ def battles_page():
 def userlist_page():
     pass
 
-@app.route("/users/<int:user_id>")
-def user_page(user_id):
-    pass
+@app.route("/users")
+def user_page():
+    try:
+        user_id = int(request.args.get("user_id"))
+    except:
+        return render_template("error.html", message="该用户不存在")
+
+    user = User.load_from_id(db, user_id)
+    if user is None:
+        return render_template("error.html", message="该用户不存在")
+
+    return render_template("user.html", target_user=user)
 
 @app.route("/battle")
 def battle_page():

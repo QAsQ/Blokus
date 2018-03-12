@@ -62,7 +62,12 @@ class User(UserMixin):
                 "email": "anonymous@blokus.io",
                 "confirmed": True,
                 "password": "",
-                "user_info": {}
+                "user_info": {
+                    "number_of_battles": 0,
+                    "number_of_victory": 0,
+                    "rate_of_victory": 0,
+                    "rating": 1500
+                }
             })
         
         return generater
@@ -91,7 +96,12 @@ class User(UserMixin):
             "password": generate_password_hash(password),
             "user_id": id_generate(db, "users"),
             "confirmed": False,
-            "user_info": {}
+            "user_info": {
+                "number_of_battles": 0,
+                "number_of_victory": 0,
+                "rate_of_victory": 0,
+                "rating": 1500
+            }
         }
 
         db.users.insert(user_data)

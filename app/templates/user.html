@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block head %}
+<script>
+$(document).ready(function() {
+
+    user_data = new Vue({
+        el: "#user_data",
+        data:{
+            user: {{ target_user.dump()|tojson|safe }}
+        }
+    })
+})
+</script>
+<div class="ui hidden divider"> </div>
+<user-data id="user_data" :user="user"></user-data>
+{% endblock %}
+
+{% block content %}
+{% endblock %}
