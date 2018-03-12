@@ -59,8 +59,9 @@ Vue.component("user-item", {
                 <div class="text">{{user.username}}</div>
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <div class="item"><i class="user icon"></i>个人主页</div>
-                    <div class="item"><i class="sign out icon" v-on:click="logout"></i>退出登录</div>
+                    <a class="item" :href="my_index"><i class="user icon"></i>我的主页</a>
+                    <div class="item"><i class="setting icon"></i>设置</div>
+                    <div class="item"><i class="sign out icon" v-on:click="logout"></i>退出</div>
                 </div>
             </a>
         </div>`,
@@ -93,6 +94,9 @@ Vue.component("user-item", {
     computed: {
         logged: function(){
             return this.user.user_id !== -1
+        },
+        my_index: function(){
+            return "/users?user_id=" + this.user.user_id
         }
     }
 });
@@ -102,7 +106,7 @@ Vue.component("user-data", {
     template: `
     <div class="ui centered grid">
         <div class="row">
-            <h1 class='ui header' style="font-size: 10em"> {{user.username}} </h1>
+            <h1 style="font-size: 10em"> {{user.username}} </h1>
         </div>
         <div class="segment">
             <div class="ui statistic">
