@@ -71,37 +71,75 @@
 {% endblock %}
 
 {% block content %}
-<div class="ui small modal" id="create">
+<div class="ui modal" id="create">
     <div class="header">
         创建对局
     </div>
-    <div class="image content">
-        <div class="ui image">
-            <img src="static/common/images/standard.png">
-        </div>
-        <div class="ui description container">
-            <div class="ui labeled input">
-                <div class="ui basic label">对局名称</div>
-                <input type="text" placeholder="长度小于6个字符">
-            </div>
-            <div class="ui divider"> </div>
-            <div class="ui left labeled button">
-                <div class="ui basic label">
-                    对局类型
-                </div>
-                <div class="ui basic inline dropdown button">
-                    <div class="text">标准</div>
-                    <i class="dropdown icon"></i>
-                    <div class="menu">
-                        <div class="active item" data-text="标准">标准</div>
-                        <div class="disabled item" data-text="双人">双人</div>
-                        <div class="disabled item" data-text="三人">三人</div>
+    <div class="content">
+    <div class="ui two column grid">
+        <div class="ui six width column">
+            <div class="ui big form">
+                <div class="two fields">
+                    <div class="field">
+                        <div class="ui vertical segment">
+                            <label>对局名称</label>
+                            <input type="text" placeholder="名称长度小于6">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui vertical segment">
+                            <label>对局类型</label>
+                            <div class="ui basic inline dropdown fluid button">
+                                <div class="text">标准</div>
+                                <i class="dropdown icon"></i>
+                                <div class="menu">
+                                    <div class="active item" data-text="标准">标准</div>
+                                    <div class="disabled item" data-text="双人">双人</div>
+                                    <div class="disabled item" data-text="三人">三人</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <div class="ui divider"></div>
+                <div class="ui vertical segment">
+                    <div class="field">
+                        <label>计时类型</label>
+                        <div class="ui basic inline dropdown fluid button">
+                            <div class="text">标准</div>
+                            <i class="dropdown icon"></i>
+                            <div class="menu">
+                                <div class="active item" data-text="标准">标准</div>
+                                <div class="item" data-text="快速">快速</div>
+                                <div class="item" data-text="自定义">自定义</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="two fields">
+                        <div class="field">
+                            <label>计时</label>
+                            <div class="ui right labeled input">
+                                <input type="text">
+                                <a class="ui basic label">秒</a>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>额外</label>
+                            <div class="ui right labeled input">
+                                <input type="text">
+                                <a class="ui basic label">秒/步</a>
+                            </div>
+                        </div>
+                    </div>
+                    <h4>预计游戏时间: 45分钟</h4>
+                </div>
             </div>
-            <div class="ui divider"> </div>
-            <timer-type-selector id="timer_type_selector"></timer-type-selector>
         </div>
+        <div class="ui column">
+            <img class="ui middle image" src="static/common/images/standard.png">
+        </div>
+    </div>
+
     </div>
 
     <div class="actions">

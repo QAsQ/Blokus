@@ -47,8 +47,8 @@ function gen_chatlogs(){
 
 function show_message(message){
     $("#hit_nag_message").text(message)
-    $("#hit_nag").nag('clear')
     $("#hit_nag").nag('show')
+    $("#hit_nag").nag('clear')
 }
 
 Vue.component("user-item", {
@@ -408,44 +408,3 @@ function timer_type_gen(){
         }
     ]
 }
-
-Vue.component("timer-type-selector", {
-    props: ["timer_type"],
-    template: `
-        <div>
-            <div class="ui left labeled button">
-                <div class="ui basic label">
-                    计时类型
-                </div>
-                <div class="ui basic inline dropdown button">
-                    <div class="text">标准</div>
-                    <i class="dropdown icon"></i>
-                    <div class="menu">
-                        <div class="active item" data-text="标准">标准</div>
-                        <div class="item" data-text="快速">快速</div>
-                        <div class="item" data-text="自定义">自定义</div>
-                    </div>
-                </div>
-            </div>
-            <div class="ui hidden divider"></div>
-            <div class="fluid ui left right labeled input">
-                <a class="ui basic label">计时</a>
-                <input type="text">
-                <a class="ui basic label">秒</a>
-            </div>
-            <div class="fluid ui left right labeled input">
-                <a class="ui basic label">额外时间</a>
-                <input type="text">
-                <a class="ui basic label">秒/步</a>
-            </div>
-            <div class="ui header">预计游戏时间: 45分钟</div>
-        </div>`,
-    methods:{
-        show_type: function(){
-
-        }
-    },
-    computed: {
-        
-    }
-});
