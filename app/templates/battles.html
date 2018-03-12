@@ -11,23 +11,44 @@
                 return ret
             }
 
-            new Vue({
+            var battle_list = new Vue({
                 el: "#battle_list",
                 data:{
                     battles_data: gen_data()
                 }
             });
 
-            new Vue({
-                el: "#timer_type_selector",
-            });
+            var timer_scheme_selector = new Vue({
+                el: "#timer_scheme_selector",
+                data: {
+                    timer:{
+                        accuracy_time: 50,
+                        additional_time: 5,
+                        identity: "custom"
+                    },
+                    timer_scheme: [
+                        {
+                            identity: "standard",
+                            name:"标准",
+                            accuracy_time: 180,
+                            additional_time: 5
+                        },
+                        {
+                            identity: "fast",
+                            name:"快速",
+                            accuracy_time: 60,
+                            additional_time: 10
+                        }
+                    ]
+                }
+            })
 
-            $('.ui.dropdown').dropdown();
+            $('#timer_type_selector').dropdown()
             $('[name="head"]').popup({inline:true});
             $('[name="content"]').popup({inline: true});
             $('.ui.sticky').sticky({
-                    offset: 50,
-                    context: '#battle_list'}
+                offset: 50,
+                context: '#battle_list'}
             );
         }
     );
@@ -80,13 +101,13 @@
         <div class="ui six width column">
             <div class="ui big form">
                 <div class="two fields">
-                    <div class="field">
+                    <div class="field" name="battle_name">
                         <div class="ui vertical segment">
                             <label>对局名称</label>
-                            <input type="text" placeholder="名称长度小于6">
+                            <input type="text" placeholder="名称长度小于12">
                         </div>
                     </div>
-                    <div class="field">
+                    <div class="field" name="battle_type">
                         <div class="ui vertical segment">
                             <label>对局类型</label>
                             <div class="ui basic inline dropdown fluid button">
@@ -102,37 +123,11 @@
                     </div>
                 </div>
                 <div class="ui divider"></div>
-                <div class="ui vertical segment">
-                    <div class="field">
-                        <label>计时类型</label>
-                        <div class="ui basic inline dropdown fluid button">
-                            <div class="text">标准</div>
-                            <i class="dropdown icon"></i>
-                            <div class="menu">
-                                <div class="active item" data-text="标准">标准</div>
-                                <div class="item" data-text="快速">快速</div>
-                                <div class="item" data-text="自定义">自定义</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="two fields">
-                        <div class="field">
-                            <label>计时</label>
-                            <div class="ui right labeled input">
-                                <input type="text">
-                                <a class="ui basic label">秒</a>
-                            </div>
-                        </div>
-                        <div class="field">
-                            <label>额外</label>
-                            <div class="ui right labeled input">
-                                <input type="text">
-                                <a class="ui basic label">秒/步</a>
-                            </div>
-                        </div>
-                    </div>
-                    <h4>预计游戏时间: 45分钟</h4>
-                </div>
+                <timer-scheme-selector
+                    id="timer_scheme_selector" 
+                    :timer_scheme="timer_scheme"
+                    :timer="timer">
+                </timer-scheme-selector>
             </div>
         </div>
         <div class="ui column">

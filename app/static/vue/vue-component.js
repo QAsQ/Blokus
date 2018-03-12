@@ -388,23 +388,86 @@ Vue.component("battle-interface", {
     }
 });
 
-function timer_type_gen(){
-    return [
-        {
-            name:"标准",
-            accuracy_time: 120,
-            additional_time: 10,
-            default: true
-        },
-        {
-            name:"标准",
-            accuracy_time: 50,
-            additional_time: 10
-        },
-        {
-            name:"自定义",
-            accuracy_time: 120,
-            additional_time: 10
+Vue.component("timer-scheme-selector", {
+    props: ['timer_scheme', 'timer'],
+    template: `
+        <div class="ui vertical segment">
+            <div class="field" name="timing_plan">
+                <label>计时类型</label>
+                <select v-model="timer.identity" class="ui basic inline dropdown" id="timer_type_selector">
+                    <option v-for="scheme in timer_scheme" 
+                        :value="scheme.identity">
+                        {{scheme.name}}
+                    </option>
+                    <option value="custom">自定义</option>
+                </select>
+            </div>
+            <div class="two fields">
+                <div class="field">
+                    <label>计时</label>
+                    <div class="ui right labeled input">
+                        <input v-model.number="timer.accuracy_time" type="text">
+                        <a class="ui basic label">秒</a>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>额外</label>
+                    <div class="ui right labeled input">
+                        <input v-model.number="timer.additional_time" type="text">
+                        <a class="ui basic label">秒/步</a>
+                    </div>
+                </div>
+            </div>
+            <h4>预计游戏时间: {{expect_time}}</h4>
+        </div> `,
+    mounted: function(){
+        this.update_timer_identity()
+    },
+    methods: {
+        update_timer_identity: function(){
+            for (var id = 0; id < this.timer_scheme.length; id++){
+                if(this.timer_scheme[id].additional_time === this.timer.additional_time
+                    && this.timer_scheme[id].accuracy_time === this.timer.accuracy_time){
+                    this.timer.identity = this.timer_scheme[id].identity
+                    $('#timer_type_selector').dropdown("set selected", this.timer_scheme[id].identity)
+                    return
+                }
+            }
+            this.timer.identity = "custom"
+            $('#timer_type_selector').dropdown("set selected", 'custom')
         }
-    ]
-}
+    },
+    watch: {
+        "timer.identity": function(){
+            if(this.timer.identity === "custom")
+                return true
+            for (var id = 0; id < this.timer_scheme.length; id++){
+                if(this.timer_scheme[id].identity == this.timer.identity){
+                    this.timer.accuracy_time = this.timer_scheme[id].accuracy_time
+                    this.timer.additional_time = this.timer_scheme[id].additional_time
+                    return true
+                }
+            }
+            console.log("ERROR! unknow identity " + this.timer.identity)
+        },
+        "timer.accuracy_time": function(){
+            this.update_timer_identity()
+        },
+        "timer.additional_time": function(){
+            this.update_timer_identity()
+        }
+    },
+    computed: {
+        expect_time: function(){
+            second = (this.timer.accuracy_time + this.timer.additional_time * 21) * 4
+            var minute = Math.floor( second / 60 );
+            if (minute < 60)
+                return minute + "分钟";
+            var hour = Math.floor(second / 60);
+            if (hour < 24)
+                return hour + "小时";
+            var day = Math.floor(hour / 24);
+            return day + "天";
+        }
+    }
+});
