@@ -63,9 +63,6 @@
                 transition: 'horizontal flip'
             })
             $('.ui.dropdown').dropdown({action: 'hide'})
-            $.fn.form.settings.rules.same_as_password = function(confirm_password) {
-                return confirm_password === $('#regiester_form').form("get value", "password")
-            }
             $.fn.form.settings.rules.not_used = function(value, type) {
                 var data = {}
                 data[type] = value
@@ -137,7 +134,7 @@
                     confirm_password: {
                         identifier: 'confirm_password',
                         rules: [
-                            {type: 'same_as_password', prompt: '两次输入的密码不一致'}
+                            {type: 'match[password]', prompt: '两次输入的密码不一致'}
                         ]
                     }
                 },

@@ -183,7 +183,7 @@ Vue.component("battle-info", {
                     <span class="date">{{start_state}}</span>
                 </div>
                 <div class="description">
-                    对局进程: {{battle_process}}%
+                    对局进程: {{board_info.board_process * 100).toFixed(2)}}%
                 </div>
             </div>
             <div class="extra content">
@@ -208,7 +208,7 @@ Vue.component("battle-info", {
     computed: {
         battle_type: function () {
             var battletype_translate = {
-                standard: "标准对局"
+                standard: "四人对局"
             };
             return battletype_translate[this.board_info.board_type]
         },
@@ -218,9 +218,6 @@ Vue.component("battle-info", {
             else
                 return "开始于" + this.format_time(
                         (Math.floor(new Date().valueOf() / 1000) - this.battle_info.start_time )) + "前"
-        },
-        battle_process: function () {
-            return "暂未实现"
         },
         accuracy_time: function () {
             return this.battle_info.accuracy_time + "s"
@@ -259,7 +256,7 @@ Vue.component("battle-list", {
     props: ['battles_data', 'show_create'],
     template: `
         <div class="ui huge divided selection list">
-            <div v-if="show_create" class="item" onclick="$('#create').modal({autofocus: false}).modal('show')">
+            <div v-if="show_create" class="item" onclick="$('#create_modal').modal({autofocus: false}).modal('show')">
                 <i class="teal inverted circular middle plus icon"></i>
                 <div class="content" data-tooltip="点击创建新对局">
                     <div class="ui header">「&ensp;&ensp;」</div>
@@ -348,6 +345,23 @@ Vue.component("control-panel", {
     }
 });
 
+Vue.component("battle-progress", {
+    props: ['running', 'board_progress'],
+    template: `
+        <div class="ui small progress"
+            :class="{disabled: !running, gray: !running, teal: running}"
+            :data-percent="board_progress" id="battle_progress">
+            <div class="bar">
+                <div class="progress"></div>
+            </div>
+        </div>`,
+    watch: {
+        "board_progress": function(){
+            $("#battle_progress").progress("set percent", this.board_progress)
+        }
+    }
+})
+
 Vue.component("battle-interface", {
     props: ['board_data', 'battle_data', 'chat_logs'],
     template: `
@@ -356,24 +370,18 @@ Vue.component("battle-interface", {
                 <div class="ui segment">
                     <canvas id="board" height="600px" width="700px"></canvas>
                 </div>
-                <div class="ui small grey progress"
-                    :class="{disabled: !running}"
-                    :data-percent="battle_data.battle_info.battle_process" id="process_bar">
-                    <div class="bar">
-                        <div class="progress"></div>
-                    </div>
-                </div>
+                <battle-progress
+                    :running="running"
+                    :board_progress="board_progress">
+                </battle-progress>
             </div>
             <control-panel
                 :battle_data="battle_data"
                 :chat_logs="chat_logs">
             </control-panel>
         </div>`,
-    created: function(){
-        self = this
-        $.get("/api/boards/square_standard", {}, function(boardData){
-            self.board = generateBoard($("#board")[0], boardData, ColorThemeFactory("default"));
-        })
+    mounted: function(){
+        this.board = generateBoard($("#board")[0], this.board_data, ColorThemeFactory("default"));
     },
     watch: {
         'battle_data.board_info': function(){
@@ -384,6 +392,9 @@ Vue.component("battle-interface", {
         running: function () {
             return this.battle_data.battle_info.started &&
                     !this.battle_data.battle_info.ended
+        },
+        board_progress: function(){
+            return 100 * this.battle_data.board_info.board_progress
         }
     }
 });
@@ -406,14 +417,14 @@ Vue.component("timer-scheme-selector", {
                 <div class="field">
                     <label>计时</label>
                     <div class="ui right labeled input">
-                        <input v-model.number="timer.accuracy_time" type="text">
+                        <input v-model.number="timer.accuracy_time" type="text" name="accuracy_time">
                         <a class="ui basic label">秒</a>
                     </div>
                 </div>
                 <div class="field">
                     <label>额外</label>
                     <div class="ui right labeled input">
-                        <input v-model.number="timer.additional_time" type="text">
+                        <input v-model.number="timer.additional_time" type="text" name="additional_time">
                         <a class="ui basic label">秒/步</a>
                     </div>
                 </div>

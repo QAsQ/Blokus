@@ -8,23 +8,27 @@ class Board:
         # player_id, piece_id, state, x, y
         self.piece_shape_set = piece_shape_set
         self.pieces = [[] for _ in range(4)]
+        self.drop_history = []
+        self.amount_cells = 0
+        self.dropped_cells = 0
 
         for player_id in range(4):
             for piece_id in range(21):
                 # TODO should not income player_id
-                self.pieces[player_id].append(
-                    Piece(
-                        self.piece_shape_set[piece_id], 
-                        player_id, 
-                        copy.deepcopy(piece_initial_pos[player_id][piece_id])
-                    )
+                piece = Piece(
+                    self.piece_shape_set[piece_id], 
+                    player_id, 
+                    copy.deepcopy(piece_initial_pos[player_id][piece_id])
                 )
-        self.drop_history = []
+                self.amount_cells += piece.cell_num
+                self.pieces[player_id].append(piece)
+
 
     def get_info(self):
         return {
             "board_type": "square_standard",
-            "history": self.drop_history
+            "history": self.drop_history,
+            "board_progress": self.dropped_cells * 1.0 /  self.amount_cells
         }
 
     def try_drop_piece(self, player_id, piece_id, dict_position):
@@ -36,6 +40,7 @@ class Board:
             return False
         if not self.pieces[player_id][piece_id].try_drop(position):
             return False
+        self.dropped_cells += self.pieces[player_id][piece_id].cell_num
 
         self.drop_history.append({
             "player_id": player_id,

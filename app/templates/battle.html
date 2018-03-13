@@ -12,7 +12,7 @@ $(document).ready(function() {
 
     function getPlayerId(battle_data){
         for (var id = 0; id < battle_data.players_info.length; id++)
-            if (gUserId === battle_data.players_info[id].user_id)
+            if (user_item.user_id === battle_data.players_info[id].user_id)
                 return id
         return -1
     }
@@ -33,21 +33,22 @@ $(document).ready(function() {
 
     $.when(get_board_data(), get_battle_data())
     .then(function(board_data, battle_data){
-        console.log(battle_data)
-        gPlayerId = getPlayerId(battle_data[0]);
+
+        board_data = board_data[0].result
+        battle_data = battle_data[0].result
+        gPlayerId = getPlayerId(battle_data)
 
         battle_inferface = new Vue({
             el: "#battle_inferface",
             data: {
-                board_data: board_data[0],
-                battle_data: battle_data[0],
+                board_data: board_data,
+                battle_data: battle_data,
                 chat_logs: gen_chatlogs(),
                 board: null
             }
         });
 
-        $('.ui.progress')
-            .progress();
+        $('#battle_progress').progress();
         $('.chat-box').scrollTop(
             $('.chat-box')[0].scrollHeight
         );
@@ -75,8 +76,9 @@ $(document).ready(function() {
                         console.log(textStatus);
                     }
                 }, 
-                success: function(battle_data){
-                    battle_inferface.battle_data = battle_data;
+                success: function(data){
+                    battle_data = data.result
+                    battle_inferface.battle_data = battle_data
                 }
             });
         }, 
@@ -88,6 +90,7 @@ $(document).ready(function() {
 <battle-interface
         id="battle_inferface"
         :battle_data="battle_data"
+        :board_data="board_data"
         :chat_logs="chat_logs">
 </battle-interface>
 {% endblock %}

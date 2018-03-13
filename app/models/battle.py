@@ -10,6 +10,7 @@ class Battle:
 
         self.board = board
         self.create_time = timestamp
+        self.battle_name = battle_info['battle_name']
         self.accuracy_time = battle_info['accuracy_time']
         self.additional_time = battle_info['additional_time']
 
@@ -111,6 +112,7 @@ class Battle:
 
     def _get_battle_info(self):
         return {
+            "battle_name": self.battle_name,
             "accuracy_time": self.accuracy_time,
             "additional_time": self.additional_time,
             "started": self.started,
@@ -192,7 +194,10 @@ buffer = {}
 class BattleFactory():
     @staticmethod
     def create_battle(start_timestamp, battle_info, board_type, db):
-        return Battle(start_timestamp, battle_info, BoardFactory.createBoard(board_type), db=db)
+        board = BoardFactory.createBoard(board_type)
+        if isinstance(board, str):
+            return board
+        return Battle(start_timestamp, battle_info, board, db=db)
     
     @staticmethod
     def load_battle(battle_id, db):

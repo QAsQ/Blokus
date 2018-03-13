@@ -44,12 +44,44 @@
             })
 
             $('#timer_type_selector').dropdown()
+            $('.ui.dropdown').dropdown()
             $('[name="head"]').popup({inline:true});
             $('[name="content"]').popup({inline: true});
             $('.ui.sticky').sticky({
                 offset: 50,
                 context: '#battle_list'}
             );
+            $("#create_form").form({
+                fields: {
+                    battle_name: {
+                        identifier: 'battle_name',
+                        rules: [
+                            {type: 'empty', prompt: '对局名称不能为空'},
+                            {type: 'maxLength[8]', prompt: '对局名称长度要短于12个字符'}
+                        ]
+                    },
+                    accuracy_time: {
+                        identifier: 'accuracy_time',
+                        rules: [
+                            {type: 'empty', prompt: '计时不能为空'},
+                            {type: 'integer[0..]', prompt : '计时必须为正整数'}
+                        ]
+                    },
+                    additional_time: {
+                        identifier: 'additional_time',
+                        rules: [
+                            {type: 'empty', prompt: '额外用时不能为空'},
+                            {type: 'integer[0..]', prompt : '额外用时必须为正整数'}
+                        ]
+                    }  
+                },
+                onSuccess: function(){
+                    console.log("wtf");
+                    data = $("#create_form").form("get values")
+                    console.log(data)
+                }
+            })
+            $("#create_modal").modal("show");
         }
     );
 </script>
@@ -92,56 +124,57 @@
 {% endblock %}
 
 {% block content %}
-<div class="ui modal" id="create">
+<div class="ui modal" id="create_modal">
     <div class="header">
         创建对局
     </div>
     <div class="content">
-    <div class="ui two column grid">
-        <div class="ui six width column">
-            <div class="ui big form">
-                <div class="two fields">
-                    <div class="field" name="battle_name">
-                        <div class="ui vertical segment">
-                            <label>对局名称</label>
-                            <input type="text" placeholder="名称长度小于12">
+        <div class="ui two column grid">
+            <div class="ui six width column">
+                <form class="ui form" id='create_form'>
+                    <div class="two fields">
+                        <div class="field">
+                            <div class="ui vertical segment">
+                                <label>对局名称</label>
+                                <input type="text" name="battle_name" placeholder="名称长度小于12">
+                            </div>
                         </div>
-                    </div>
-                    <div class="field" name="battle_type">
-                        <div class="ui vertical segment">
-                            <label>对局类型</label>
-                            <div class="ui basic inline dropdown fluid button">
-                                <div class="text">标准</div>
-                                <i class="dropdown icon"></i>
-                                <div class="menu">
-                                    <div class="active item" data-text="标准">标准</div>
-                                    <div class="disabled item" data-text="双人">双人</div>
-                                    <div class="disabled item" data-text="三人">三人</div>
+                        <div class="field">
+                            <div class="ui vertical segment">
+                                <label>对局类型</label>
+                                <div class="ui basic selection dropdown">
+                                    <input type="hidden" name="battle_type">
+                                    <div class="default text"></div>
+                                    <i class="dropdown icon"></i>
+                                    <div class="menu">
+                                        <div class="item" data-value="standard">四人</div>
+                                        <div class="disabled item" data-value="twin">双人</div>
+                                        <div class="disabled item" data-value="trio">三人</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="ui divider"></div>
-                <timer-scheme-selector
-                    id="timer_scheme_selector" 
-                    :timer_scheme="timer_scheme"
-                    :timer="timer">
-                </timer-scheme-selector>
+                    <div class="ui divider"></div>
+                    <timer-scheme-selector
+                        id="timer_scheme_selector" 
+                        :timer_scheme="timer_scheme"
+                        :timer="timer">
+                    </timer-scheme-selector>
+                    <div class="ui error message"></div>
+                </form>
+            </div>
+            <div class="ui column">
+                <img class="ui middle image" src="static/common/images/standard.png">
             </div>
         </div>
-        <div class="ui column">
-            <img class="ui middle image" src="static/common/images/standard.png">
-        </div>
-    </div>
-
     </div>
 
     <div class="actions">
         <div class="ui grey deny button">
             取消
         </div>
-        <div class="ui teal right labeled icon button">
+        <div class="ui teal right labeled icon button" onclick="$('#create_form').form('validate form')">
             确认创建
             <i class="plus icon"></i>
         </div>

@@ -7,11 +7,11 @@ class BoardFactory:
     def createBoard(boardType):
         if boardType == "square_standard":
             return NormalBoard(piece_shape_set)
-        return False
+        return "board type {} is not defined!".format(boardType)
     
     @staticmethod
     def getBoardData(boardType):
         if boardType == "square_standard":
             return piece_shape_set
-        return False
+        return "board type {} is not defined!".format(boardType)
     

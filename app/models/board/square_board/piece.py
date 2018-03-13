@@ -40,6 +40,7 @@ occupy = 2
 class Piece:
     def __init__(self, piece_shape_set, player_id, initialize_position=None):
         self.shape_set = piece_shape_set
+        self.cell_num = 0 if len(piece_shape_set) == 0 else len(piece_shape_set[0])
 
         self.possible_position = []
         if initialize_position is None:
