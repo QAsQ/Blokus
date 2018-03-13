@@ -86,7 +86,6 @@ class Battle:
 
         player_id = get_player_id()
         self._update_info(timestamp, player_id)
-        print("update_done")
 
         return {
             "battle_id": self.id,
@@ -147,6 +146,7 @@ class Battle:
     
         def auto_drop_piece():
             self.board.auto_drop_piece(self.current_player)
+            self.ended = self.board.is_ended()
             current_player()['additional_time_left'] = self.additional_time
             self.current_player += 1
             self.current_player %= 4
