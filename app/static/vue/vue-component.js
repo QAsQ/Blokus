@@ -5,7 +5,7 @@ function data_gen(){
             { is_auto: false, user_id: 12, username: "QAQ", winning_rate: 13.5 },
             { is_auto: true, user_id: 12, username: "QvQ", winning_rate: 1.5 },
             { user_id: -1},
-            { is_auto: false, user_id: 12, username: "oAo", winning_rate: 13 }
+            { is_auto: true, user_id: 12, username: "oAo", winning_rate: 13 }
         ],
         battle_info:{
             battle_name: "Battle_QAQ",
@@ -16,12 +16,12 @@ function data_gen(){
             create_time: current_timestamp + 1,
             start_time: current_timestamp,
             current_user: 1,
-            current_time: current_timestamp,
-            battle_process: 78
+            current_time: current_timestamp
         },
         board_info:{
             board_type: "standard",
-            history: []
+            history: [],
+            board_process: 0.35
         }
     }
 }
@@ -183,7 +183,7 @@ Vue.component("battle-info", {
                     <span class="date">{{start_state}}</span>
                 </div>
                 <div class="description">
-                    对局进程: {{board_info.board_process * 100).toFixed(2)}}%
+                    对局进程: {{(board_info.board_process * 100).toFixed(2)}}%
                 </div>
             </div>
             <div class="extra content">

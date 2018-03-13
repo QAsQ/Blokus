@@ -76,9 +76,41 @@
                     }  
                 },
                 onSuccess: function(){
-                    console.log("wtf");
-                    data = $("#create_form").form("get values")
-                    console.log(data)
+                    form = $("#create_form")
+                    form.addClass("loading")
+
+                    data = form.form("get values")
+                    data.accuracy_time = parseInt(data.accuracy_time)
+                    data.additional_time = parseInt(data.additional_time)
+                    $.ajax({
+                        type: "POST",
+                        url:  "/api/battles", 
+                        data: JSON.stringify(data),
+                        contentType: 'application/json; charset=UTF-8',
+                        async: false,
+                        success: function(data){
+                            console.log(data)
+                            form.removeClass("loading")
+                            if (data.message == "success"){
+                                form.removeClass("loading")
+                                $("#create_modal").modal("hide");
+                                window.open("/battle?battle_id=" + data.result.id);
+                            }
+                            else{
+                                form
+                                    .removeClass("success")
+                                    .addClass("error")
+                                $("#create_message").text(data.message)
+                            }
+                        },
+                        error: function(data){
+                            form
+                                .removeClass("loading")
+                                .removeClass("success")
+                                .addClass("error")
+                            $("#create_message").text("请求失败")
+                        }
+                    })
                 }
             })
             $("#create_modal").modal("show");
@@ -143,13 +175,13 @@
                             <div class="ui vertical segment">
                                 <label>对局类型</label>
                                 <div class="ui basic selection dropdown">
-                                    <input type="hidden" name="battle_type">
+                                    <input type="hidden" name="board_type">
                                     <div class="default text"></div>
                                     <i class="dropdown icon"></i>
                                     <div class="menu">
-                                        <div class="item" data-value="standard">四人</div>
-                                        <div class="disabled item" data-value="twin">双人</div>
-                                        <div class="disabled item" data-value="trio">三人</div>
+                                        <div class="item" data-value="square_standard">四人</div>
+                                        <div class="disabled item" data-value="square_twin">双人</div>
+                                        <div class="disabled item" data-value="square_trio">三人</div>
                                     </div>
                                 </div>
                             </div>

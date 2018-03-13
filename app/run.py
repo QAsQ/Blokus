@@ -130,16 +130,22 @@ def battles():
     elif request.method == 'POST':
         request_json = request.get_json(force=True)
 
-        check_res = field_checker(request_json, ['battle_info', 'board_type'])
+        print(request_json)
+        check_res = field_checker(request_json, [
+            'battle_name', 
+            'accuracy_time', 
+            'additional_time', 
+            'board_type'])
         if check_res is not None:
             return failure(check_res)
 
         battle = BattleFactory.create_battle(
             int(time.time()),
-            request_json['battle_info'],
+            request_json,
             request_json['board_type'],
             db
         )
+
         if isinstance(battle, str):
             return failure(battle) 
         return success({"id": battle.id})
@@ -148,7 +154,7 @@ def battles():
 def battle(battle_id):
     if request.method == 'GET':
         battle = BattleFactory.load_battle(battle_id, db)
-        user_id = int(request.args.get('user_id'))
+        user_id = current_user.user_id
 
         if isinstance(battle, str):
             return failure(battle)
