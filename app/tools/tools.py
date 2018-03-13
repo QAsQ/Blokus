@@ -11,6 +11,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("mode", help="mode of this function")
 parser.add_argument("-b", "--battle_id", type=int,
 					help="battle-id, default 0", default=0)
+parser.add_argument("--battle_name", 
+					help="name of battle", default="TestBattle")
 parser.add_argument("--accuracy_time", type=int,
 					help="accuracy time for battle, default 30", default=30)
 parser.add_argument("--additional_time", type=int,
@@ -43,10 +45,9 @@ def output_battle(battle):
 def create_battle(param):
 	data = {
 		"board_type": "square_standard", 
-		"battle_info": {
-			"accuracy_time": param.accuracy_time,
-			"additional_time": param.additional_time
-		}
+		"accuracy_time": param.accuracy_time,
+		"additional_time": param.additional_time,
+		"battle_name": param.battle_name
 	}
 	r = requests.post(api_head + "battles", json=data)
 	print(r.text)
@@ -55,7 +56,7 @@ def add_user(param):
 	data = {
 		"user_id": param.user_id
 	}
-	r = requests.put(
+	r = requests.post(
 		api_head +  "battles/{}/players/{}".format(
 			param.battle_id, param.player_id
 		),
