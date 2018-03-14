@@ -147,6 +147,15 @@
                 )
             })
         });
+        function check_login(){
+            if (user_item.user.user_id === -1){
+                $("#login_message").text("请先登录")
+                $("#login_form").addClass("error")
+                $('#login').modal("show")
+                return false
+            }
+            return true
+        }
     </script>
 </head>
 
@@ -191,7 +200,7 @@
         <div class="ui container">
             <div class="ui stackable divided equal height stackable grid">
                 <div class="three wide column">
-                    <h4 class="ui header inverted">POWERED BY</h4>
+                    <h4 class="ui header inverted">Powered By</h4>
                     <div class="ui inverted list">
                         <a class="item link" href="https://semantic-ui.com/">
                             <i class="stripe s icon"></i>
@@ -208,7 +217,7 @@
                     </div>
                 </div>
                 <div class="three wide column">
-                    <h4 class="ui header inverted">ABOUT</h4>
+                    <h4 class="ui header inverted">About</h4>
                     <div class="ui inverted list">
                         <a class="item link" href="https://github.com/QAsQ/Blokus">
                             <i class="github icon"></i> Github
@@ -217,7 +226,7 @@
                     </div>
                 </div>
                 <div class="seven wide column">
-                    <h4 class="ui inverted header">CONNECT US</h4>
+                    <h4 class="ui inverted header">Connect Us</h4>
                     <div class="ui list">
                         <div class="item"><i class="qq icon"></i> Blokus玩家群: 97257869</div>
                     </div>

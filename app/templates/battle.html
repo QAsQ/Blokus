@@ -8,50 +8,23 @@
 <script>
 
 $(document).ready(function() {
-    gUserId = 0
+    $.get("/api/boards/square_standard")
+    .then(function(board_data){
 
-    function getPlayerId(battle_data){
-        for (var id = 0; id < battle_data.players_info.length; id++)
-            if (user_item.user_id === battle_data.players_info[id].user_id)
-                return id
-        return -1
-    }
-
-    get_board_data = function(){
-        return $.get("/api/boards/square_standard");
-    }
-
-    get_battle_data = function(){
-        return $.ajax({
-            type: "get",
-            url:  "/api/battles/0", 
-            data: {user_id: gUserId},
-            contentType: 'application/json; charset=UTF-8',
-            dataType: 'json'
-        });
-    }
-
-    $.when(get_board_data(), get_battle_data())
-    .then(function(board_data, battle_data){
-
-        board_data = board_data[0].result
-        battle_data = battle_data[0].result
-        gPlayerId = getPlayerId(battle_data)
+        board_data = board_data.result
+        battle_data = {{ battle|tojson|safe }};
 
         battle_inferface = new Vue({
             el: "#battle_inferface",
             data: {
                 board_data: board_data,
                 battle_data: battle_data,
-                chat_logs: gen_chatlogs(),
+                user_id: user_item.user.user_id,
                 board: null
             }
         });
 
         $('#battle_progress').progress();
-        $('.chat-box').scrollTop(
-            $('.chat-box')[0].scrollHeight
-        );
         $('.ui.button.toggle').state({
             text: {
                 inactive : '托管',
@@ -64,9 +37,8 @@ $(document).ready(function() {
         function (){
             $.ajax({
                 type: "GET",
-                url: "/api/battles/0",
+                url: "/api/battles/" + battle_inferface.battle_data.battle_id,
                 contentType: "applicaton/json",
-                data: {user_id: gUserId},
                 timeout: 1000,
                 error: function (xhr, textStatus){
                     if (textStatus == 'timeout'){
@@ -91,6 +63,6 @@ $(document).ready(function() {
         id="battle_inferface"
         :battle_data="battle_data"
         :board_data="board_data"
-        :chat_logs="chat_logs">
+        :user_id="user_id">
 </battle-interface>
 {% endblock %}

@@ -5,7 +5,7 @@ from .db_utility import id_generate
 default_offline_time = 300
 
 class Battle:
-    def __init__(self, timestamp, battle_info, board, db, players_info=None, battle_id=None):
+    def __init__(self, timestamp, battle_info, board, db, chat_logs=[], players_info=None, battle_id=None):
         self.db = db.battles
 
         self.board = board
@@ -20,7 +20,9 @@ class Battle:
         self.current_player = battle_info.get("current_player", -1)
         self.current_time = battle_info.get("current_time", -1)
 
+        self.chat_logs=chat_logs
         self.default_player_info = {"user_id": -1}
+
         if players_info is None:
             self.players_info = [self.default_player_info for _ in range(4)]
         else:
@@ -32,15 +34,13 @@ class Battle:
         else:
             self.id = battle_id
 
-    def try_join_player(self, timestamp, player_id, user_id):
+    def try_join_player(self, timestamp, player_id, user_id, user_data):
         if self.players_info[player_id]["user_id"] != -1:
             return {"message" : "user already in"}
 
-        user_info = {}
-
         self.players_info[player_id] = {
             "user_id": user_id,
-            "info": user_info,
+            "user_data": user_data,
             "join_time": timestamp,
             "last_active_time": timestamp,
             "accuracy_time_left": self.accuracy_time,
@@ -58,7 +58,7 @@ class Battle:
 
             self._update("battle_info", self._get_battle_info())
 
-        return {"message" : "success"}
+        return self.get_state()
 
     def remove_player(self, timestamp, player_id):
         if not self.started:
@@ -75,7 +75,7 @@ class Battle:
 
         self._update_player(player_id)
     
-    def get_state(self, timestamp, user_id=-1):
+    def get_state(self, timestamp=-1, user_id=-1):
         def get_player_id():
             if user_id == -1:
                 return -1
@@ -91,7 +91,8 @@ class Battle:
             "battle_id": self.id,
             "players_info": self.players_info,
             "board_info": self.board.get_info(),
-            "battle_info": self._get_battle_info()
+            "battle_info": self._get_battle_info(),
+            "chat_logs": self.chat_logs
         }
 
     def try_drop_piece(self, timestamp, player_id, piece_id, dict_position):
@@ -205,7 +206,7 @@ class BattleFactory():
             return buffer[battle_id]
         battle_data = db.battles.find_one({"battle_id": battle_id})
         if battle_data is None:
-            return "battles not exists"
+            return "battle not exists"
         battle_info = battle_data['battle_info']
         board = BoardFactory.createBoard(battle_data['board_info']['board_type'])
         for one_step in battle_data['board_info']['history']:
@@ -217,9 +218,10 @@ class BattleFactory():
             battle_info['create_time'], 
             battle_info, 
             board, 
-            players_info=battle_data['players_info'], 
             db=db, 
-            battle_id=battle_id
+            battle_id=battle_id,
+            players_info=battle_data['players_info'],
+            chat_logs=battle_data['chat_logs']
         )
 
         buffer[battle_id] = battle

@@ -26,25 +26,6 @@ function data_gen(){
     }
 }
 
-function gen_chatlogs(){
-    return [
-        "lizi: wtf",
-        "lizi: wtf",
-        "lizi: wtf",
-        "lizi: wtf",
-        "lizi: wtf",
-        "lizi: wtf",
-        "lizi: wtf",
-        "lizi: wtf",
-        "lizi: wtf",
-        "lizi: wtf",
-        "yyn: hahahaha",
-        "quailty: 干得漂亮",
-        "lizi: 多大仇多大仇",
-        "QAQ: 一下子接受不了吧.jpg"
-    ]
-}
-
 function show_message(message){
     $("#hit_nag_message").text(message)
     $("#hit_nag").nag('show')
@@ -142,19 +123,51 @@ Vue.component("user-data", {
     }
 })
 
-Vue.component("playerinfo-item", {
-    props: ['player_info', 'player_id'],
+function try_join(player_id){
+    if (!check_login()) return
+    $.post("/api/battles/" + battle_inferface.battle_data.battle_id + "/players/" + player_id, {}, function(data){
+        if(data.message != "success")
+            show_message(data.message)
+        battle_inferface.battle_data = data.result
+    })
+}
+
+Vue.component("playerinfo-item",{
+    props: ['player_info', 'player_id', 'description_type'],
     template: `
-        <div class='item'>
-            <img class='ui avatar image' :src='image_path'>
-            <div class='content'>
-                <div class='header'> {{player_info.username}}</div>
-                <div class='description'>胜率:{{player_info.winning_rate}}%</div>
+        <div class="item" :class="{link: !occupied}" @click="try_join">
+            <img class="ui avatar image" :src="image_path">
+            <div class="content">
+                <div class="header">{{user_name}}</div>
+                <div class='description'>{{description}}</div>
             </div>
         </div>`,
+    methods: {
+        try_join: function(){
+            if (this.occupied)
+                return
+            try_join(this.player_id)
+        }
+    },
     computed: {
+        occupied: function () {
+            return this.player_info.user_id != -1;
+        },
+        user_name: function () {
+            if (this.player_info.user_id == -1)
+                return "";
+            return this.player_info.user_data.username
+        },
         image_path: function () {
-            return (1 << this.player_id ) + '.png'
+            return "static/common/images/" + (1 << this.player_id) + '.png'
+        },
+        description: function(){
+            if (this.player_info.user_id == -1)
+                return "";
+            if (this.description_type == "winning_rate")
+                return "胜率:" + this.player_info.user_data.user_info.winning_rate + "%"
+            else if (this.description_type == "battle_state")
+                return this.player_info.is_auto ? "托管中" : "在线"
         }
     }
 });
@@ -165,7 +178,8 @@ Vue.component("playerinfo-list", {
         <div class='ui big list'>
             <playerinfo-item v-for="(player_info, index) in players_info" :key="index"
                 :player_id="index"
-                :player_info="player_info" >
+                :player_info="player_info"
+                description_type="winning_rate">
             </playerinfo-item>
         </div>`
 });
@@ -277,52 +291,21 @@ Vue.component("battle-list", {
     }
 });
 
-Vue.component("playerinfo-item",{
-    props: ['player_info', 'player_id'],
-    template: `
-        <div class="item" :class="{link: !occupied}">
-            <img class="ui avatar image" :src="image_path">
-            <div class="content">
-                <div class="header">{{user_name}}</div>
-                <div class="description"> {{user_state}}</div>
-            </div>
-        </div>`,
-    computed: {
-        occupied: function () {
-            return this.player_info.user_id != -1;
-        },
-        user_name: function () {
-            if (this.player_info.user_id == -1)
-                return "";
-            return this.player_info.username
-        },
-        image_path: function () {
-            return "static/common/images/" + (1 << this.player_id) + '.png'
-        },
-        user_state: function () {
-            if (this.player_info.user_id == -1)
-                return "";
-            if (this.player_info.is_auto)
-                return "托管中";
-            return "在线";
-        }
-    }
-});
-
 Vue.component("playerinfo-table",{
     props: ['players_info'],
     template: `
     <div class="ui vertical segment">
         <div class="left aligned attached ui two item menu">
-            <playerinfo-item :player_info="players_info[0]" :player_id="0"></playerinfo-item>
-            <playerinfo-item :player_info="players_info[3]" :player_id="3"></playerinfo-item>
+            <playerinfo-item :player_info="players_info[0]" :player_id="0" description_type="battle_state"></playerinfo-item>
+            <playerinfo-item :player_info="players_info[3]" :player_id="3" description_type="battle_state"></playerinfo-item>
         </div>
         <div class="left aligned attached ui two item menu">
-            <playerinfo-item :player_info="players_info[1]" :player_id="1"></playerinfo-item>
-            <playerinfo-item :player_info="players_info[2]" :player_id="2"></playerinfo-item>
+            <playerinfo-item :player_info="players_info[1]" :player_id="1" description_type="battle_state"></playerinfo-item>
+            <playerinfo-item :player_info="players_info[2]" :player_id="2" description_type="battle_state"></playerinfo-item>
         </div>
     </div>`
 });
+
 Vue.component("chat-box", {
     props: ['chat_logs'],
     template: `
@@ -339,17 +322,18 @@ Vue.component("chat-box", {
 });
 
 Vue.component("control-panel", {
-    props: ['battle_data', 'chat_logs'],
+    props: ['battle_data'],
     template: `
         <div class="ui four wide column">
-            <chat-box :chat_logs="chat_logs"></chat-box>
-            <div class="ui teal fluid toggle button" :class="{disabled: on_game}">托管</div>
-            <playerinfo-table :players_info="battle_data.players_info"></playerinfo-table>
+            <chat-box :chat_logs="battle_data.chat_logs"></chat-box>
+            <div class="ui teal fluid toggle button" :class="{disabled: running}">托管</div>
+            <playerinfo-table :players_info="battle_data.players_info">
+            </playerinfo-table>
         </div> `,
     computed: {
-        on_game: function () {
-            //todo
-            return false
+        running: function () {
+            return this.battle_data.battle_info.started &&
+                    !this.battle_data.battle_info.ended
         }
     }
 });
@@ -372,7 +356,7 @@ Vue.component("battle-progress", {
 })
 
 Vue.component("battle-interface", {
-    props: ['board_data', 'battle_data', 'chat_logs'],
+    props: ['board_data', 'battle_data'],
     template: `
         <div class="ui grid container stackable">
             <div class="ui center aligned eleven wide column">
@@ -384,13 +368,15 @@ Vue.component("battle-interface", {
                     :board_progress="board_progress">
                 </battle-progress>
             </div>
-            <control-panel
-                :battle_data="battle_data"
-                :chat_logs="chat_logs">
-            </control-panel>
+            <control-panel :battle_data="battle_data"> </control-panel>
         </div>`,
     mounted: function(){
-        this.board = generateBoard($("#board")[0], this.board_data, ColorThemeFactory("default"));
+        this.board = generateBoard($("#board")[0], this.player_id, this.board_data, ColorThemeFactory("default"));
+    },
+    updated: function(){
+        $('.chat-box').scrollTop(
+            $('.chat-box')[0].scrollHeight
+        );
     },
     watch: {
         'battle_data.board_info': function(){
@@ -404,6 +390,12 @@ Vue.component("battle-interface", {
         },
         board_progress: function(){
             return 100 * this.battle_data.board_info.board_progress
+        },
+        player_id: function(){
+            for (var id = 0; id < this.battle_data.players_info.length; id++)
+                if (this.user_id === this.battle_data.players_info[id].user_id)
+                    return id
+            return -1
         }
     }
 });

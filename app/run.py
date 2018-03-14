@@ -58,9 +58,17 @@ def user_page():
 
 @app.route("/battle")
 def battle_page():
-    battle_id = request.args.get('battle_id')
+    try:
+        battle_id = int(request.args.get('battle_id'))
+    except Exception as e:
+        return render_template("error.html", message=repr(e))
+    
     battle = BattleFactory.load_battle(battle_id, db)
-    return render_template("battle.html", battle=battle)
+
+    if isinstance(battle, str):
+        return render_template("error.html", message=battle)
+
+    return render_template("battle.html", battle=battle.get_state(int(time.time()), current_user.user_id))
 
 @app.route("/api/users", methods=['GET', 'POST'])
 def users():
@@ -129,8 +137,8 @@ def battles():
         return success(id_clear(db.battles.find()))
 
     elif request.method == 'POST':
-        if current_user.user_id == -1:
-            return failure("need login first!")
+        #if current_user.user_id == -1:
+        #    return failure("need login first!")
         request_json = request.get_json(force=True)
 
         check_res = field_checker(request_json, [
@@ -154,13 +162,13 @@ def battles():
 
 @app.route("/api/battles/<int:battle_id>", methods=['GET', 'POST'])
 def battle(battle_id):
+    battle = BattleFactory.load_battle(battle_id, db)
+    user_id = current_user.user_id
+
+    if isinstance(battle, str):
+        return failure(battle)
+
     if request.method == 'GET':
-        battle = BattleFactory.load_battle(battle_id, db)
-        user_id = current_user.user_id
-
-        if isinstance(battle, str):
-            return failure(battle)
-
         return success(battle.get_state(int(time.time()), user_id))
 
     elif request.method == 'POST':
@@ -184,18 +192,12 @@ def players(battle_id, player_id):
     if current_user.user_id == -1:
         return failure("need login first!")
     if request.method == 'POST':
-        request_json = request.get_json(force=True)
-        check_res = field_checker(request_json, ['user_id'])
-        if check_res is not None:
-            return failure(check_res)
-
         battle = BattleFactory.load_battle(battle_id, db)
         
         if isinstance(battle, str):
             return failure(battle)
 
-        user_id = request_json['user_id']
-        result = battle.try_join_player(int(time.time()), player_id, user_id)
+        result = battle.try_join_player(int(time.time()), player_id, current_user.user_id, current_user.dump())
         return success(result)
     
     elif request.method == 'DELETE':

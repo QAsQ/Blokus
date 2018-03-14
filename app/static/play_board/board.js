@@ -351,7 +351,7 @@ function PieceFactory(pieceId,
  *  在棋子被松开的时候判断是否落下棋子并更新棋子
  *
  */
-function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
+function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) {
     var placedGroup = new PIXI.display.Group(-1, false); 
     var boardGroup = new PIXI.display.Group(0, false);
     var pieceGroup = new PIXI.display.Group(1, false);
@@ -433,7 +433,7 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
                 DragEndCallBack
             );
             piece.parentGroup = pieceGroup;
-            if (playerId === gPlayerId) {
+            if (playerId === mPlayerId) {
                 piece.x = gPiecesLocate[pieceId].x * gCellSize;
                 piece.y = gPiecesLocate[pieceId].y * gCellSize;
             }
@@ -466,12 +466,12 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
         var _pieceLists = this.pieceLists;
         for (var playerId = 0; playerId < 4; playerId ++){
             for (var pieceId = 0; pieceId < 21; pieceId ++){
-                _pieceLists[playerId][pieceId].SetVisible(playerId === gPlayerId);
-                _pieceLists[playerId][pieceId].SetInteractive(playerId === gPlayerId);
+                _pieceLists[playerId][pieceId].SetVisible(playerId === mPlayerId);
+                _pieceLists[playerId][pieceId].SetInteractive(playerId === mPlayerId);
             }
         }
         state.board_info.history.forEach(function (piece) {
-            var isCurrentPlayer = piece.player_id == gPlayerId;
+            var isCurrentPlayer = piece.player_id == mPlayerId;
             var currentPiece = _pieceLists[piece.player_id][piece.piece_id];
 
             currentPiece.SetInteractive(false);
@@ -488,7 +488,7 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
         if (pieceId > 20 || pieceId < 0)
             return false;
         var positionState = this.position;
-        //if (this.cellList[gPlayerId][pieceId].)
+        //if (this.cellList[mPlayerId][pieceId].)
         
     };
 
@@ -498,9 +498,9 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
             if (current_piece === -1)    
                 return
             if (event.key == "w" || event.key == "s")
-                board.pieceLists[gPlayerId][current_piece].Flip();
+                board.pieceLists[mPlayerId][current_piece].Flip();
             if (event.key == "a" || event.key == "d")
-                board.pieceLists[gPlayerId][current_piece].Rotate(event.key == 'a');
+                board.pieceLists[mPlayerId][current_piece].Rotate(event.key == 'a');
         },
         false
     );
@@ -508,7 +508,7 @@ function BoardFactory(app, colorTheme, TryDropPiece, piecesCellList) {
     return board;
 }
 
-function generateBoard(canvas, boardData, colorTheme){
+function generateBoard(canvas, mPlayerId, boardData, colorTheme){
     gWidth = canvas.width;
     gHeight = canvas.height;
 
@@ -529,7 +529,7 @@ function generateBoard(canvas, boardData, colorTheme){
 
     }
 
-    var board = BoardFactory(app, colorTheme, TryDropPiece, boardData)
+    var board = BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData)
     app.stage.addChild(board);
 
     return board;
