@@ -113,41 +113,131 @@
                     })
                 }
             })
-            $("#create_modal").modal("show");
+            $(".ui.checkbox").checkbox()
         }
     );
 </script>
+<style>
+    .ui.toggle.checkbox input:focus:checked~.box:before, .ui.toggle.checkbox input:focus:checked~label:before {
+        background-color: #00b5ad!important;
+    }
+    .ui.toggle.checkbox input:checked~label:before {
+        background-color: #00b5ad!important;
+    }
+    .ui.toggle.checkbox input:checked~.box:before, .ui.toggle.checkbox input:checked~label:before {
+        background-color: #00b5ad!important;
+    }
+</style>
 <div class="ui divider"></div>
 <div class="ui stackable grid two column container">
     <div class="ui column">
         <div class="ui sticky">
-            <div class="ui two column grid">
-                <div class="column">
-                    <h1><i class="sort ascending icon"></i> 排序</h1>
+            <form class="ui form">
+                <h1><i class="filter icon"></i> 筛选</h1>
+                <div class="field">
+                    <label>按对局状态</label>
+                    <div class="three fields">
+                        <div class="field">
+                            <div class="ui segment">
+                                <div class="ui toggle checkbox">
+                                    <input type="checkbox" tabindex="0" class="teal hidden">
+                                    <label><i class="hourglass start icon"></i>未开始</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui segment">
+                                <div class="ui toggle checkbox">
+                                    <input type="checkbox" tabindex="0" class="hidden">
+                                    <label><i class="hourglass half icon"></i>进行中</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui segment">
+                                <div class="ui toggle checkbox">
+                                    <input type="checkbox" tabindex="0" class="hidden">
+                                    <label><i class="hourglass end icon"></i>已结束</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="column">
-                    <h1><i class="filter icon"></i> 筛选</h1>
-                    <h2>根据对局状态</h2>
-                    <div class="ui middle header">
-                        <div class="ui big toggle checkbox">
-                            <input type="checkbox"> <label></label>
+                <div class="two fields">
+                    <div class="field">
+                        <label><i class="user icon"></i>  按参与用户 </label>
+                        <div class="ui right icon input">
+                            <input type="text" placeholder="用户名">
+                            <i class="inverted circular search link icon"></i>
                         </div>
-                        <div class="ui basic tag label">未开始</div>
                     </div>
-                    <div class="ui middle header">
-                        <div class="ui big toggle checkbox">
-                            <input type="checkbox"> <label></label>
+                    <div class="field">
+                        <label><i class="chess board icon"></i>按对局名</label>
+                        <div class="ui right icon input">
+                            <input type="text" placeholder="对局名称">
+                            <i class="inverted circular search link icon"></i>
                         </div>
-                        <div class="ui basic tag label">进行中</div>
-                    </div>
-                    <div class="ui middle header">
-                        <div class="ui big toggle checkbox">
-                            <input type="checkbox"> <label></label>
-                        </div>
-                        <div class="ui basic tag label">已完成</div>
                     </div>
                 </div>
-            </div>
+                <div class="field">
+                    <label>按对局类型</label>
+                    <div class="ui fluid selection dropdown">
+                        <input type="hidden" name="user">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">对局类型</div>
+                        <div class="menu">
+                            <div class="item" data-value="square_standard">标准(四人)</div>
+                            <div class="disabled item" data-value="square_twin">双人</div>
+                            <div class="disabled item" data-value="square_trio">三人</div>
+                        </div>
+                    </div>
+                </div>
+                <h1><i class="sort icon"></i> 排序</h1>
+                <div class="ui fluid multiple selection dropdown">
+                    <div class="default text">默认顺序</div>
+                    <i class="dropdown icon"></i>
+                    <input type="hidden" name="sort">
+                    <div class="menu">
+                        <div class="item" data-value="a:left_pos">
+                            <i class="vertically flipped sort amount up icon"></i>
+                            剩余位置
+                        </div>
+                        <div class="item" data-value="a:start_time">
+                            <i class="vertically flipped sort amount up icon"></i>
+                            起始时间
+                        </div>
+                        <div class="item" data-value="a:create_time">
+                            <i class="vertically flipped sort amount up icon"></i>
+                            对局进程
+                        </div>
+                        <div class="disabled item" data-value="a:left_pos">
+                            <i class="vertically flipped sort amount up icon"></i>
+                            预计剩余时间
+                        </div>
+                        <div class="item" data-value="d:left_pos">
+                            <i class="sort amount down icon"></i>
+                            剩余位置
+                        </div>
+                        <div class="item" data-value="d:start_time">
+                            <i class="sort amount down icon"></i>
+                            起始时间
+                        </div>
+                        <div class="item" data-value="d:create_time">
+                            <i class="sort amount down icon"></i>
+                            对局进程
+                        </div>
+                        <div class="disabled item" data-value="d:left_pos">
+                            <i class="sort amount down icon"></i>
+                            预计剩余时间
+                        </div>
+                    </div>
+                </div>
+                <div class="ui center aligned basic segment">
+                    <button class="huge circular ui icon negative button" data-tooltip="清除条件">
+                        <i class="eraser icon"></i>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 <div class="column">
