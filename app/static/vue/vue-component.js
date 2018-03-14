@@ -234,7 +234,7 @@ Vue.component("battle-info", {
 Vue.component("battle-item", {
     props: ['battle_data'],
     template:`
-        <div class="item">
+        <div class="item" v-on:click="goto_battle">
             <div class="ui image" name="head">
                 <img class="ui avatar image" src="static/favicon.ico">
             </div>
@@ -249,7 +249,12 @@ Vue.component("battle-item", {
                 <div class='header'>用户信息</div>
                 <playerinfo-list :players_info="battle_data.players_info"></playerinfo-list>
             </div>
-        </div>`
+        </div>`,
+    methods: {
+        goto_battle: function(){
+            window.open("/battle?battle_id=" + this.battle_data.battle_id)
+        }
+    }
 });
 
 Vue.component("battle-list", {
@@ -267,8 +272,6 @@ Vue.component("battle-list", {
             </battle-item>
         </div>`,
     updated: function(){
-        console.log(this)
-        console.log(this.battles_data.length)
         $('[name="head"]').popup({inline:true});
         $('[name="content"]').popup({inline: true});
     }
