@@ -265,7 +265,13 @@ Vue.component("battle-list", {
             <battle-item v-for="(battle_data, index) in battles_data"  :key="index"
                 :battle_data="battle_data">
             </battle-item>
-        </div>`
+        </div>`,
+    updated: function(){
+        console.log(this)
+        console.log(this.battles_data.length)
+        $('[name="head"]').popup({inline:true});
+        $('[name="content"]').popup({inline: true});
+    }
 });
 
 Vue.component("playerinfo-item",{

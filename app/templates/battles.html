@@ -4,17 +4,25 @@
 <script>
     $(document)
         .ready(function() {
-            function gen_data(){
-                var ret = [];
-                for (var i = 0; i < 20; i++)
-                    ret.push(data_gen())
-                return ret
-            }
-
             var battle_list = new Vue({
                 el: "#battle_list",
                 data:{
-                    battles_data: gen_data()
+                    battles_data: null
+                }
+            });
+            $.ajax({
+                type: "GET",
+                url: "/api/battles",
+                contentType: "applicaton/json",
+                data: {},
+                error: function(){
+                    show_message("网络连接超时");
+                }, 
+                success: function(data){
+                    if (data.message != 'success')
+                        show_message(data.message);
+                    else
+                    battle_list.battles_data = data.result
                 }
             });
 
@@ -45,8 +53,6 @@
 
             $('#timer_type_selector').dropdown()
             $('.ui.dropdown').dropdown()
-            $('[name="head"]').popup({inline:true});
-            $('[name="content"]').popup({inline: true});
             $('.ui.sticky').sticky({
                 offset: 50,
                 context: '#battle_list'}
@@ -233,7 +239,7 @@
                     </div>
                 </div>
                 <div class="ui center aligned basic segment">
-                    <button class="huge circular ui icon negative button" data-tooltip="清除条件">
+                    <button class="huge circular ui icon negative button" data-position="bottom center" data-tooltip="清除条件">
                         <i class="eraser icon"></i>
                     </button>
                 </div>

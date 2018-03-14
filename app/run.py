@@ -14,6 +14,7 @@ from models.app_utility import success, failure, field_checker
 
 from config import db_config, app_config
 
+
 db = MongoClient(host=db_config['host'], port=db_config['port'])[db_config['db_name']]
 auth_db(db, db_config)
 init_generate(db, ["battles", "users"])
@@ -58,7 +59,8 @@ def user_page():
 @app.route("/battle")
 def battle_page():
     battle_id = request.args.get('battle_id')
-    return render_template("battle.html")
+    battle = BattleFactory.load_battle(battle_id, db)
+    return render_template("battle.html", battle=battle)
 
 @app.route("/api/users", methods=['GET', 'POST'])
 def users():
@@ -71,7 +73,6 @@ def users():
 
         #remove password
         projection = {"password" : False}
-
         return success(id_clear(db.users.find(
             filter=query,
             projection=projection,
@@ -128,9 +129,10 @@ def battles():
         return success(id_clear(db.battles.find()))
 
     elif request.method == 'POST':
+        if current_user.user_id == -1:
+            return failure("need login first!")
         request_json = request.get_json(force=True)
 
-        print(request_json)
         check_res = field_checker(request_json, [
             'battle_name', 
             'accuracy_time', 
@@ -178,8 +180,9 @@ def battle(battle_id):
         return jsonify(battle.get_state(int(time.time()), request_json['player_id']))
 
 @app.route("/api/battles/<int:battle_id>/players/<int:player_id>", methods=['POST', 'DELETE'])
-@login_required
 def players(battle_id, player_id):
+    if current_user.user_id == -1:
+        return failure("need login first!")
     if request.method == 'POST':
         request_json = request.get_json(force=True)
         check_res = field_checker(request_json, ['user_id'])

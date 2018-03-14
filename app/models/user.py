@@ -4,6 +4,25 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app
 import json
 
+default_info = {
+    "number_of_battles": 0,
+    "number_of_victory": 0,
+    "rate_of_victory": 0,
+    "rating": 1500,
+    "perference":{
+        "query_preference": {
+            "condition": {},
+            "sort": []
+        },
+        "create_perference": {
+            'battle_name': "Blokus_GO!",
+            'accuracy_time': 180, 
+            'additional_time': 5, 
+            'board_type': "square_standard"
+        }
+    }
+}
+
 class User(UserMixin):
     def __init__(self, db, user_data):
 
@@ -45,6 +64,18 @@ class User(UserMixin):
 
         self.confirmed = True
         self.db.update({"user_id": self.user_id}, {"confirmed": True})
+    
+    def update_perference(self, field, res):
+        #TODO
+        pass
+
+    def check_password(self, password):
+        if self.password is None:
+            return False
+        return check_password_hash(self.password, password)
+
+    def get_id(self):
+        return self.user_id
 
     @staticmethod
     def load(db, user_data):
@@ -62,12 +93,7 @@ class User(UserMixin):
                 "email": "anonymous@blokus.io",
                 "confirmed": True,
                 "password": "",
-                "user_info": {
-                    "number_of_battles": 0,
-                    "number_of_victory": 0,
-                    "rate_of_victory": 0,
-                    "rating": 1500
-                }
+                "user_info": default_info
             })
         
         return generater
@@ -96,21 +122,8 @@ class User(UserMixin):
             "password": generate_password_hash(password),
             "user_id": id_generate(db, "users"),
             "confirmed": False,
-            "user_info": {
-                "number_of_battles": 0,
-                "number_of_victory": 0,
-                "rate_of_victory": 0,
-                "rating": 1500
-            }
+            "user_info": default_info
         }
 
         db.users.insert(user_data)
         return User.load(db, user_data)
-
-    def check_password(self, password):
-        if self.password is None:
-            return False
-        return check_password_hash(self.password, password)
-
-    def get_id(self):
-        return self.user_id
