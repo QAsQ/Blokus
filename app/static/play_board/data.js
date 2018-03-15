@@ -7,18 +7,22 @@ function Point(x, y) {
 }
 
 var gPiecesLocate = [
-    Point(34,0),Point(31,0),Point(24,0),Point(27,0),Point(36,3),
-    Point(26,3),Point(24,3),Point(32,3),Point(29,3),Point(35,15),
-    Point(24,16),Point(26,8),Point(29,16),Point(37,8),Point(24,8),
-    Point(36,11),Point(30,8),Point(31,13),Point(26,13),Point(28,10),
-    Point(34,8),
+    Point(19, -4), Point(13, -4), Point(-4, -4), Point(7, -4), Point(9, 23),
+    Point(18, 23), Point(0, -4), Point(-4, 6), Point(0, 23), Point(-4, 11),
+    Point(23, 22), Point(22, -4), Point(-4, 17), Point(23, 17), Point(-4, -1),
+    Point(4, 23), Point(-4, 22), Point(13, 23), Point(23, 7), Point(23, 12),
+    Point(23, 1)
+]
+
+var gInitState = [
+    0, 0, 0, 0, 0, 2, 2, 2, 6, 2, 7, 6, 7, 7, 0, 7, 4, 4, 6, 0, 5
 ]
 
 gProgressBarEndPointList= [
-    Point(0, -2), Point(20, -2), 
-    Point(-2, 20), Point(-2, 0), 
-    Point(20, 22), Point(0, 22), 
-    Point(22, 0), Point(22, 20)
+    Point(0, -1), Point(20, -1), 
+    Point(-1, 20), Point(-1, 0), 
+    Point(20, 21), Point(0, 21), 
+    Point(21, 0), Point(21, 20)
 ]
 
 function ColorThemeFactory(type) {

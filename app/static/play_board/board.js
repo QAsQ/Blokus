@@ -207,6 +207,7 @@ function ProgressBarFactory(stPoint, edPoint, width, progressBarColor, tempBarCo
 function PieceFactory(pieceId,
                       shape,
                       PieceColor,
+                      offset,
                       DragStartCallBack,
                       DragMoveCallBack,
                       DragEndCallBack) {
@@ -224,6 +225,11 @@ function PieceFactory(pieceId,
             var new_position = this.data.getLocalPosition(this.parent);
             this.x = new_position.x - this.anchorPoint.x;
             this.y = new_position.y - this.anchorPoint.y;
+            this.x = Math.max(this.x, -offset.x)
+            this.y = Math.max(this.y, -offset.y)
+            this.x = Math.min(this.x, gWidth - offset.x - this.width)
+            this.y = Math.min(this.y, gHeight - offset.y - this.height)
+
             DragMoveCallBack(pieceId, this.State());
         }
     }
@@ -386,9 +392,9 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
     board.x = 4  * gCellSize;
     board.y = 4  * gCellSize;
 
-    current_piece = -1
+    current_piece_id = -1
     function DragStartCallBack (id, position) {
-        current_piece = id;
+        current_piece_id = id;
         console.log(
             "Drag start" + id,
             Math.floor(position.x / gCellSize),
@@ -433,6 +439,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
                 pieceId,
                 piecesCellList[pieceId],
                 colorTheme.pieceColor[playerId],
+                new PIXI.Point(board.x, board.y),
                 DragStartCallBack,
                 DragMoveCallBack,
                 DragEndCallBack
@@ -440,6 +447,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
             piece.parentGroup = pieceGroup;
             piece.x = gPiecesLocate[pieceId].x * gCellSize;
             piece.y = gPiecesLocate[pieceId].y * gCellSize;
+            piece.SetState(gInitState[pieceId])
             if (playerId !== mPlayerId) 
                 piece.SetOwnership(false)
             pieceList.push(piece);
@@ -502,12 +510,12 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
     window.addEventListener(
         "keydown", 
         function(event){
-            if (current_piece === -1)    
+            if (current_piece_id === -1)    
                 return
             if (event.key == "w" || event.key == "s")
-                board.pieceLists[mPlayerId][current_piece].Flip();
+                board.pieceLists[mPlayerId][current_piece_id].Flip();
             if (event.key == "a" || event.key == "d")
-                board.pieceLists[mPlayerId][current_piece].Rotate(event.key == 'a');
+                board.pieceLists[mPlayerId][current_piece_id].Rotate(event.key == 'a');
         },
         false
     );
