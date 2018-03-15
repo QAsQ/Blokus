@@ -19,7 +19,7 @@ $(document).ready(function() {
             data: {
                 board_data: board_data,
                 battle_data: battle_data,
-                user_id: user_item.user.user_id,
+                user_info: user_item.user,
                 board: null
             }
         });
@@ -57,6 +57,6 @@ $(document).ready(function() {
         id="battle_inferface"
         :battle_data="battle_data"
         :board_data="board_data"
-        :user_id="user_id">
+        :user_info="user_info">
 </battle-interface>
 {% endblock %}

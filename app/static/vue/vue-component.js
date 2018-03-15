@@ -32,7 +32,7 @@ Vue.component("user-item", {
                 success: function(data){
                     if (data.message == "success"){
                         show_message("退出登录成功")
-                        user_item.user = data.result 
+                        user_item.user = Object.assign(user_item.user, data.result)
                     }
                     else{
                         show_message(data.message)
@@ -106,7 +106,7 @@ function try_join(player_id){
     })
 }
 
-function try_leave(player_id){
+function try_leave(player_id, call_back){
     if (!check_login()) return
     $.ajax({
         method: "delete",
@@ -117,6 +117,12 @@ function try_leave(player_id){
                 return
             }
             battle_inferface.battle_data = data.result
+            if (typeof(call_back) != "undefined")
+                call_back()
+        },
+        error: function(data){
+            if (typeof(call_back) != "undefined")
+                call_back()
         }
     })
 }
@@ -161,18 +167,18 @@ Vue.component("playerinfo-item",{
 
         },
         dimmer: function(argument){
-            if (this.player_id != -1 &&this.item_id != this.player_id)
+            if ((this.player_id != -1 && this.item_id != this.player_id) || this.occupied)
                 return
             $("#playerinfo_item_"+this.item_id).dimmer(argument);
         }
     },
     computed: {
         occupied: function () {
-            return this.player_info.user_id != -1;
+            return this.player_info.user_id != -1 && this.item_id != this.player_id
         },
         user_name: function () {
             if (this.player_info.user_id == -1)
-                return "";
+                return ""
             return this.player_info.user_data.username
         },
         image_path: function () {
@@ -349,7 +355,7 @@ Vue.component("control-panel", {
                 :player_id="player_id"
                 :players_info="battle_data.players_info">
             </playerinfo-table>
-            <div class="ui fluid negative button" :class="{disabled: !can_leave}">离开</div>
+            <div class="ui fluid negative button" @click="leave">离开</div>
         </div> `,
     data: function(){
         return {
@@ -378,6 +384,12 @@ Vue.component("control-panel", {
                     show_message("请求失败，请检查网络连接")
                 }
             })
+        },
+        leave: function(){
+            if (this.player_id !== -1)
+                try_leave(this.player_id, window.close)
+            else
+                window.close()
         }
     },
     computed: {
@@ -415,7 +427,7 @@ Vue.component("battle-progress", {
 })
 
 Vue.component("battle-interface", {
-    props: ['board_data', 'battle_data', 'user_id'],
+    props: ['board_data', 'battle_data', 'user_info'],
     template: `
         <div class="ui grid container stackable">
             <div class="ui center aligned eleven wide column">
@@ -440,6 +452,9 @@ Vue.component("battle-interface", {
     watch: {
         'battle_data.board_info': function(){
             this.board.loadState(this.battle_data)
+        },
+        'player_id': function(){
+            this.board.update_player(this.player_id)
         }
     },
     computed: {
@@ -451,8 +466,10 @@ Vue.component("battle-interface", {
             return 100 * this.battle_data.board_info.board_progress
         },
         player_id: function(){
+            if (this.user_info.user_id === -1)
+                return -1
             for (var id = 0; id < this.battle_data.players_info.length; id++)
-                if (this.user_id === this.battle_data.players_info[id].user_id)
+                if (this.user_info.user_id === this.battle_data.players_info[id].user_id)
                     return id
             return -1
         }

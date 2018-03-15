@@ -34,7 +34,7 @@
                             form.removeClass("loading")
                             if (data.message == "success"){
                                 form.addClass("success")
-                                user_item.user = data.result 
+                                user_item.user = Object.assign(user_item.user, data.result)
                                 modal.modal('hide')
                                 res = true
                                 show_message(hit_message)

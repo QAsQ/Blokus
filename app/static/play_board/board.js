@@ -291,6 +291,7 @@ function PieceFactory(pieceId,
     pieces.alpha = 0.8;
     pieces.anchor = new PIXI.Point();
     pieces.interactive = true
+    pieces.dropped = false
     pieces
         .on('pointerdown', onDragStart)
         .on('pointerup', onDragEnd)
@@ -313,12 +314,16 @@ function PieceFactory(pieceId,
         };
     }
 
-    pieces.SetVisible = function(visible) {
-        pieces.visible = visible
+    pieces.SetOwnership= function(rights){
+        pieces.visible = rights
+        if(!pieces.dropped)
+            pieces.interactive = rights
     }
 
-    pieces.SetInteractive = function(interactive){
-        pieces.interactive = interactive
+    pieces.DropDown = function(){
+        pieces.dropped = true
+        pieces.visible = true
+        pieces.interactive = false
     }
 
     pieces.Flip = function(){
@@ -433,14 +438,10 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
                 DragEndCallBack
             );
             piece.parentGroup = pieceGroup;
-            if (playerId === mPlayerId) {
-                piece.x = gPiecesLocate[pieceId].x * gCellSize;
-                piece.y = gPiecesLocate[pieceId].y * gCellSize;
-            }
-            else {
-                piece.SetVisible(false)
-                piece.SetInteractive(false)
-            }
+            piece.x = gPiecesLocate[pieceId].x * gCellSize;
+            piece.y = gPiecesLocate[pieceId].y * gCellSize;
+            if (playerId !== mPlayerId) 
+                piece.SetOwnership(false)
             pieceList.push(piece);
             board.addChild(piece);
         }
@@ -466,22 +467,28 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
         var _pieceLists = this.pieceLists;
         for (var playerId = 0; playerId < 4; playerId ++){
             for (var pieceId = 0; pieceId < 21; pieceId ++){
-                _pieceLists[playerId][pieceId].SetVisible(playerId === mPlayerId);
-                _pieceLists[playerId][pieceId].SetInteractive(playerId === mPlayerId);
+                _pieceLists[playerId][pieceId].SetOwnership(playerId === mPlayerId);
             }
         }
         state.board_info.history.forEach(function (piece) {
             var isCurrentPlayer = piece.player_id == mPlayerId;
             var currentPiece = _pieceLists[piece.player_id][piece.piece_id];
 
-            currentPiece.SetInteractive(false);
-            currentPiece.SetVisible(true);
+            currentPiece.DropDown();
             currentPiece.SetState(piece.position.state);
             currentPiece.x = piece.position.x * gCellSize;
             currentPiece.y = piece.position.y * gCellSize;
 
             currentPiece.parentGroup = placedGroup;
         });
+    };
+    board.update_player = function(playerId){
+        mPlayerId = playerId
+        for(var player_id = 0; player_id < 4; player_id++) {
+            board.pieceLists[player_id].forEach(piece => {
+                piece.SetOwnership(player_id === mPlayerId)
+            })
+        }
     };
 
     board.isPossiblePosition = function (pieceId, position) {
