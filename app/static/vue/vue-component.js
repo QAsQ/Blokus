@@ -1,31 +1,3 @@
-function data_gen(){
-    current_timestamp =  Math.floor(new Date().valueOf() / 1000) - 120;
-    return {
-        players_info:[
-            { is_auto: false, user_id: 12, username: "QAQ", winning_rate: 13.5 },
-            { is_auto: true, user_id: 12, username: "QvQ", winning_rate: 1.5 },
-            { user_id: -1},
-            { is_auto: true, user_id: 12, username: "oAo", winning_rate: 13 }
-        ],
-        battle_info:{
-            battle_name: "Battle_QAQ",
-            accuracy_time: 120,
-            additional_time: 10,
-            started: true,
-            ended: false,
-            create_time: current_timestamp + 1,
-            start_time: current_timestamp,
-            current_user: 1,
-            current_time: current_timestamp
-        },
-        board_info:{
-            board_type: "standard",
-            history: [],
-            board_process: 0.35
-        }
-    }
-}
-
 function show_message(message){
     $("#hit_nag_message").text(message)
     $("#hit_nag").nag('show')
@@ -87,7 +59,7 @@ Vue.component("user-data", {
     template: `
     <div class="ui centered grid">
         <div class="row">
-            <h1 style="font-size: 10em"> {{user.username}} </h1>
+            <h1 style="font-size: 8em"> {{user.username}} </h1>
         </div>
         <div class="segment">
             <div class="ui statistic">
@@ -165,9 +137,9 @@ Vue.component("playerinfo-item",{
             if (this.player_info.user_id == -1)
                 return "";
             if (this.description_type == "winning_rate")
-                return "胜率:" + this.player_info.user_data.user_info.winning_rate + "%"
+                return "胜率:" + (this.player_info.user_data.user_info.rate_of_victory * 100).toFixed(2) + "%"
             else if (this.description_type == "battle_state")
-                return this.player_info.is_auto ? "托管中" : "在线"
+                return this.player_info.is_hosting? "托管中" : "在线"
         }
     }
 });
@@ -197,7 +169,7 @@ Vue.component("battle-info", {
                     <span class="date">{{start_state}}</span>
                 </div>
                 <div class="description">
-                    对局进程: {{(board_info.board_process * 100).toFixed(2)}}%
+                    对局进程: {{(board_info.board_progress * 100).toFixed(2)}}%
                 </div>
             </div>
             <div class="extra content">
@@ -231,7 +203,7 @@ Vue.component("battle-info", {
                 return "未开始";
             else
                 return "开始于" + this.format_time(
-                        (Math.floor(new Date().valueOf() / 1000) - this.battle_info.start_time )) + "前"
+                    (Math.floor(new Date().valueOf() / 1000) - this.battle_info.start_time )) + "前"
         },
         accuracy_time: function () {
             return this.battle_info.accuracy_time + "s"
@@ -322,18 +294,62 @@ Vue.component("chat-box", {
 });
 
 Vue.component("control-panel", {
-    props: ['battle_data'],
+    props: ['battle_data', 'player_id'],
     template: `
         <div class="ui four wide column">
             <chat-box :chat_logs="battle_data.chat_logs"></chat-box>
-            <div class="ui teal fluid toggle button" :class="{disabled: running}">托管</div>
+            <div class="ui teal fluid button" 
+                :class="{disabled: !can_hosting, loading: loading, active: hosting}"
+                @mousedown="update_hosting"
+                id="hosting_button">
+                {{ hosting ? "取消托管": "托管"}}
+            </div>
             <playerinfo-table :players_info="battle_data.players_info">
             </playerinfo-table>
+            <div class="ui fluid negative button" :class="{disabled: !can_leave}">离开</div>
         </div> `,
+    data: function(){
+        return {
+            loading: false
+        }
+    },
+    methods: {
+        update_hosting: function(){
+            this.loading = true
+            control_panel = this
+            target_url = "/api/battles/" + this.battle_data.battle_id + "/players/" + this.player_id + "/hosting"
+            $.ajax({
+                type: control_panel.hosting? "DELETE": "POST",
+                url: target_url,
+                success: function(data){
+                    control_panel.loading = false
+                    if (data.message == "success"){
+                        battle_inferface.battle_data = data.result
+                    }
+                    else{
+                        show_message(data.message)
+                    }
+                },
+                error: function(data){
+                    control_panel.loading = false
+                    show_message("请求失败，请检查网络连接")
+                }
+            })
+        }
+    },
     computed: {
-        running: function () {
-            return this.battle_data.battle_info.started &&
-                    !this.battle_data.battle_info.ended
+        can_hosting: function () {
+            return !this.battle_data.battle_info.ended && 
+                    !this.loading && 
+                    this.player_id != -1
+        },
+        can_leave: function(){
+            return this.player_id != -1
+        },
+        hosting: function(){
+            if (this.player_id == -1) 
+                return false
+            return this.battle_data.players_info[this.player_id]['is_hosting']
         }
     }
 });
@@ -356,19 +372,19 @@ Vue.component("battle-progress", {
 })
 
 Vue.component("battle-interface", {
-    props: ['board_data', 'battle_data'],
+    props: ['board_data', 'battle_data', 'user_id'],
     template: `
         <div class="ui grid container stackable">
             <div class="ui center aligned eleven wide column">
                 <div class="ui segment">
-                    <canvas id="board" height="600px" width="700px"></canvas>
+                    <canvas id="board" height="642px" width="700px"></canvas>
                 </div>
                 <battle-progress
                     :running="running"
                     :board_progress="board_progress">
                 </battle-progress>
             </div>
-            <control-panel :battle_data="battle_data"> </control-panel>
+            <control-panel :battle_data="battle_data" :player_id="player_id"> </control-panel>
         </div>`,
     mounted: function(){
         this.board = generateBoard($("#board")[0], this.player_id, this.board_data, ColorThemeFactory("default"));

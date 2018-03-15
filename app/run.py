@@ -10,7 +10,7 @@ from models.battle import Battle, BattleFactory
 from models.board import BoardFactory
 from models.user import User
 from models.db_utility import init_generate, id_clear, id_generate, auth_db
-from models.app_utility import success, failure, field_checker
+from models.app_utility import success, failure, field_checker, current_time
 
 from config import db_config, app_config
 
@@ -68,7 +68,7 @@ def battle_page():
     if isinstance(battle, str):
         return render_template("error.html", message=battle)
 
-    return render_template("battle.html", battle=battle.get_state(int(time.time()), current_user.user_id))
+    return render_template("battle.html", battle=battle.get_state(current_time(), current_user.user_id))
 
 @app.route("/api/users", methods=['GET', 'POST'])
 def users():
@@ -150,7 +150,7 @@ def battles():
             return failure(check_res)
 
         battle = BattleFactory.create_battle(
-            int(time.time()),
+            current_time(),
             request_json,
             request_json['board_type'],
             db
@@ -169,7 +169,7 @@ def battle(battle_id):
         return failure(battle)
 
     if request.method == 'GET':
-        return success(battle.get_state(int(time.time()), user_id))
+        return success(battle.get_state(current_time(), user_id))
 
     elif request.method == 'POST':
         #todo check user_id match player_id
@@ -180,12 +180,12 @@ def battle(battle_id):
             return failure(check_res)
 
         battle.try_drop_piece(
-            int(time.time()), 
+            current_time(), 
             request_json['player_id'],
             request_json['piece_id'],
             request_json['position']
         )
-        return jsonify(battle.get_state(int(time.time()), request_json['player_id']))
+        return jsonify(battle.get_state(current_time(), request_json['player_id']))
 
 @app.route("/api/battles/<int:battle_id>/players/<int:player_id>", methods=['POST', 'DELETE'])
 def players(battle_id, player_id):
@@ -197,12 +197,37 @@ def players(battle_id, player_id):
         if isinstance(battle, str):
             return failure(battle)
 
-        result = battle.try_join_player(int(time.time()), player_id, current_user.user_id, current_user.dump())
+        result = battle.try_join_player(current_time(), player_id, current_user.user_id, current_user.dump())
         return success(result)
     
     elif request.method == 'DELETE':
         #todo
         pass
+
+
+@app.route("/api/battles/<int:battle_id>/players/<int:player_id>/hosting", methods=['POST', 'DELETE'])
+def hosting(battle_id, player_id):
+    battle = BattleFactory.load_battle(battle_id, db)
+    if isinstance(battle, str):
+        return failure(battle)
+
+    user_id = current_user.user_id
+    if user_id == -1:
+        return failure("请先登录!")
+
+    if request.method == 'POST':
+        result = battle.add_hosting(current_time(), current_user.user_id, player_id)
+        if (isinstance(result, str)):
+            return failure(result)
+        
+        return success(result)
+
+    elif request.method == 'DELETE':
+        result = battle.remove_hosting(current_time(), current_user.user_id, player_id)
+        if (isinstance(result, str)):
+            return failure(result)
+        
+        return success(result)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

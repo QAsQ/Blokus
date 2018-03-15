@@ -1,4 +1,5 @@
 from flask import jsonify
+import time
 
 def success(result):
     if result == "":
@@ -21,3 +22,6 @@ def field_checker(request_json, fields):
         if field not in request_json:
             return "{} field not exist".format(field)
     return None
+
+def current_time():
+    return int(time.time())

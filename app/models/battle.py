@@ -45,7 +45,7 @@ class Battle:
             "last_active_time": timestamp,
             "accuracy_time_left": self.accuracy_time,
             "additional_time_left": self.additional_time,
-            "is_auto": False
+            "is_hosting": False
         }
 
         self._update_player(player_id)
@@ -64,16 +64,30 @@ class Battle:
         if not self.started:
             self.players_info[player_id] = self.default_player_info
         else:
-            self.players_info[player_id]['is_auto'] = True
+            self.players_info[player_id]['is_hosting'] = True
             self.players_info[player_id]['last_active_time'] = timestamp
         
         self._update_player(player_id)
 
-    def remove_auto(self, timestamp, player_id):
-        self.players_info[player_id]['is_auto'] = False
-        self.players_info[player_id]['last_active_time'] = timestamp
+    def add_hosting(self, timestamp, user_id, player_id):
+        if self.players_info[player_id]['user_id'] != user_id:
+            return "USER AND PLAYER DOES'T MATCH!"
 
+        self.players_info[player_id]['is_hosting'] = True
+        self.players_info[player_id]['last_active_time'] = timestamp
         self._update_player(player_id)
+
+        return self.get_state(timestamp)
+
+    def remove_hosting(self, timestamp, user_id, player_id):
+        if self.players_info[player_id]['user_id'] != user_id:
+            return "USER AND PLAYER DOES'T MATCH!"
+
+        self.players_info[player_id]['is_hosting'] = False
+        self.players_info[player_id]['last_active_time'] = timestamp
+        self._update_player(player_id)
+
+        return self.get_state(timestamp)
     
     def get_state(self, timestamp=-1, user_id=-1):
         def get_player_id():
@@ -158,9 +172,9 @@ class Battle:
         while self.current_time < timestamp and not self.ended:
             for player_info in self.players_info:
                 if player_info["last_active_time"] + default_offline_time < timestamp:
-                    player_info['is_auto'] = True
+                    player_info['is_hosting'] = True
 
-            if current_player()["is_auto"]:
+            if current_player()["is_hosting"]:
                auto_drop_piece()
             else:
                 if current_player()["additional_time_left"] + self.current_time > timestamp:
@@ -229,3 +243,4 @@ class BattleFactory():
             
 
         
+
