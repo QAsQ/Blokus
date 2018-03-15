@@ -98,27 +98,72 @@ Vue.component("user-data", {
 function try_join(player_id){
     if (!check_login()) return
     $.post("/api/battles/" + battle_inferface.battle_data.battle_id + "/players/" + player_id, {}, function(data){
-        if(data.message != "success")
+        if(data.message != "success"){
             show_message(data.message)
+            return
+        }
         battle_inferface.battle_data = data.result
     })
 }
 
+function try_leave(player_id){
+    if (!check_login()) return
+    $.ajax({
+        method: "delete",
+        url:"/api/battles/" + battle_inferface.battle_data.battle_id + "/players/" + player_id, 
+        success: function(data){
+            if(data.message != "success"){
+                show_message(data.message)
+                return
+            }
+            battle_inferface.battle_data = data.result
+        }
+    })
+}
+
 Vue.component("playerinfo-item",{
-    props: ['player_info', 'player_id', 'description_type'],
+    props: ['player_info', 'item_id', 'player_id', 'description_type'],
     template: `
-        <div class="item" :class="{link: !occupied}" @click="try_join">
+        <div class="item" 
+            :class="{link: !occupied}" 
+            @mouseenter="dimmer('show')"
+            @mouseleave="dimmer('hide')"
+            @click="change">
             <img class="ui avatar image" :src="image_path">
             <div class="content">
                 <div class="header">{{user_name}}</div>
                 <div class='description'>{{description}}</div>
             </div>
+            <div class="ui dimmer" :id="'playerinfo_item_' + item_id" @click="operator">
+                <div class="content">
+                    {{player_id !== -1 ? '离开': '加入'}}
+                    <i class="ui icon" :class="{close: player_id !== -1}"></i>
+                </div> 
+            </div>
         </div>`,
     methods: {
-        try_join: function(){
-            if (this.occupied)
+        operator: function(){
+            this.dimmer('hide')
+            if (this.player_id === -1){
+                if (this.occupied)
+                    return
+                try_join(this.item_id)
+            }
+            else{
+                try_leave(this.item_id)
+            }
+        },
+        change: function(){
+            if (this.player_id != this.item_id &&this.player_id !== -1){
+                try_leave(this.player_id)
+                try_join(this.item_id)
+            }
+
+        },
+        dimmer: function(argument){
+            if (this.player_id != -1 &&this.item_id != this.player_id)
                 return
-            try_join(this.player_id)
+            $("#playerinfo_item_"+this.item_id).dimmer(argument);
         }
     },
     computed: {
@@ -131,7 +176,7 @@ Vue.component("playerinfo-item",{
             return this.player_info.user_data.username
         },
         image_path: function () {
-            return "static/common/images/" + (1 << this.player_id) + '.png'
+            return "static/common/images/" + (1 << this.item_id) + '.png'
         },
         description: function(){
             if (this.player_info.user_id == -1)
@@ -149,9 +194,11 @@ Vue.component("playerinfo-list", {
     template:`
         <div class='ui big list'>
             <playerinfo-item v-for="(player_info, index) in players_info" :key="index"
-                :player_id="index"
+                :item_id="index"
+                :player_id="-1"
                 :player_info="player_info"
                 description_type="winning_rate">
+
             </playerinfo-item>
         </div>`
 });
@@ -244,15 +291,9 @@ Vue.component("battle-item", {
 });
 
 Vue.component("battle-list", {
-    props: ['battles_data', 'show_create'],
+    props: ['battles_data'],
     template: `
         <div class="ui huge divided selection list">
-            <div v-if="show_create" class="item" onclick="$('#create_modal').modal({autofocus: false}).modal('show')">
-                <i class="teal inverted circular middle plus icon"></i>
-                <div class="content" data-tooltip="点击创建新对局">
-                    <div class="ui header">「&ensp;&ensp;」</div>
-                </div>
-            </div>
             <battle-item v-for="(battle_data, index) in battles_data"  :key="index"
                 :battle_data="battle_data">
             </battle-item>
@@ -264,16 +305,16 @@ Vue.component("battle-list", {
 });
 
 Vue.component("playerinfo-table",{
-    props: ['players_info'],
+    props: ['players_info', 'player_id'],
     template: `
     <div class="ui vertical segment">
         <div class="left aligned attached ui two item menu">
-            <playerinfo-item :player_info="players_info[0]" :player_id="0" description_type="battle_state"></playerinfo-item>
-            <playerinfo-item :player_info="players_info[3]" :player_id="3" description_type="battle_state"></playerinfo-item>
+            <playerinfo-item :player_info="players_info[0]" :item_id="0" :player_id="player_id" description_type="battle_state"></playerinfo-item>
+            <playerinfo-item :player_info="players_info[3]" :item_id="3" :player_id="player_id" description_type="battle_state"></playerinfo-item>
         </div>
         <div class="left aligned attached ui two item menu">
-            <playerinfo-item :player_info="players_info[1]" :player_id="1" description_type="battle_state"></playerinfo-item>
-            <playerinfo-item :player_info="players_info[2]" :player_id="2" description_type="battle_state"></playerinfo-item>
+            <playerinfo-item :player_info="players_info[1]" :item_id="1" :player_id="player_id" description_type="battle_state"></playerinfo-item>
+            <playerinfo-item :player_info="players_info[2]" :item_id="2" :player_id="player_id" description_type="battle_state"></playerinfo-item>
         </div>
     </div>`
 });
@@ -304,7 +345,9 @@ Vue.component("control-panel", {
                 id="hosting_button">
                 {{ hosting ? "取消托管": "托管"}}
             </div>
-            <playerinfo-table :players_info="battle_data.players_info">
+            <playerinfo-table 
+                :player_id="player_id"
+                :players_info="battle_data.players_info">
             </playerinfo-table>
             <div class="ui fluid negative button" :class="{disabled: !can_leave}">离开</div>
         </div> `,

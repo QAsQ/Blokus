@@ -36,7 +36,7 @@ class Battle:
 
     def try_join_player(self, timestamp, player_id, user_id, user_data):
         if self.players_info[player_id]["user_id"] != -1:
-            return {"message" : "user already in"}
+            return "user already in"
 
         self.players_info[player_id] = {
             "user_id": user_id,
@@ -60,7 +60,10 @@ class Battle:
 
         return self.get_state()
 
-    def remove_player(self, timestamp, player_id):
+    def try_remove_player(self, timestamp, player_id, user_id):
+        if self.players_info[player_id]['user_id'] != user_id:
+            return "user and player does't match!"
+
         if not self.started:
             self.players_info[player_id] = self.default_player_info
         else:
@@ -68,8 +71,9 @@ class Battle:
             self.players_info[player_id]['last_active_time'] = timestamp
         
         self._update_player(player_id)
+        return self.get_state()
 
-    def add_hosting(self, timestamp, user_id, player_id):
+    def add_hosting(self, timestamp, player_id, user_id):
         if self.players_info[player_id]['user_id'] != user_id:
             return "USER AND PLAYER DOES'T MATCH!"
 
@@ -79,7 +83,7 @@ class Battle:
 
         return self.get_state(timestamp)
 
-    def remove_hosting(self, timestamp, user_id, player_id):
+    def remove_hosting(self, timestamp, player_id, user_id):
         if self.players_info[player_id]['user_id'] != user_id:
             return "USER AND PLAYER DOES'T MATCH!"
 

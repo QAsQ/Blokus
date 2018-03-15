@@ -238,16 +238,26 @@
                         </div>
                     </div>
                 </div>
-                <div class="ui center aligned basic segment">
-                    <button class="huge circular ui icon negative button" data-position="bottom center" data-tooltip="清除条件">
-                        <i class="eraser icon"></i>
-                    </button>
-                </div>
             </form>
+            <div class="ui center aligned vertical segment">
+                <div class="ui column">
+                    <div class="ui red fluid button">
+                        <i class="erase icon"></i> 清空条件
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 <div class="column">
-    <battle-list id="battle_list" :battles_data="battles_data" :show_create="true"></battle-list>
+    <div class="ui fluid buttons">
+        <div class="ui teal button" onclick="$('#create_modal').modal('show')">
+            <i class="plus icon"></i> 新建 
+        </div>
+        <div class="ui button">
+            <i class="sync alternate icon"></i> 刷新
+        </div>
+    </div>
+    <battle-list id="battle_list" :battles_data="battles_data" :show_create="false"></battle-list>
 </div>
 {% endblock %}
 

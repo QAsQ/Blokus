@@ -191,18 +191,24 @@ def battle(battle_id):
 def players(battle_id, player_id):
     if current_user.user_id == -1:
         return failure("need login first!")
-    if request.method == 'POST':
-        battle = BattleFactory.load_battle(battle_id, db)
-        
-        if isinstance(battle, str):
-            return failure(battle)
 
+    battle = BattleFactory.load_battle(battle_id, db)
+    if isinstance(battle, str):
+        return failure(battle)
+
+    if request.method == 'POST':
         result = battle.try_join_player(current_time(), player_id, current_user.user_id, current_user.dump())
+        if (isinstance(result, str)):
+            return failure(result)
+        
         return success(result)
     
     elif request.method == 'DELETE':
-        #todo
-        pass
+        result = battle.try_remove_player(current_time(), player_id, current_user.user_id)
+        if (isinstance(result, str)):
+            return failure(result)
+        
+        return success(result)
 
 
 @app.route("/api/battles/<int:battle_id>/players/<int:player_id>/hosting", methods=['POST', 'DELETE'])
@@ -216,14 +222,14 @@ def hosting(battle_id, player_id):
         return failure("请先登录!")
 
     if request.method == 'POST':
-        result = battle.add_hosting(current_time(), current_user.user_id, player_id)
+        result = battle.add_hosting(current_time(), player_id, current_user.user_id)
         if (isinstance(result, str)):
             return failure(result)
         
         return success(result)
 
     elif request.method == 'DELETE':
-        result = battle.remove_hosting(current_time(), current_user.user_id, player_id)
+        result = battle.remove_hosting(current_time(), player_id, current_user.user_id)
         if (isinstance(result, str)):
             return failure(result)
         
