@@ -182,7 +182,7 @@ Vue.component("playerinfo-item",{
             return this.player_info.user_data.username
         },
         image_path: function () {
-            return "static/common/images/" + (1 << this.item_id) + '.png'
+            return "static/common/images/player/" + (1 << this.item_id) + '.jpg'
         },
         description: function(){
             if (this.player_info.user_id == -1)
@@ -275,7 +275,7 @@ Vue.component("battle-item", {
     template:`
         <div class="item" v-on:click="goto_battle">
             <div class="ui image" name="head">
-                <img class="ui avatar image" src="static/favicon.ico">
+                <img class="ui avatar image" :src="image_path">
             </div>
             <div class="content">
                 <div class="ui header" name="content"> {{battle_data.battle_info.battle_name}} </div>
@@ -292,6 +292,15 @@ Vue.component("battle-item", {
     methods: {
         goto_battle: function(){
             window.open("/battle?battle_id=" + this.battle_data.battle_id)
+        }
+    },
+    computed:{
+        image_path: function(){
+            state = 0
+            for (var id = 0; id < 4; id++)
+                if (this.battle_data.players_info[id].user_id !== -1)
+                    state |= 1 << id
+            return "static/common/images/battle/" + state + ".jpg"
         }
     }
 });
