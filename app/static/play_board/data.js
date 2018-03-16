@@ -28,37 +28,33 @@ gProgressBarEndPointList= [
 function ColorThemeFactory(type) {
     if (type === "default") {
         return {
-            boardBackgroundColor: 0xffffff,
-            boardLineColor: "#e6eae9",
-            pieceColor: {
-                "0": 0xed1c24,
-                "1": 0x23b14d,
-                "2": 0x00a2e8,
-                "3": 0xffc90d,
-               "-1": 0xb7b7b7
-            },
-            tampColor: 0xafafaf,
-            legal: "#6f645e",
-            horn: "#d5d7d5",
-            rim: "#875f5f",
-            unlegal: "#e1d9c4",
-            can: "#f5f9f8",
-            frameColor: "#ffffff",
-            shade: "#e6eae9",
-            corner: function (o) {
-                switch (o) {
-                    case -1:
-                        return "#e6eae9";
-                    case 0:
-                        return "#cf1b24";
-                    case 1:
-                        return "#239546";
-                    case 2:
-                        return "#0091cf";
-                    case 3:
-                        return "#ebb60d";
+            backgroundColor: 0xfcfafb,
+            board: {
+                dividing_line: 0xffffff,
+                dividing_line_width: 3,
+                frame: 0xe6eae9,
+                progress_bar:{
+                    accuracy: [0xed1c24, 0x23b14d, 0x00a2e8, 0xffc90d],
+                    additional: 0xafafaf,
+                    particles: {
+                        accuracy: [0xed1c24, 0x23b14d, 0x00a2e8, 0xffc90d],
+                        additional: 0xafafaf
+                    }
                 }
-                return null;
+            },
+            piece: {
+                initial_alpha: 0.7,
+                onselect_alpha: 0.9,
+                dropped_alpha: 1,
+                shadow: {
+                    legal: 0x6f645e,
+                    unlegal: 0xe1d9c4
+                },
+                spectator: 0xb7b7b7,
+                dividing_line: 0xffffff,
+                dividing_line_width: 3,
+                cell: [0xed1c24, 0x23b14d, 0x00a2e8, 0xffc90d],
+                last_drop: [0xcf1b24, 0x239546, 0x0091cf, 0xebb60d]
             }
         }
     }

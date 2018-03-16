@@ -83,12 +83,12 @@ function ParticleFactory(direction, particleColor) {
 	return emitterContainer
 }
 
-function ProgressBarFactory(stPoint, edPoint, width, progressBarColor, tempBarColor){
+function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme){
 	var graphics = new PIXI.Graphics();
-    graphics.beginFill(progressBarColor, 1);
+    graphics.beginFill(colorTheme.board.progress_bar.accuracy[player_id], 1);
 	graphics.drawRect(0, 0, 1, 1)
 	var progressBar = new PIXI.Sprite(graphics.generateTexture());
-    graphics.beginFill(tempBarColor, 1);
+    graphics.beginFill(colorTheme.board.progress_bar.additional, 1);
 	graphics.drawRect(0, 0, 1, 1)
 	var tempBar = new PIXI.Sprite(graphics.generateTexture());
 
@@ -114,7 +114,7 @@ function ProgressBarFactory(stPoint, edPoint, width, progressBarColor, tempBarCo
 	tempBar.y = progressBar.y = startPoint.y
 	var length = distance(startPoint, endPoint);
 	tempBar.scale.x = progressBar.scale.x = length;
-    tempBar.scale.y = progressBar.scale.y = width;
+    tempBar.scale.y = progressBar.scale.y = colorTheme.board.progress_bar.width;
 	tempBar.rotation = progressBar.rotation = angle;
 
 	progressBarContainer.addChild(progressBar)
@@ -122,8 +122,8 @@ function ProgressBarFactory(stPoint, edPoint, width, progressBarColor, tempBarCo
 	progressBarContainer.progressBar = progressBar;
 
     progressBarContainer.extremity = ParticleFactory(
-		progressBar.rotation,
-		progressBarColor
+        progressBar.rotation,
+        colorTheme.board.progress_bar.accuracy[player_id]
 	);
 
 	progressBarContainer.addChild(progressBarContainer.extremity);
@@ -192,31 +192,19 @@ function ProgressBarFactory(stPoint, edPoint, width, progressBarColor, tempBarCo
     return progressBarContainer;
 }
 
-/**
- *  A  Piece
- *  可以被拖动的棋子, 在移动的各个过程调用响应的回调函数
- * @param pieceId 棋子 Id
- * @param cellList 棋子所占的格子
- * @param PieceColor 棋子的颜色
- * @param DragStartCallBack
- * @param DragMoveCallBack
- * @param DragEndCallBack
- * @returns 返回一个棋子
- * @constructor
- */
 function PieceFactory(pieceId,
                       shape,
-                      PieceColor,
                       offset,
+                      player_id,
+                      colorTheme,
                       DragStartCallBack,
                       DragMoveCallBack,
                       DragEndCallBack) {
     function onDragStart(event) {
         this.data = event.data;
         this.anchorPoint = this.data.getLocalPosition(this);
-        this.alpha = 1;
+        this.alpha = colorTheme.piece.onselect_alpha;
         this.dragging = true;
-        //TODO this function is not work yet
         DragStartCallBack(pieceId, this.State());
     }
 
@@ -235,7 +223,7 @@ function PieceFactory(pieceId,
     }
 
     function onDragEnd() {
-        this.alpha = 0.8;
+        this.alpha = colorTheme.piece.initial_alpha
         this.dragging = false;
         this.data = null;
         if (true)
@@ -269,10 +257,10 @@ function PieceFactory(pieceId,
         var polygon = CellList_2_Polygon(cellList, new PIXI.Point());
 
         var graphics = new PIXI.Graphics();
-        graphics.beginFill(PieceColor, 1);
+        graphics.beginFill(colorTheme.piece.cell[player_id], 1);
         graphics.drawPolygon(polygon);
         // todo adhoc
-        graphics.lineStyle(1, 0xFFFFFF, 1);
+        //graphics.lineStyle(0, 0xFFFFFF, 0);
         graphics.endFill();
         cellList.forEach(function (cells) {
             graphics.drawRect(
@@ -294,7 +282,7 @@ function PieceFactory(pieceId,
         pieces.addChild(piece);
     })
 
-    pieces.alpha = 0.8;
+    pieces.alpha = colorTheme.piece.initial_alpha
     pieces.anchor = new PIXI.Point();
     pieces.interactive = true
     pieces.dropped = false
@@ -330,6 +318,7 @@ function PieceFactory(pieceId,
         pieces.dropped = true
         pieces.visible = true
         pieces.interactive = false
+        pieces.alpha = colorTheme.piece.dropped_alpha
     }
 
     pieces.Flip = function(){
@@ -344,24 +333,6 @@ function PieceFactory(pieceId,
     return pieces;
 }
 
-/**
- *
- * @param colorTheme
- * @param state
- * @returns {*}
- * @constructor
- *
- *  board, piece manager
- *      根据传入的 state 来创建自己
- *      updateState 根据传入的 state 来更新
- *           棋子状态
- *           棋子位置
- *  知道哪个棋子是当前棋子，可以处理棋子的旋转，翻转
- *  在棋子被选择的时候更新当前棋子
- *  在棋子移动的时候根据当前位置是否为可落下的位置更新（棋子的透明度？落下按钮的可用性？）
- *  在棋子被松开的时候判断是否落下棋子并更新棋子
- *
- */
 function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) {
     var placedGroup = new PIXI.display.Group(-1, false); 
     var boardGroup = new PIXI.display.Group(0, false);
@@ -373,8 +344,8 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
 
     var graphics = new PIXI.Graphics();
 
-    graphics.lineColor = colorTheme.boardLineColor;
-    graphics.lineWidth = 1;
+    graphics.lineColor = colorTheme.board.dividing_line
+    graphics.lineWidth = colorTheme.board.dividing_line_width
     //Draw board line
     for (var i = 0; i <= 20; i++) {
         graphics.moveTo(i * gCellSize, 0);
@@ -420,9 +391,8 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
         progressBar = ProgressBarFactory(
             gProgressBarEndPointList[player_id * 2],
             gProgressBarEndPointList[player_id * 2 + 1],
-            3, //width
-            colorTheme.pieceColor[player_id.toString()],
-            colorTheme.tempColor
+            player_id,
+            colorTheme
         )
         progressBar.parentGroup = boardGroup
         board.addChild(progressBar)
@@ -438,8 +408,9 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
             var piece = PieceFactory(
                 pieceId,
                 piecesCellList[pieceId],
-                colorTheme.pieceColor[playerId],
                 new PIXI.Point(board.x, board.y),
+                playerId,
+                colorTheme,
                 DragStartCallBack,
                 DragMoveCallBack,
                 DragEndCallBack
@@ -531,8 +502,8 @@ function generateBoard(canvas, mPlayerId, boardData, colorTheme){
         gWidth, 
         gHeight, 
         {
-            backgroundColor: 0xffffff, 
-            view:canvas
+            backgroundColor: colorTheme.backgroundColor, 
+            view: canvas
         }
     );
     app.stage = new PIXI.display.Stage();
