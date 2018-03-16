@@ -2,29 +2,32 @@
 
 {% block head %}
 <script>
+    function load_battles(){
+        $.ajax({
+            type: "GET",
+            url: "/api/battles",
+            contentType: "applicaton/json",
+            data: {},
+            error: function(){
+                show_message("网络连接超时");
+            }, 
+            success: function(data){
+                if (data.message != 'success')
+                    show_message(data.message);
+                else
+                battle_list.battles_data = data.result
+            }
+        });
+    }
     $(document)
         .ready(function() {
-            var battle_list = new Vue({
+            battle_list = new Vue({
                 el: "#battle_list",
                 data:{
                     battles_data: null
                 }
             });
-            $.ajax({
-                type: "GET",
-                url: "/api/battles",
-                contentType: "applicaton/json",
-                data: {},
-                error: function(){
-                    show_message("网络连接超时");
-                }, 
-                success: function(data){
-                    if (data.message != 'success')
-                        show_message(data.message);
-                    else
-                    battle_list.battles_data = data.result
-                }
-            });
+            load_battles()
 
             var timer_scheme_selector = new Vue({
                 el: "#timer_scheme_selector",
@@ -253,7 +256,7 @@
         <div class="ui teal button" onclick="$('#create_modal').modal('show')">
             <i class="plus icon"></i> 新建 
         </div>
-        <div class="ui button">
+        <div class="ui button" onclick="load_battles()">
             <i class="sync alternate icon"></i> 刷新
         </div>
     </div>
