@@ -12,33 +12,37 @@ var gPiecesLocate = [
     Point(23, 22), Point(22, -4), Point(-4, 17), Point(23, 17), Point(-4, -1),
     Point(4, 23), Point(-4, 22), Point(13, 23), Point(23, 7), Point(23, 12),
     Point(23, 1)
-]
+];
 
 var gInitState = [
     0, 0, 0, 0, 0, 2, 2, 2, 6, 2, 7, 6, 7, 7, 0, 7, 4, 4, 6, 0, 5
-]
+];
 
 gProgressBarEndPointList= [
     Point(0, -1), Point(20, -1), 
     Point(-1, 20), Point(-1, 0), 
     Point(20, 21), Point(0, 21), 
     Point(21, 0), Point(21, 20)
-]
+];
 
+function trans_color(color){
+    return parseInt(color.slice(1), 16);
+}
 function ColorThemeFactory(type) {
     if (type === "default") {
         return {
-            backgroundColor: 0xfcfafb,
+            backgroundColor: trans_color("#f2f0f1"),
             board: {
-                dividing_line: 0xffffff,
+                dividing_line: trans_color("#ffffff"),
                 dividing_line_width: 3,
-                frame: 0xe6eae9,
+                frame: trans_color("#e6eae9"),
                 progress_bar:{
-                    accuracy: [0xed1c24, 0x23b14d, 0x00a2e8, 0xffc90d],
-                    additional: 0xafafaf,
+                    bar_width: 4,
+                    accuracy: [trans_color("#ed1c24"), trans_color("#23b14d"), trans_color("#00a2e8"), trans_color("#ffc90d")],
+                    additional: trans_color("#cdcdcd"),
                     particles: {
-                        accuracy: [0xed1c24, 0x23b14d, 0x00a2e8, 0xffc90d],
-                        additional: 0xafafaf
+                        accuracy: [trans_color("#ed1c24"), trans_color("#23b14d"), trans_color("#00a2e8"), trans_color("#ffc90d")],
+                        additional: trans_color("#d9dede")
                     }
                 }
             },
@@ -47,14 +51,14 @@ function ColorThemeFactory(type) {
                 onselect_alpha: 0.9,
                 dropped_alpha: 1,
                 shadow: {
-                    legal: 0x6f645e,
-                    unlegal: 0xe1d9c4
+                    legal: trans_color("#6f645e"),
+                    unlegal: trans_color("#e1d9c4")
                 },
-                spectator: 0xb7b7b7,
-                dividing_line: 0xffffff,
+                spectator: trans_color("#b7b7b7"),
+                dividing_line: trans_color("#ffffff"),
                 dividing_line_width: 3,
-                cell: [0xed1c24, 0x23b14d, 0x00a2e8, 0xffc90d],
-                last_drop: [0xcf1b24, 0x239546, 0x0091cf, 0xebb60d]
+                cell: [trans_color("#f2542d"), trans_color("#80ba04"), trans_color("#1da6f0"), trans_color("#feb923")],
+                last_drop: [trans_color("#cf1b24"), trans_color("#239546"), trans_color("#0091cf"), trans_color("#ebb60d")]
             }
         }
     }

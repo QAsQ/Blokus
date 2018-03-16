@@ -90,7 +90,7 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme){
 	var progressBar = new PIXI.Sprite(graphics.generateTexture());
     graphics.beginFill(colorTheme.board.progress_bar.additional, 1);
 	graphics.drawRect(0, 0, 1, 1)
-	var tempBar = new PIXI.Sprite(graphics.generateTexture());
+	var additionalBar = new PIXI.Sprite(graphics.generateTexture());
 
 	var startPoint = Point(stPoint.x * gCellSize, stPoint.y * gCellSize);
 	var endPoint = Point(edPoint.x * gCellSize, edPoint.y * gCellSize);
@@ -110,27 +110,34 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme){
 
 	var progressBarContainer = new PIXI.Container();
 
-    tempBar.x = progressBar.x = startPoint.x
-	tempBar.y = progressBar.y = startPoint.y
+    additionalBar.x = progressBar.x = startPoint.x
+	additionalBar.y = progressBar.y = startPoint.y
 	var length = distance(startPoint, endPoint);
-	tempBar.scale.x = progressBar.scale.x = length;
-    tempBar.scale.y = progressBar.scale.y = colorTheme.board.progress_bar.width;
-	tempBar.rotation = progressBar.rotation = angle;
+	additionalBar.scale.x = progressBar.scale.x = length;
+    additionalBar.scale.y = progressBar.scale.y = colorTheme.board.progress_bar.bar_width;
+	additionalBar.rotation = progressBar.rotation = angle;
 
 	progressBarContainer.addChild(progressBar)
-	progressBarContainer.addChild(tempBar)
+	progressBarContainer.addChild(additionalBar)
 	progressBarContainer.progressBar = progressBar;
+    progressBarContainer.additional = false
 
     progressBarContainer.extremity = ParticleFactory(
         progressBar.rotation,
         colorTheme.board.progress_bar.accuracy[player_id]
-	);
-
+    );
 	progressBarContainer.addChild(progressBarContainer.extremity);
-	progressBarContainer.extremity.rotation = angle
-	progressBarContainer.extremity.x = endPoint.x
-	progressBarContainer.extremity.y = endPoint.y
-	progressBarContainer.extremity.visible = false
+    progressBarContainer.extremity.rotation = angle
+
+    progressBarContainer.additional_extremity = ParticleFactory(
+        progressBar.rotation,
+        colorTheme.board.progress_bar.additional
+	);
+	progressBarContainer.addChild(progressBarContainer.additional_extremity);
+    progressBarContainer.additional_extremity.rotation = angle
+
+    progressBarContainer.extremity.visible = false
+    progressBarContainer.additional_extremity.visible = false
 
 	var progressBarText = new PIXI.Text(
 		"",
@@ -162,32 +169,48 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme){
 	progressBarContainer.progressBarText = progressBarText;
 
 	progressBarContainer.setActivate = function(active){
-		this.extremity.visible = active;
+        if (!active){
+            this.extremity.visible = false
+            this.additional_extremity.visible = false
+        }
+        else{
+            if (this.additional){
+                this.additional_extremity.visible = true
+                this.extremity.visible = false
+            }
+            else{
+                this.additional_extremity.visible = false
+                this.extremity.visible = true
+            }
+        }
 	}
 	//todo update set progress rate to set time
-	progressBarContainer.setProgressRate = function(total_time_left, temp_time_left, total_time, temp_time){
+	progressBarContainer.setProgressRate = function(total_time_left, additional_time_left, total_time, additional_time){
 		this.progressBarText.updText(
-			formTime(total_time_left + temp_time_left) + " / " +
-			formTime(temp_time) + "+" + formTime(total_time) 
-		);
-		var total_rate = total_time_left / (total_time + temp_time);
+			formTime(total_time_left + additional_time_left) + " / " +
+			formTime(additional_time) + "+" + formTime(total_time) 
+        );
+        this.additional = additional_time_left !== 0
+		var total_rate = total_time_left / (total_time + additional_time);
 		var total_end = {
 			x: startPoint.x + (endPoint.x - startPoint.x) * total_rate,
 			y: startPoint.y + (endPoint.y - startPoint.y) * total_rate
 		}
 		this.progressBar.scale.x = distance(startPoint, total_end)
 
-		var temp_rate = (total_time_left + temp_time_left) / (total_time + temp_time);
-		var temp_end = {
-			x: startPoint.x + (endPoint.x - startPoint.x) * temp_rate,
-			y: startPoint.y + (endPoint.y - startPoint.y) * temp_rate 
+		var additional_rate = (total_time_left + additional_time_left) / (total_time + additional_time);
+		var additional_end = {
+			x: startPoint.x + (endPoint.x - startPoint.x) * additional_rate,
+			y: startPoint.y + (endPoint.y - startPoint.y) * additional_rate 
 		}
-		tempBar.x = total_end.x
-		tempBar.y = total_end.y
-		tempBar.scale.x = distance(total_end, temp_end);
+		additionalBar.x = total_end.x
+		additionalBar.y = total_end.y
+		additionalBar.scale.x = distance(total_end, additional_end);
 
-		this.extremity.x = temp_end.x
-		this.extremity.y = temp_end.y
+		this.extremity.x = additional_end.x
+		this.extremity.y = additional_end.y
+		this.additional_extremity.x = additional_end.x
+		this.additional_extremity.y = additional_end.y
 	}
     return progressBarContainer;
 }
@@ -236,7 +259,7 @@ function PieceFactory(pieceId,
     function CellList_2_Polygon(cell_list, offset){
         var vertex_list = [new PIXI.Point(0, 0)];
         cell_list.forEach(function (cell) {
-            [[0, 0], [0, 1], [1, 1], [1, 0], [0 ,0]].forEach(function (point) {
+            [[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]].forEach(function (point) {
                 vertex_list.push(
                     new PIXI.Point(
                         (cell[0] + point[0]) * gCellSize + offset.x,
@@ -254,23 +277,23 @@ function PieceFactory(pieceId,
     pieces.piece = []
 
     shape.forEach(function(cellList, state){
-        var polygon = CellList_2_Polygon(cellList, new PIXI.Point());
-
         var graphics = new PIXI.Graphics();
         graphics.beginFill(colorTheme.piece.cell[player_id], 1);
+
+        var polygon = CellList_2_Polygon(cellList, new PIXI.Point());
         graphics.drawPolygon(polygon);
-        // todo adhoc
-        //graphics.lineStyle(0, 0xFFFFFF, 0);
-        graphics.endFill();
-        cellList.forEach(function (cells) {
-            graphics.drawRect(
-                cells.x * gCellSize,
-                cells.y * gCellSize,
-                gCellSize,
-                gCellSize
-            )
+
+        graphics.lineColor = colorTheme.piece.dividing_line;
+        graphics.lineWidth = colorTheme.piece.dividing_line_width;
+        cellList.forEach(function (cell){
+            last = [0, 0]
+            lis = [[1, 0], [1, 1], [0, 1], [0, 0]]
+            lis.forEach(function (bias){
+                graphics.moveTo((cell[0] + bias[0]) * gCellSize, (cell[1] + bias[1]) * gCellSize);
+                graphics.lineTo((cell[0] + last[0]) * gCellSize, (cell[1] + last[1]) * gCellSize);
+                last = bias
+            })
         });
-        graphics.endFill();
 
         var piece = new PIXI.Sprite(graphics.generateTexture());
         //piece.hitArea = polygon;
@@ -433,13 +456,13 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
         //update progressBar
         for (var playerId = 0; playerId < 4; playerId ++) {
             var currentProgressBar = this.progressBars[playerId];
-            currentProgressBar.setActivate(playerId === state.battle_info.current_player);
             currentProgressBar.setProgressRate(
                 state.players_info[playerId].accuracy_time_left, 
                 state.players_info[playerId].additional_time_left, 
                 state.battle_info.accuracy_time,
                 state.battle_info.additional_time
             )
+            currentProgressBar.setActivate(playerId === state.battle_info.current_player);
         }
         
         //TODO state.playerState;
