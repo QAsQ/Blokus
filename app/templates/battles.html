@@ -7,7 +7,10 @@
             type: "GET",
             url: "/api/battles",
             contentType: "applicaton/json",
-            data: {},
+            data: {
+                sort: JSON.stringify(battle_condition.condition.sort),
+                query: JSON.stringify(battle_condition.condition.query)
+            },
             error: function(){
                 show_message("网络连接超时");
             }, 
@@ -19,6 +22,10 @@
             }
         });
     }
+    function try_create(){
+        if (check_login())
+            $('#create_modal').modal('show')
+    }
     $(document)
         .ready(function() {
             battle_list = new Vue({
@@ -27,6 +34,20 @@
                     battles_data: null
                 }
             });
+            battle_condition = new Vue({
+                el: "#battle_condition",
+                data:{
+                    condition: {
+                        "sort" : [],
+                        "query" : {
+                            "username": "",
+                            "battle_state": [],
+                            "battle_name": "",
+                            "board_type": "" 
+                        }
+                    }
+                }
+            })
             load_battles()
 
             var timer_scheme_selector = new Vue({
@@ -55,7 +76,6 @@
             })
 
             $('#timer_type_selector').dropdown()
-            $('.ui.dropdown').dropdown()
             $('.ui.sticky').sticky({
                 offset: 50,
                 context: '#battle_list'}
@@ -66,7 +86,7 @@
                         identifier: 'battle_name',
                         rules: [
                             {type: 'empty', prompt: '对局名称不能为空'},
-                            {type: 'maxLength[8]', prompt: '对局名称长度要短于12个字符'}
+                            {type: 'maxLength[20]', prompt: '对局名称长度要短于20'}
                         ]
                     },
                     accuracy_time: {
@@ -98,7 +118,6 @@
                         contentType: 'application/json; charset=UTF-8',
                         async: false,
                         success: function(data){
-                            console.log(data)
                             form.removeClass("loading")
                             if (data.message == "success"){
                                 form.removeClass("loading")
@@ -141,119 +160,12 @@
 <div class="ui stackable grid two column container">
     <div class="ui column">
         <div class="ui sticky">
-            <form class="ui form">
-                <h1><i class="filter icon"></i> 筛选</h1>
-                <div class="field">
-                    <label>按对局状态</label>
-                    <div class="three fields">
-                        <div class="field">
-                            <div class="ui segment">
-                                <div class="ui toggle checkbox">
-                                    <input type="checkbox" tabindex="0" class="teal hidden">
-                                    <label><i class="hourglass start icon"></i>未开始</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="field">
-                            <div class="ui segment">
-                                <div class="ui toggle checkbox">
-                                    <input type="checkbox" tabindex="0" class="hidden">
-                                    <label><i class="hourglass half icon"></i>进行中</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="field">
-                            <div class="ui segment">
-                                <div class="ui toggle checkbox">
-                                    <input type="checkbox" tabindex="0" class="hidden">
-                                    <label><i class="hourglass end icon"></i>已结束</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="two fields">
-                    <div class="field">
-                        <label><i class="user icon"></i>  按参与用户 </label>
-                        <div class="ui right icon input">
-                            <input type="text" placeholder="用户名">
-                            <i class="inverted circular search link icon"></i>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label><i class="chess board icon"></i>按对局名</label>
-                        <div class="ui right icon input">
-                            <input type="text" placeholder="对局名称">
-                            <i class="inverted circular search link icon"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="field">
-                    <label>按对局类型</label>
-                    <div class="ui fluid selection dropdown">
-                        <input type="hidden" name="user">
-                        <i class="dropdown icon"></i>
-                        <div class="default text">对局类型</div>
-                        <div class="menu">
-                            <div class="item" data-value="square_standard">标准(四人)</div>
-                            <div class="disabled item" data-value="square_twin">双人</div>
-                            <div class="disabled item" data-value="square_trio">三人</div>
-                        </div>
-                    </div>
-                </div>
-                <h1><i class="sort icon"></i> 排序</h1>
-                <div class="ui fluid multiple selection dropdown">
-                    <div class="default text">默认顺序</div>
-                    <i class="dropdown icon"></i>
-                    <input type="hidden" name="sort">
-                    <div class="menu">
-                        <div class="item" data-value="a:left_pos">
-                            <i class="vertically flipped sort amount up icon"></i>
-                            剩余位置
-                        </div>
-                        <div class="item" data-value="a:start_time">
-                            <i class="vertically flipped sort amount up icon"></i>
-                            起始时间
-                        </div>
-                        <div class="item" data-value="a:create_time">
-                            <i class="vertically flipped sort amount up icon"></i>
-                            对局进程
-                        </div>
-                        <div class="disabled item" data-value="a:left_pos">
-                            <i class="vertically flipped sort amount up icon"></i>
-                            预计剩余时间
-                        </div>
-                        <div class="item" data-value="d:left_pos">
-                            <i class="sort amount down icon"></i>
-                            剩余位置
-                        </div>
-                        <div class="item" data-value="d:start_time">
-                            <i class="sort amount down icon"></i>
-                            起始时间
-                        </div>
-                        <div class="item" data-value="d:create_time">
-                            <i class="sort amount down icon"></i>
-                            对局进程
-                        </div>
-                        <div class="disabled item" data-value="d:left_pos">
-                            <i class="sort amount down icon"></i>
-                            预计剩余时间
-                        </div>
-                    </div>
-                </div>
-            </form>
-            <div class="ui center aligned vertical segment">
-                <div class="ui column">
-                    <div class="ui red fluid button">
-                        <i class="erase icon"></i> 清空条件
-                    </div>
-                </div>
-            </div>
+            <battle-condition :condition="condition" id='battle_condition'></battle-condition>
         </div>
     </div>
 <div class="column">
     <div class="ui fluid buttons">
-        <div class="ui teal button" onclick="$('#create_modal').modal('show')">
+        <div class="ui teal button" onclick="try_create()">
             <i class="plus icon"></i> 新建 
         </div>
         <div class="ui button" onclick="load_battles()">
@@ -277,7 +189,7 @@
                         <div class="field">
                             <div class="ui vertical segment">
                                 <label>对局名称</label>
-                                <input type="text" name="battle_name" placeholder="名称长度小于12">
+                                <input type="text" name="battle_name" placeholder="名称长度小于20">
                             </div>
                         </div>
                         <div class="field">

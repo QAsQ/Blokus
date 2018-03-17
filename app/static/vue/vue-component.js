@@ -160,6 +160,8 @@ Vue.component("playerinfo-item",{
             }
         },
         change: function(){
+            if (this.occupied)
+                return
             if (this.player_id != this.item_id &&this.player_id !== -1){
                 try_leave(this.player_id)
                 try_join(this.item_id)
@@ -296,6 +298,8 @@ Vue.component("battle-item", {
     },
     computed:{
         image_path: function(){
+            if (this.battle_data.battle_info.ended)
+                return "static/common/images/battle/ended.jpg"
             state = 0
             for (var id = 0; id < 4; id++)
                 if (this.battle_data.players_info[id].user_id !== -1)
@@ -557,14 +561,145 @@ Vue.component("timer-scheme-selector", {
     computed: {
         expect_time: function(){
             second = (this.timer.accuracy_time + this.timer.additional_time * 21) * 4
-            var minute = Math.floor( second / 60 );
+            var minute = Math.floor( second / 60 )
             if (minute < 60)
-                return minute + "分钟";
-            var hour = Math.floor(second / 60);
+                return minute + "分钟"
+            var hour = Math.floor(second / 60)
             if (hour < 24)
-                return hour + "小时";
-            var day = Math.floor(hour / 24);
-            return day + "天";
+                return hour + "小时"
+            var day = Math.floor(hour / 24)
+            return day + "天"
+        }
+    }
+});
+
+Vue.component("battle-condition", {
+    props: ['condition'],
+    template: `
+    <form class="ui form">
+        <h1><i class="filter icon"></i>筛选</h1>
+        <div class="field">
+            <label>按对局状态</label>
+            <div class="three fields">
+                <div class="field">
+                    <div class="ui segment">
+                        <div class="ui toggle checkbox">
+                            <input type="checkbox" 
+                                tabindex="0" 
+                                value="unstarted" 
+                                v-model="condition.query.battle_state">
+                            <label><i class="hourglass start icon"></i>未开始</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui segment">
+                        <div class="ui toggle checkbox">
+                            <input type="checkbox" 
+                                tabindex="0" 
+                                value="ongoing"
+                                v-model="condition.query.battle_state">
+                            <label><i class="hourglass half icon"></i>进行中</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui segment">
+                        <div class="ui toggle checkbox">
+                            <input type="checkbox" 
+                                tabindex="0" 
+                                value="ended" 
+                                v-model="condition.query.battle_state">
+                            <label><i class="hourglass end icon"></i>已结束</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="two fields">
+            <div class="field">
+                <label><i class="user icon"></i>按参与用户</label>
+                <div class="ui right icon input">
+                    <input v-model="condition.query.username" type="text" placeholder="用户名">
+                    <i class="inverted circular search link icon"></i>
+                </div>
+            </div>
+            <div class="field">
+                <label><i class="chess board icon"></i>按对局名</label>
+                <div class="ui right icon input">
+                    <input v-model="condition.query.battle_name" type="text" placeholder="对局名称">
+                    <i class="inverted circular search link icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="field">
+            <label>按对局类型</label>
+            <select id="board_type" class="ui fluid selection dropdown" v-model="condition.query.board_type">
+                <option value="">对局类型</option>
+                <option class="item" value="square_standard">标准(四人)</option>
+            </select>
+        </div>
+        <h1><i class="sort icon"></i>排序</h1>
+        <select id="sort_condition" class="ui fluid dropdown multiple" v-model="condition.sort">
+            <option value="">默认顺序</option>
+            <option value="a:left_position">
+                <i class="vertically flipped sort amount up icon"></i>
+                剩余位置
+            </option>
+            <option value="a:initiation_time">
+                <i class="vertically flipped sort amount up icon"></i>
+                起始时间
+            </option>
+            <option value="a:board_progress">
+                <i class="vertically flipped sort amount up icon"></i>
+                对局进程
+            </option>
+            <option value="d:left_position">
+                <i class="sort amount down icon"></i>
+                剩余位置
+            </option>
+            <option value="d:initiation_time">
+                <i class="sort amount down icon"></i>
+                起始时间
+            </option>
+            <option value="d:board_progress">
+                <i class="sort amount down icon"></i>
+                对局进程
+            </option>
+        </select>
+        </div>
+        <div class="ui divider"></div>
+        <div class="ui red fluid button" @click="reset_condition"> 
+            <i class="erase icon"></i> 清空条件
+        </div>
+    </form>`,
+    mounted: function(){
+        $("#sort_condition").dropdown("set selected",this.condition.sort)
+        $('#board_type').dropdown();
+    },
+    methods: {
+        reset_condition: function(){
+            this.condition = Object.assign(this.condition, {
+                sort: [],
+                query: {
+                    username: "",
+                    battle_state: [],
+                    battle_name: "",
+                    board_type: "" 
+                }
+            })
+            $("#sort_condition").dropdown("clear")
+        }
+    },
+    watch: {
+        "condition.sort": function(){
+            $("#sort_condition").dropdown("set selected",this.condition.sort);
+        },
+        "condition": {
+            handler(){
+                load_battles()
+            },
+            deep: true
         }
     }
 });

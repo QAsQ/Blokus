@@ -9,7 +9,7 @@ from flask_login import LoginManager, current_user, login_user, login_required, 
 from models.battle import Battle, BattleFactory
 from models.board import BoardFactory
 from models.user import User
-from models.db_utility import init_generate, id_clear, id_generate, auth_db
+from models.db_utility import init_generate, id_clear, id_generate, auth_db, filter_condition_generate, sort_condition_generate
 from models.app_utility import success, failure, field_checker, current_time
 
 from config import db_config, app_config
@@ -133,14 +133,29 @@ def boards(boardType):
 @app.route("/api/battles", methods=['GET', 'POST'])
 def battles():
     if request.method == 'GET':
-        #need config (condition, sort)
-        return success(id_clear(db.battles.find()))
+        try:
+            query = json.loads(request.args.get("query", "{}"))
+            sort = json.loads(request.args.get("sort", "[]"))
+        except:
+            return failure("request syntax error! need json string!")
+        
+        query = filter_condition_generate(query)
+        if isinstance(query, str):
+            return failure(query)
+
+        sort = sort_condition_generate(sort)
+        if isinstance(sort, str):
+            return failure(sort)
+        
+        return success(id_clear(db.battles.find(
+            filter=query,
+            sort=sort)))
 
     elif request.method == 'POST':
-        #if current_user.user_id == -1:
-        #    return failure("need login first!")
-        request_json = request.get_json(force=True)
+        if current_user.user_id == -1:
+            return failure("need login first!")
 
+        request_json = request.get_json(force=True)
         check_res = field_checker(request_json, [
             'battle_name', 
             'accuracy_time', 

@@ -23,11 +23,15 @@
                 return function(){
                     form.addClass("loading")
                     var res = false
+                    data = form.form('get values')
+
+                    if(data.regiester_password !== undefined)
+                        data.password = data.regiester_password
                     
                     $.ajax({
                         type: "POST",
                         url:  url, 
-                        data: JSON.stringify(form.form('get values')),
+                        data: JSON.stringify(data),
                         contentType: 'application/json; charset=UTF-8',
                         async: false,
                         success: function(data){
@@ -123,8 +127,8 @@
                             {type: 'not_used[username]', prompt: '该用户名已被使用'}
                         ]
                     },
-                    password: {
-                        identifier: 'password',
+                    regiester_password: {
+                        identifier: 'regiester_password',
                         rules: [
                             {type: 'empty', prompt: '密码不能为空'},
                             {type: 'minLength[6]', prompt: '密码长度要长于6个字符'},
@@ -134,7 +138,8 @@
                     confirm_password: {
                         identifier: 'confirm_password',
                         rules: [
-                            {type: 'match[password]', prompt: '两次输入的密码不一致'}
+                            {type: 'empty', prompt: '确认密码不能为空'},
+                            {type: 'match[regiester_password]', prompt: '两次输入的密码不一致'}
                         ]
                     }
                 },
@@ -163,7 +168,7 @@
 <div class="ui vertical inverted sidebar menu">
     <a class="active item">主页</a>
     <a class="item">在线对局</a>
-    <a class="item">玩家排名</a>
+    <a class="item">用户排名</a>
     <a class="item" onclick="$('#login').modal('show')">登录</a>
     <a class="item" onclick="$('#regiester').modal('show')">注册</a>
 </div>
@@ -185,7 +190,7 @@
                     <a class="active item" href="/">
                         <img class="logo" src="static/favicon.ico"></a>
                     <a class="item" href="/battles">在线对局</a>
-                    <a class="item">玩家排名</a>
+                    <a class="item">用户排名</a>
                     <div class="right item">
                         <user-item id="user_item" :user="user"></user-item>
                     </div>
@@ -290,7 +295,7 @@
             <div class="field">
                 <div class="ui left icon input">
                     <i class="lock icon"></i>
-                    <input type="password" name="password" placeholder="密码">
+                    <input type="password" name="regiester_password" placeholder="密码">
                 </div>
             </div>
             <div class="field">

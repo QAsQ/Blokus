@@ -10,15 +10,19 @@ class Battle:
 
         self.board = board
         self.create_time = timestamp
+        self.initiation_time = self.create_time
         self.battle_name = battle_info['battle_name']
         self.accuracy_time = battle_info['accuracy_time']
         self.additional_time = battle_info['additional_time']
 
         self.started = battle_info.get("started", False)
         self.ended = battle_info.get("ended", False)
+        self.left_position = battle_info.get("leftposition", 4)
         self.start_time = battle_info.get("start_time", -1)
         self.current_player = battle_info.get("current_player", -1)
         self.current_time = battle_info.get("current_time", -1)
+        if self.start_time != -1:
+            self.initiation_time = self.start_time
 
         self.chat_logs=chat_logs
         self.default_player_info = {"user_id": -1}
@@ -47,18 +51,19 @@ class Battle:
             "additional_time_left": self.additional_time,
             "is_hosting": False
         }
-
         self._update_player(player_id)
 
         if self._is_ready():
             self.started = True
             self.start_time = timestamp
             self.current_time = timestamp
+            self.initiation_time = timestamp
             self.current_player = 0
 
-            self._update("battle_info", self._get_battle_info())
+        self.left_position -= 1
+        self._update("battle_info", self._get_battle_info())
 
-        return self.get_state()
+        return self.get_state(timestamp)
 
     def try_remove_player(self, timestamp, player_id, user_id):
         if self.players_info[player_id]['user_id'] != user_id:
@@ -66,12 +71,15 @@ class Battle:
 
         if not self.started:
             self.players_info[player_id] = self.default_player_info
+            self.left_position += 1
+            self._update("battle_info", self._get_battle_info())
         else:
             self.players_info[player_id]['is_hosting'] = True
             self.players_info[player_id]['last_active_time'] = timestamp
-        
+
         self._update_player(player_id)
-        return self.get_state()
+
+        return self.get_state(timestamp)
 
     def add_hosting(self, timestamp, player_id, user_id):
         if self.players_info[player_id]['user_id'] != user_id:
@@ -137,6 +145,8 @@ class Battle:
             "ended": self.ended,
             "create_time": self.create_time,
             "start_time": self.start_time,
+            "initiation_time": self.initiation_time,
+            "left_position": self.left_position,
             "current_player": self.current_player,
             "current_time": self.current_time
         }
