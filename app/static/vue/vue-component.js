@@ -617,18 +617,16 @@ Vue.component("battle-condition", {
             </div>
         </div>
         <div class="two fields">
-            <div class="field">
+            <div class="field" id="username_condition">
                 <label><i class="user icon"></i>按参与用户</label>
-                <div class="ui right icon input">
+                <div class="ui input">
                     <input v-model="condition.query.username" type="text" placeholder="用户名">
-                    <i class="inverted circular search link icon"></i>
                 </div>
             </div>
             <div class="field">
                 <label><i class="chess board icon"></i>按对局名</label>
-                <div class="ui right icon input">
+                <div class="ui input">
                     <input v-model="condition.query.battle_name" type="text" placeholder="对局名称">
-                    <i class="inverted circular search link icon"></i>
                 </div>
             </div>
         </div>
@@ -697,7 +695,15 @@ Vue.component("battle-condition", {
         },
         "condition": {
             handler(){
-                load_battles()
+                $("#username_condition").removeClass("error")
+                var res = load_battles()
+                if (res === "user not exist"){
+                    console.log("QAQ")
+                    $("#username_condition").addClass("error")
+                }
+                else if (res !== "success"){
+                    show_message(res)
+                }
             },
             deep: true
         }

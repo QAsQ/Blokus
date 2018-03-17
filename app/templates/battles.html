@@ -3,9 +3,11 @@
 {% block head %}
 <script>
     function load_battles(){
+        var res = ""
         $.ajax({
             type: "GET",
             url: "/api/battles",
+            async: false,
             contentType: "applicaton/json",
             data: {
                 sort: JSON.stringify(battle_condition.condition.sort),
@@ -15,12 +17,14 @@
                 show_message("网络连接超时");
             }, 
             success: function(data){
-                if (data.message != 'success')
-                    show_message(data.message);
+                res = data.message
+                if (data.message != 'success'){
+                }
                 else
-                battle_list.battles_data = data.result
+                    battle_list.battles_data = data.result
             }
         });
+        return res;
     }
     function try_create(){
         if (check_login())

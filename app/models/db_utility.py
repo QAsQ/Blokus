@@ -35,6 +35,9 @@ def id_clear(data_list):
 
     return ret
 
+def username_checker(db, username):
+    return username == "" or db.users.find({"username": username}).count() != 0 
+
 def sort_condition_generate(conditions):
     field_translate = {
         "left_position": "battle_info.left_position",

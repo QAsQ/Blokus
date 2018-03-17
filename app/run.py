@@ -9,7 +9,7 @@ from flask_login import LoginManager, current_user, login_user, login_required, 
 from models.battle import Battle, BattleFactory
 from models.board import BoardFactory
 from models.user import User
-from models.db_utility import init_generate, id_clear, id_generate, auth_db, filter_condition_generate, sort_condition_generate
+from models.db_utility import init_generate, id_clear, id_generate, auth_db, filter_condition_generate, sort_condition_generate, username_checker
 from models.app_utility import success, failure, field_checker, current_time
 
 from config import db_config, app_config
@@ -138,6 +138,10 @@ def battles():
             sort = json.loads(request.args.get("sort", "[]"))
         except:
             return failure("request syntax error! need json string!")
+
+        if "username" in query and not username_checker(db, query['username']):
+            print("wtf")
+            return failure("user not exist")
         
         query = filter_condition_generate(query)
         if isinstance(query, str):
