@@ -526,6 +526,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
     current_piece_id = -1
     function DragStartCallBack (piece, position) {
         current_piece_id = piece.piece_id;
+        piece.parentGroup = draggedGroup
         piece.activeShadow(shadowGroup, position.x * gCellSize - piece.x, position.y * gCellSize - piece.y)
         console.log(
             "Drag start" + piece.piece_id,
@@ -543,6 +544,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
     }
     function DragEndCallBack(piece, position) {
         piece.deactiveShadow()
+        piece.parentGroup = pieceGroup
         data = {
             piece_id: piece.piece_id,
             position: position
