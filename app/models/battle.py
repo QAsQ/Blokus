@@ -133,6 +133,16 @@ class Battle:
         else:
             return False
 
+    def appent_chat_log(self, timestamp, username, content):
+        self.chat_logs.append({
+            "timestamp": timestamp,
+            "username": username,
+            "content": content
+        })
+
+        self._update("chat_logs", self.chat_logs)
+        return self.get_state(timestamp)
+
     def _get_battle_info(self):
         return {
             "battle_name": self.battle_name,

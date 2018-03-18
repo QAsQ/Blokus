@@ -214,6 +214,32 @@ def battle(battle_id):
         )
         return jsonify(battle.get_state(current_time(), request_json['player_id']))
 
+@app.route("/api/battles/<int:battle_id>/chat_logs", methods=['POST'])
+def chat_logs(battle_id):
+    if current_user.user_id == -1:
+        return failure("need login first!")
+
+    print("wtf")
+    request_json = request.get_json(force=True)
+    print("wtf")
+    check_res = field_checker(request_json, ['content'])
+    if check_res is not None:
+        return failure(check_res)
+
+    battle = BattleFactory.load_battle(battle_id, db)
+    if isinstance(battle, str):
+        return failure(battle)
+
+    result = battle.appent_chat_log(
+        current_time(),
+        current_user.username,
+        request_json['content']
+    )
+    if isinstance(result, str):
+        return failure(result)
+    
+    return success(result)
+
 @app.route("/api/battles/<int:battle_id>/players/<int:player_id>", methods=['POST', 'DELETE'])
 def players(battle_id, player_id):
     if current_user.user_id == -1:

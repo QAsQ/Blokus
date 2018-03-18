@@ -338,19 +338,73 @@ Vue.component("playerinfo-table",{
     </div>`
 });
 
+Vue.component("chat-item", {
+    props: ['chat_log'],
+    template: `
+        <div class="comment">
+            <div class="content">
+                <div class="inline author">{{chat_log.username}}
+                    <div class="metadata">
+                        <span class="date">{{time_format}}</span>
+                    </div>
+                </div>
+                <div class="text">{{chat_log.content}}</div>
+            </div>
+        </div>`,
+    computed: {
+        time_format: function(){
+            var date = new Date(this.chat_log.timestamp * 1000)
+            return date.getHours() + ":" + date.getMinutes()
+        }
+    }
+})
+
 Vue.component("chat-box", {
     props: ['chat_logs'],
     template: `
         <div class="ui segment">
             <div class="ui horizontal chat-box">
-                <p v-for="chat_log in chat_logs"> {{chat_log}}</p>
+                <div class="ui comments">
+                    <chat-item v-for="(chat_log, index) in chat_logs" :chat_log="chat_log" :key="index"></chat-item>
+                </div>
             </div>
             <div class="ui divider"></div>
-            <div class="ui fluid action input">
-                <input type="text">
-                <button class="ui teal button">发送</button>
+            <div class="ui fluid icon input">
+                <input type="text" id='input_box' @keydown.enter="send_message">
+                <i class="inverted circular send link teal icon" @click="send_message"></i>
             </div>
-        </div>`
+        </div>`,
+    updated: function(){
+        $('.chat-box').scrollTop(
+            $('.chat-box')[0].scrollHeight
+        );
+    },
+    methods: {
+        send_message: function(){
+            var content = $("#input_box").val()
+            console.log(content)
+            if (content == "")
+                return
+            $.ajax({
+                type: "POST",
+                url: "/api/battles/13/chat_logs",
+                data: JSON.stringify({"content": content}),
+                contentType: 'application/json; charset=UTF-8',
+                success: function(data){
+                    if (data.message == "success"){
+                        battle_inferface.battle_data = data.result
+                        $("#input_box").val("")
+                    }
+                    else{
+                        show_message(data.message)
+                    }
+                },
+                error: function(data){
+                    show_message("请求失败，请检查网络连接")
+                }
+            })
+        }
+    }
 });
 
 Vue.component("control-panel", {
@@ -456,11 +510,6 @@ Vue.component("battle-interface", {
         </div>`,
     mounted: function(){
         this.board = generateBoard($("#board")[0], this.player_id, this.board_data, ColorThemeFactory("default"));
-    },
-    updated: function(){
-        $('.chat-box').scrollTop(
-            $('.chat-box')[0].scrollHeight
-        );
     },
     watch: {
         'battle_data.board_info': function(){
@@ -687,7 +736,6 @@ Vue.component("battle-creater", {
             <div class="ui column">
                 <img class="ui middle image" src="static/common/images/standard.png">
             </div>
-            {{parameter}}
         </div>`,
     data: function(){
         return {
