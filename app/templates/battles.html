@@ -41,27 +41,15 @@
             battle_condition = new Vue({
                 el: "#battle_condition",
                 data:{
-                    condition: {
-                        "sort" : [],
-                        "query" : {
-                            "username": "",
-                            "battle_state": [],
-                            "battle_name": "",
-                            "board_type": "" 
-                        }
-                    }
+                    condition: user_item.user.user_info.perference.condition
                 }
             })
             load_battles()
 
-            var timer_scheme_selector = new Vue({
-                el: "#timer_scheme_selector",
+            var battle_creater = new Vue({
+                el: "#battle_creater",
                 data: {
-                    timer:{
-                        accuracy_time: 50,
-                        additional_time: 5,
-                        identity: "custom"
-                    },
+                    parameter: user_item.user.user_info.perference.create,
                     timer_scheme: [
                         {
                             identity: "standard",
@@ -79,72 +67,10 @@
                 }
             })
 
-            $('#timer_type_selector').dropdown()
             $('.ui.sticky').sticky({
                 offset: 50,
                 context: '#battle_list'}
             );
-            $("#create_form").form({
-                fields: {
-                    battle_name: {
-                        identifier: 'battle_name',
-                        rules: [
-                            {type: 'empty', prompt: '对局名称不能为空'},
-                            {type: 'maxLength[20]', prompt: '对局名称长度要短于20'}
-                        ]
-                    },
-                    accuracy_time: {
-                        identifier: 'accuracy_time',
-                        rules: [
-                            {type: 'empty', prompt: '计时不能为空'},
-                            {type: 'integer[0..]', prompt : '计时必须为正整数'}
-                        ]
-                    },
-                    additional_time: {
-                        identifier: 'additional_time',
-                        rules: [
-                            {type: 'empty', prompt: '额外用时不能为空'},
-                            {type: 'integer[0..]', prompt : '额外用时必须为正整数'}
-                        ]
-                    }  
-                },
-                onSuccess: function(){
-                    form = $("#create_form")
-                    form.addClass("loading")
-
-                    data = form.form("get values")
-                    data.accuracy_time = parseInt(data.accuracy_time)
-                    data.additional_time = parseInt(data.additional_time)
-                    $.ajax({
-                        type: "POST",
-                        url:  "/api/battles", 
-                        data: JSON.stringify(data),
-                        contentType: 'application/json; charset=UTF-8',
-                        async: false,
-                        success: function(data){
-                            form.removeClass("loading")
-                            if (data.message == "success"){
-                                form.removeClass("loading")
-                                $("#create_modal").modal("hide");
-                                window.open("/battle?battle_id=" + data.result.id);
-                            }
-                            else{
-                                form
-                                    .removeClass("success")
-                                    .addClass("error")
-                                $("#create_message").text(data.message)
-                            }
-                        },
-                        error: function(data){
-                            form
-                                .removeClass("loading")
-                                .removeClass("success")
-                                .addClass("error")
-                            $("#create_message").text("请求失败")
-                        }
-                    })
-                }
-            })
             $(".ui.checkbox").checkbox()
         }
     );
@@ -186,45 +112,11 @@
         创建对局
     </div>
     <div class="content">
-        <div class="ui two column grid">
-            <div class="ui six width column">
-                <form class="ui form" id='create_form'>
-                    <div class="two fields">
-                        <div class="field">
-                            <div class="ui vertical segment">
-                                <label>对局名称</label>
-                                <input type="text" name="battle_name" placeholder="名称长度小于20">
-                            </div>
-                        </div>
-                        <div class="field">
-                            <div class="ui vertical segment">
-                                <label>对局类型</label>
-                                <div class="ui basic selection dropdown">
-                                    <input type="hidden" name="board_type">
-                                    <div class="default text"></div>
-                                    <i class="dropdown icon"></i>
-                                    <div class="menu">
-                                        <div class="item" data-value="square_standard">四人</div>
-                                        <div class="disabled item" data-value="square_twin">双人</div>
-                                        <div class="disabled item" data-value="square_trio">三人</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ui divider"></div>
-                    <timer-scheme-selector
-                        id="timer_scheme_selector" 
-                        :timer_scheme="timer_scheme"
-                        :timer="timer">
-                    </timer-scheme-selector>
-                    <div class="ui error message"></div>
-                </form>
-            </div>
-            <div class="ui column">
-                <img class="ui middle image" src="static/common/images/standard.png">
-            </div>
-        </div>
+        <battle-creater 
+            id='battle_creater'
+            :parameter='parameter'
+            :timer_scheme='timer_scheme'>
+        </battle-creater>
     </div>
 
     <div class="actions">

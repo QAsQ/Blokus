@@ -10,11 +10,16 @@ default_info = {
     "rate_of_victory": 0,
     "rating": 1500,
     "perference":{
-        "query_preference": {
-            "condition": {},
-            "sort": []
+        "condition": {
+            "sort" : [],
+            "query" : {
+                "username": "",
+                "battle_state": [],
+                "battle_name": "",
+                "board_type": "" 
+            }
         },
-        "create_perference": {
+        "create": {
             'battle_name': "Blokus_GO!",
             'accuracy_time': 180, 
             'additional_time': 5, 
@@ -65,9 +70,17 @@ class User(UserMixin):
         self.confirmed = True
         self.db.update({"user_id": self.user_id}, {"confirmed": True})
     
-    def update_perference(self, field, res):
-        #TODO
-        pass
+    def update_perference(self, field, preference):
+        if self.user_id != -1:
+            self.user_info["perference"][field] = preference
+            self.db.update(
+                {"user_id": self.user_id}, 
+                {
+                    "$set": {
+                        "user_info.perference": self.user_info["perference"]
+                    }
+                }
+            )
 
     def check_password(self, password):
         if self.password is None:

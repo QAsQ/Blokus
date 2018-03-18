@@ -17,7 +17,6 @@ class Battle:
 
         self.started = battle_info.get("started", False)
         self.ended = battle_info.get("ended", False)
-        self.left_position = battle_info.get("leftposition", 4)
         self.start_time = battle_info.get("start_time", -1)
         self.current_player = battle_info.get("current_player", -1)
         self.current_time = battle_info.get("current_time", -1)
@@ -40,7 +39,7 @@ class Battle:
 
     def try_join_player(self, timestamp, player_id, user_id, user_data):
         if self.players_info[player_id]["user_id"] != -1:
-            return "user already in"
+            return "this position was occupied"
 
         self.players_info[player_id] = {
             "user_id": user_id,
@@ -60,7 +59,6 @@ class Battle:
             self.initiation_time = timestamp
             self.current_player = 0
 
-        self.left_position -= 1
         self._update("battle_info", self._get_battle_info())
 
         return self.get_state(timestamp)
@@ -71,7 +69,6 @@ class Battle:
 
         if not self.started:
             self.players_info[player_id] = self.default_player_info
-            self.left_position += 1
             self._update("battle_info", self._get_battle_info())
         else:
             self.players_info[player_id]['is_hosting'] = True
@@ -146,10 +143,16 @@ class Battle:
             "create_time": self.create_time,
             "start_time": self.start_time,
             "initiation_time": self.initiation_time,
-            "left_position": self.left_position,
+            "left_position": self._get_left_position(),
             "current_player": self.current_player,
             "current_time": self.current_time
         }
+
+    def _get_left_position(self):
+        left_position = 0
+        for player_info in self.players_info:
+            left_position += player_info['user_id'] == -1
+        return left_position
 
     def _update(self, key, value):
         self.db.update(

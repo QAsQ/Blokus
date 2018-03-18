@@ -143,17 +143,22 @@ def battles():
             print("wtf")
             return failure("user not exist")
         
-        query = filter_condition_generate(query)
+        mongo_query = filter_condition_generate(query)
         if isinstance(query, str):
             return failure(query)
 
-        sort = sort_condition_generate(sort)
+        mongo_sort = sort_condition_generate(sort)
         if isinstance(sort, str):
             return failure(sort)
         
+        current_user.update_perference(
+            "condition", 
+            {"query": query, "sort": sort}
+        )
+        
         return success(id_clear(db.battles.find(
-            filter=query,
-            sort=sort)))
+            filter=mongo_query,
+            sort=mongo_sort)))
 
     elif request.method == 'POST':
         if current_user.user_id == -1:
@@ -177,6 +182,9 @@ def battles():
 
         if isinstance(battle, str):
             return failure(battle) 
+
+        current_user.update_perference("create", request_json)
+
         return success({"id": battle.id})
 
 @app.route("/api/battles/<int:battle_id>", methods=['GET', 'POST'])

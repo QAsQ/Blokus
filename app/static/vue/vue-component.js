@@ -489,90 +489,6 @@ Vue.component("battle-interface", {
     }
 });
 
-Vue.component("timer-scheme-selector", {
-    props: ['timer_scheme', 'timer'],
-    template: `
-        <div class="ui vertical segment">
-            <div class="field" name="timing_plan">
-                <label>计时类型</label>
-                <select v-model="timer.identity" class="ui basic inline dropdown" id="timer_type_selector">
-                    <option v-for="scheme in timer_scheme" 
-                        :value="scheme.identity">
-                        {{scheme.name}}
-                    </option>
-                    <option value="custom">自定义</option>
-                </select>
-            </div>
-            <div class="two fields">
-                <div class="field">
-                    <label>计时</label>
-                    <div class="ui right labeled input">
-                        <input v-model.number="timer.accuracy_time" type="text" name="accuracy_time">
-                        <a class="ui basic label">秒</a>
-                    </div>
-                </div>
-                <div class="field">
-                    <label>额外</label>
-                    <div class="ui right labeled input">
-                        <input v-model.number="timer.additional_time" type="text" name="additional_time">
-                        <a class="ui basic label">秒/步</a>
-                    </div>
-                </div>
-            </div>
-            <h4>预计游戏时间: {{expect_time}}</h4>
-        </div> `,
-    mounted: function(){
-        this.update_timer_identity()
-    },
-    methods: {
-        update_timer_identity: function(){
-            for (var id = 0; id < this.timer_scheme.length; id++){
-                if(this.timer_scheme[id].additional_time === this.timer.additional_time
-                    && this.timer_scheme[id].accuracy_time === this.timer.accuracy_time){
-                    this.timer.identity = this.timer_scheme[id].identity
-                    $('#timer_type_selector').dropdown("set selected", this.timer_scheme[id].identity)
-                    return
-                }
-            }
-            this.timer.identity = "custom"
-            $('#timer_type_selector').dropdown("set selected", 'custom')
-        }
-    },
-    watch: {
-        "timer.identity": function(){
-            if(this.timer.identity === "custom")
-                return true
-            for (var id = 0; id < this.timer_scheme.length; id++){
-                if(this.timer_scheme[id].identity == this.timer.identity){
-                    this.timer.accuracy_time = this.timer_scheme[id].accuracy_time
-                    this.timer.additional_time = this.timer_scheme[id].additional_time
-                    return true
-                }
-            }
-            console.log("ERROR! unknow identity " + this.timer.identity)
-        },
-        "timer.accuracy_time": function(){
-            this.update_timer_identity()
-        },
-        "timer.additional_time": function(){
-            this.update_timer_identity()
-        }
-    },
-    computed: {
-        expect_time: function(){
-            second = (this.timer.accuracy_time + this.timer.additional_time * 21) * 4
-            var minute = Math.floor( second / 60 )
-            if (minute < 60)
-                return minute + "分钟"
-            var hour = Math.floor(second / 60)
-            if (hour < 24)
-                return hour + "小时"
-            var day = Math.floor(hour / 24)
-            return day + "天"
-        }
-    }
-});
-
 Vue.component("battle-condition", {
     props: ['condition'],
     template: `
@@ -640,18 +556,6 @@ Vue.component("battle-condition", {
         <h1><i class="sort icon"></i>排序</h1>
         <select id="sort_condition" class="ui fluid dropdown multiple" v-model="condition.sort">
             <option value="">默认顺序</option>
-            <option value="a:left_position">
-                <i class="vertically flipped sort amount up icon"></i>
-                剩余位置
-            </option>
-            <option value="a:initiation_time">
-                <i class="vertically flipped sort amount up icon"></i>
-                起始时间
-            </option>
-            <option value="a:board_progress">
-                <i class="vertically flipped sort amount up icon"></i>
-                对局进程
-            </option>
             <option value="d:left_position">
                 <i class="sort amount down icon"></i>
                 剩余位置
@@ -664,6 +568,18 @@ Vue.component("battle-condition", {
                 <i class="sort amount down icon"></i>
                 对局进程
             </option>
+            <option value="a:left_position">
+                <i class="vertically flipped sort amount up icon"></i>
+                剩余位置
+            </option>
+            <option value="a:initiation_time">
+                <i class="vertically flipped sort amount up icon"></i>
+                起始时间
+            </option>
+            <option value="a:board_progress">
+                <i class="vertically flipped sort amount up icon"></i>
+                对局进程
+            </option>
         </select>
         </div>
         <div class="ui divider"></div>
@@ -672,7 +588,8 @@ Vue.component("battle-condition", {
         </div>
     </form>`,
     mounted: function(){
-        $("#sort_condition").dropdown("set selected",this.condition.sort)
+        if (this.condition.sort !== [])
+            $("#sort_condition").dropdown("set selected",this.condition.sort)
         $('#board_type').dropdown();
     },
     methods: {
@@ -698,7 +615,6 @@ Vue.component("battle-condition", {
                 $("#username_condition").removeClass("error")
                 var res = load_battles()
                 if (res === "user not exist"){
-                    console.log("QAQ")
                     $("#username_condition").addClass("error")
                 }
                 else if (res !== "success"){
@@ -709,3 +625,186 @@ Vue.component("battle-condition", {
         }
     }
 });
+
+Vue.component("battle-creater", {
+    props: ["parameter", "timer_scheme"],
+    template:`
+        <div class="ui two column grid">
+            <div class="ui six width column">
+                <form class="ui form" id='create_form'>
+                    <div class="two fluid fields">
+                        <div class="field">
+                            <label>对局名称</label>
+                            <input v-model="parameter.battle_name" type="text" name="battle_name" placeholder="名称长度小于20">
+                        </div>
+                        <div class="field">
+                            <label>对局类型</label>
+                            <select 
+                                name="board_type"
+                                class="ui fluid selection dropdown" 
+                                v-model="parameter.board_type" 
+                                id="board_type_selector">
+
+                                <option value="">对局类型</option>
+                                <option class="item" value="square_standard">标准(四人)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="ui divider"></div>
+                        <div class="ui vertical segment">
+                            <div class="field" name="timing_plan">
+                                <label>计时类型</label>
+                                <select v-model="timer_identity" class="ui basic inline dropdown" id="timer_type_selector">
+                                    <option v-for="scheme in timer_scheme" 
+                                        :value="scheme.identity">
+                                        {{scheme.name}}
+                                    </option>
+                                    <option value="custom">自定义</option>
+                                </select>
+                            </div>
+                            <div class="two fields">
+                                <div class="field">
+                                    <label>计时</label>
+                                    <div class="ui right labeled input">
+                                        <input v-model.number="parameter.accuracy_time" type="text" name="accuracy_time">
+                                        <a class="ui basic label">秒</a>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label>额外</label>
+                                    <div class="ui right labeled input">
+                                        <input v-model.number="parameter.additional_time" type="text" name="additional_time">
+                                        <a class="ui basic label">秒/步</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <h4>预计游戏时间: {{expect_time}}</h4>
+                        </div> 
+                    </timer-scheme-selector>
+                    <div class="ui error message"></div>
+                </form>
+            </div>
+            <div class="ui column">
+                <img class="ui middle image" src="static/common/images/standard.png">
+            </div>
+            {{parameter}}
+        </div>`,
+    data: function(){
+        return {
+            timer_identity: 'custom',
+        }
+    },
+    mounted: function(){
+        this.update_timer_identity()
+        $('#timer_type_selector').dropdown()
+        $('#board_type_selector').dropdown()
+        $("#create_form").form({
+            fields: {
+                battle_name: {
+                    identifier: 'battle_name',
+                    rules: [
+                        {type: 'empty', prompt: '对局名称不能为空'},
+                        {type: 'maxLength[20]', prompt: '对局名称长度要短于20'}
+                    ]
+                },
+                accuracy_time: {
+                    identifier: 'accuracy_time',
+                    rules: [
+                        {type: 'empty', prompt: '计时不能为空'},
+                        {type: 'integer[0..]', prompt : '计时必须为正整数'}
+                    ]
+                },
+                additional_time: {
+                    identifier: 'additional_time',
+                    rules: [
+                        {type: 'empty', prompt: '额外用时不能为空'},
+                        {type: 'integer[0..]', prompt : '额外用时必须为正整数'}
+                    ]
+                }  
+            },
+            onSuccess: function(){
+                form = $("#create_form")
+                form.addClass("loading")
+
+                data = form.form("get values")
+                data.accuracy_time = parseInt(data.accuracy_time)
+                data.additional_time = parseInt(data.additional_time)
+                $.ajax({
+                    type: "POST",
+                    url:  "/api/battles", 
+                    data: JSON.stringify(data),
+                    contentType: 'application/json; charset=UTF-8',
+                    async: false,
+                    success: function(data){
+                        form.removeClass("loading")
+                        if (data.message == "success"){
+                            form.removeClass("loading")
+                            $("#create_modal").modal("hide");
+                            window.open("/battle?battle_id=" + data.result.id);
+                        }
+                        else{
+                            form
+                                .removeClass("success")
+                                .addClass("error")
+                            $("#create_message").text(data.message)
+                        }
+                    },
+                    error: function(data){
+                        form
+                            .removeClass("loading")
+                            .removeClass("success")
+                            .addClass("error")
+                        $("#create_message").text("请求失败")
+                    }
+                })
+            }
+        })
+    },
+    methods: {
+        update_timer_identity: function(){
+            for (var id = 0; id < this.timer_scheme.length; id++){
+                if(this.timer_scheme[id].additional_time === this.parameter.additional_time
+                    && this.timer_scheme[id].accuracy_time === this.parameter.accuracy_time){
+                    this.timer_identity = this.timer_scheme[id].identity
+                    $('#timer_type_selector').dropdown("set selected", this.timer_scheme[id].identity)
+                    return
+                }
+            }
+            this.timer_identity = "custom"
+            $('#timer_type_selector').dropdown("set selected", 'custom')
+        }
+    },
+    watch: {
+        "timer_identity": function(){
+            if(this.timer_identity === "custom")
+                return true
+            for (var id = 0; id < this.timer_scheme.length; id++){
+                if(this.timer_scheme[id].identity == this.timer_identity){
+                    this.parameter.accuracy_time = this.timer_scheme[id].accuracy_time
+                    this.parameter.additional_time = this.timer_scheme[id].additional_time
+                    return true
+                }
+            }
+            console.log("ERROR! unknow identity " + this.timer_identity)
+        },
+        "parameter.accuracy_time": function(){
+            this.update_timer_identity()
+        },
+        "parameter.additional_time": function(){
+            this.update_timer_identity()
+        }
+    },
+    computed: {
+        expect_time: function(){
+            second = (this.parameter.accuracy_time + this.parameter.additional_time * 21) * 4
+            var minute = Math.floor( second / 60 )
+            if (minute < 60)
+                return minute + "分钟"
+            var hour = Math.floor(second / 60)
+            if (hour < 24)
+                return hour + "小时"
+            var day = Math.floor(hour / 24)
+            return day + "天"
+        }
+    }
+})
