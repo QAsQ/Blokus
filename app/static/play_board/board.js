@@ -373,6 +373,124 @@ function PieceFactory(pieceId,
     return pieces;
 }
 
+//TODO
+/*
+function CheckerFactory(piece_shape_set, player_id){
+    //not start
+    return {
+        board: [][],
+        possible: [round][pieceid][state][x][y],
+        piece_shape_set: piece_shape_set,
+        load_state: function(state){
+
+        },
+        check_state: function(piece_id){
+
+        }
+    }
+}
+*/
+
+function HighlightLayerFactory(colorTheme, piecesCellList){
+    
+    var highlightLayer = new PIXI.Container();
+    function highlightCellGenerate(color, player_id){
+        var graphics = new PIXI.Graphics();
+
+        var player_shape = [
+            [
+                        [0, 1], [0, 2],
+                [1, 0], [1, 1],        
+                [2, 0],         [2, 2]
+            ],
+            [
+                [0, 0], [0, 1],        
+                        [1, 1], [1, 2],
+                [2, 0],         [2, 2]
+            ],
+            [
+                [0, 0],         [0, 2],
+                        [1, 1], [1, 2],
+                [2, 0], [2, 1]
+            ],
+            [
+                [0, 0],         [0, 2],
+                [1, 0], [1, 1],        
+                        [2, 1], [2, 2]
+            ]
+        ]
+
+        graphics.beginFill(color, 1);
+        lCellSize = (gCellSize - colorTheme.piece.dividing_line_width) / 3 - 1
+        player_shape[player_id].forEach(function(shape){
+            graphics.drawRect(
+                shape[0] * lCellSize + colorTheme.piece.dividing_line_width, 
+                shape[1] * lCellSize + colorTheme.piece.dividing_line_width, 
+                lCellSize, lCellSize);
+        })
+
+        graphics.lineColor = colorTheme.piece.dividing_line;
+        graphics.lineWidth = colorTheme.piece.dividing_line_width;
+        last = [0, 0]
+        lis = [[1, 0], [1, 1], [0, 1], [0, 0]]
+        lis.forEach(function (bias){
+            graphics.moveTo(bias[0] * gCellSize, bias[1] * gCellSize);
+            graphics.lineTo(last[0] * gCellSize, last[1] * gCellSize);
+            last = bias
+        })
+
+        var highlightCell = new PIXI.Sprite(graphics.generateTexture());
+        highlightCell.visible = false
+        return highlightCell
+    }
+
+    var max_size = 0
+    piecesCellList.forEach(function(cellLists){
+        cellLists.forEach(function(cellList){
+            max_size = Math.max(max_size, cellList.length)
+        })
+    })
+    highlightLayer.highlightCells = []
+    for (var player_id = 0; player_id < 4; player_id++)
+    {
+        cells = []
+        for (var i = 0; i < max_size; i ++){
+            var highlightCell = highlightCellGenerate(
+                colorTheme.piece.last_drop[player_id], 
+                player_id
+            )
+            cells.push(highlightCell)
+            highlightLayer.addChild(highlightCell)
+        }
+        highlightLayer.highlightCells.push(cells)
+    }
+
+    highlightLayer.updateHighlight = function(history){
+        this.highlightCells.forEach(function(highlightCell){
+            highlightCell.forEach(function(cell){
+                cell.visible = false
+            })
+        })
+        last_drop = [-1, -1, -1, -1]
+        history.forEach(function(drop){
+            last_drop[drop.player_id] = drop
+        })
+        for (var player_id = 0; player_id < 4; player_id ++){
+            if (last_drop[player_id] === -1)
+                continue
+            var drop = last_drop[player_id]
+            shape = piecesCellList[drop.piece_id][drop.position.state]
+            for (var index = 0; index < shape.length; index++){
+                var cells = highlightLayer.highlightCells[player_id];
+                cells[index].x = (shape[index][0] + drop.position.x) * gCellSize
+                cells[index].y = (shape[index][1] + drop.position.y) * gCellSize
+                cells[index].visible = true
+            }
+        }
+    }
+    return highlightLayer;
+}
+
 function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) {
     var placedGroup = new PIXI.display.Group(-2, false); 
     var boardGroup = new PIXI.display.Group(-1, false);
@@ -474,6 +592,10 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
     board.pieceLists = pieceLists;
     //Create piece Done
 
+    board.highlightLayer = HighlightLayerFactory(colorTheme,  piecesCellList)
+    board.highlightLayer.parentGroup = highlightGrop
+    board.addChild(board.highlightLayer)
+
     board.loadState = function(state) {
         //update progressBar
         for (var playerId = 0; playerId < 4; playerId ++) {
@@ -487,7 +609,6 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
             currentProgressBar.setActivate(!state.battle_info.ended && playerId === state.battle_info.current_player);
         }
         
-        //TODO state.playerState;
         var _pieceLists = this.pieceLists;
         for (var playerId = 0; playerId < 4; playerId ++){
             for (var pieceId = 0; pieceId < 21; pieceId ++){
@@ -505,6 +626,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
 
             currentPiece.parentGroup = placedGroup;
         });
+        board.highlightLayer.updateHighlight(state.board_info.history)
     };
     board.update_player = function(playerId){
         mPlayerId = playerId

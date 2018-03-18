@@ -531,6 +531,7 @@ Vue.component("battle-interface", {
         </div>`,
     mounted: function(){
         this.board = generateBoard($("#board")[0], this.player_id, this.board_data, ColorThemeFactory("default"));
+        this.board.loadState(this.battle_data)
     },
     watch: {
         'battle_data.board_info': function(){

@@ -50,7 +50,8 @@ function ColorThemeFactory(type) {
                 initial_alpha: 0.7,
                 onselect_alpha: 0.9,
                 dropped_alpha: 1,
-                shadow: trans_color("#6f645e"),
+                //shadow: trans_color("#6f645e"),
+                shadow: trans_color("#ffffff"),
                 //shadow: {
                 //    legal: trans_color("#6f645e"),
                 //    unlegal: trans_color("#e1d9c4")
@@ -59,7 +60,7 @@ function ColorThemeFactory(type) {
                 dividing_line: trans_color("#ffffff"),
                 dividing_line_width: 3,
                 cell: [trans_color("#f2542d"), trans_color("#80ba04"), trans_color("#1da6f0"), trans_color("#feb923")],
-                last_drop: [trans_color("#cf1b24"), trans_color("#239546"), trans_color("#0091cf"), trans_color("#ebb60d")]
+                last_drop: [trans_color("#cf1b24"), trans_color("#239546"), trans_color("#006BA3"), trans_color("#D69723")]
             }
         }
     }
