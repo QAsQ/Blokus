@@ -363,7 +363,7 @@ Vue.component("chat-box", {
     props: ['chat_logs'],
     template: `
         <div class="ui segment">
-            <div class="ui horizontal chat-box">
+            <div class="ui horizontal chat-box" id="chat_box" @scroll="update_buttom">
                 <div class="ui comments">
                     <chat-item v-for="(chat_log, index) in chat_logs" :chat_log="chat_log" :key="index"></chat-item>
                 </div>
@@ -374,13 +374,28 @@ Vue.component("chat-box", {
                 <i class="inverted circular send link teal icon" @click="send_message"></i>
             </div>
         </div>`,
+    data: function(){
+        return {
+            "buttom": true
+        }
+    },
+    mounted: function(){
+        this.roll_to_bottom()
+    },
     updated: function(){
-        $('.chat-box').scrollTop(
-            $('.chat-box')[0].scrollHeight
-        );
+        var chat_box = $("#chat_box")
+        if(this.buttom)
+            this.roll_to_bottom()
     },
     methods: {
+        update_buttom: function(){
+            var chat_box = $("#chat_box")
+            this.buttom = chat_box[0].scrollTop + chat_box.height() >= chat_box[0].scrollHeight
+        },
         send_message: function(){
+            self = this
+            if (!check_login())
+                return
             var content = $("#input_box").val()
             if (content == "")
                 return
@@ -395,6 +410,7 @@ Vue.component("chat-box", {
                     if (data.message == "success"){
                         battle_inferface.battle_data = data.result
                         $("#input_box").val("")
+                        self.roll_to_bottom()
                     }
                     else{
                         show_message(data.message)
@@ -404,6 +420,10 @@ Vue.component("chat-box", {
                     show_message("请求失败，请检查网络连接")
                 }
             })
+        },
+        roll_to_bottom: function(){
+            this.bottom = true
+            $('#chat_box').scrollTop($('#chat_box')[0].scrollHeight)
         }
     }
 });
