@@ -382,12 +382,13 @@ Vue.component("chat-box", {
     methods: {
         send_message: function(){
             var content = $("#input_box").val()
-            console.log(content)
             if (content == "")
                 return
+            var battle_id = battle_inferface.battle_data.battle_id
+            var url = "/api/battles/" + battle_id + "/chat_logs"
             $.ajax({
                 type: "POST",
-                url: "/api/battles/13/chat_logs",
+                url: url,
                 data: JSON.stringify({"content": content}),
                 contentType: 'application/json; charset=UTF-8',
                 success: function(data){

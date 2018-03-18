@@ -219,9 +219,7 @@ def chat_logs(battle_id):
     if current_user.user_id == -1:
         return failure("need login first!")
 
-    print("wtf")
     request_json = request.get_json(force=True)
-    print("wtf")
     check_res = field_checker(request_json, ['content'])
     if check_res is not None:
         return failure(check_res)
