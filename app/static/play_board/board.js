@@ -142,27 +142,26 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme){
 	var progressBarText = new PIXI.Text(
 		"",
 		new PIXI.TextStyle({
-            fontSize: 1
+            fontSize: 19
         })
 	);  
 	progressBarText.updText= function(text){
-		//Todo,not such right, need fix
 		progressBarText.setText(text);
-		progressBarText.rotation = angle
-		if (Math.PI * 0.5 < angle && angle < Math.PI * 1.5)
-		{
-			var unitX = (endPoint.x - startPoint.x) / length;
-			var unitY = (endPoint.y - startPoint.y) / length;
-			progressBarText.scale.x = -1;
-			progressBarText.scale.y = -1;
-			progressBarText.x = startPoint.x + unitX * progressBarText.width;
-			progressBarText.y = startPoint.y + unitY * progressBarText.width;
-		}
-		else
-		{
-			progressBarText.x = startPoint.x;  
-			progressBarText.y = startPoint.y;  
-		}
+        progressBarText.rotation = angle
+
+        var unitX = (endPoint.x - startPoint.x) / length;
+        var unitY = (endPoint.y - startPoint.y) / length;
+        if (angle < Math.PI * 0.5)
+        {
+            progressBarText.x = startPoint.x + unitY * progressBarText.height;
+            progressBarText.y = startPoint.y - unitX * progressBarText.height;
+        }
+        else{
+            progressBarText.x = startPoint.x + unitX * progressBarText.width;
+            progressBarText.y = startPoint.y + unitY * progressBarText.width;
+            progressBarText.scale.x = -1
+            progressBarText.scale.y = -1
+        }
 	}
 	progressBarText.updText('NaN/NaN');
 	progressBarContainer.addChild(progressBarText);
@@ -357,11 +356,13 @@ function PieceFactory(pieceId,
 }
 
 function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) {
-    var placedGroup = new PIXI.display.Group(-1, false); 
-    var boardGroup = new PIXI.display.Group(0, false);
-    var pieceGroup = new PIXI.display.Group(1, false);
-    var draggedGroup = new PIXI.display.Group(2, false);
-    [placedGroup, boardGroup, pieceGroup, draggedGroup].forEach(function(value, index, array){
+    var placedGroup = new PIXI.display.Group(-2, false); 
+    var boardGroup = new PIXI.display.Group(-1, false);
+    var highlightGrop = new PIXI.display.Group(0, false);
+    var shadowGroup = new PIXI.display.Group(1, false);
+    var pieceGroup = new PIXI.display.Group(2, false);
+    var draggedGroup = new PIXI.display.Group(3, false);
+    [placedGroup, boardGroup, highlightGrop, shadowGroup, pieceGroup, draggedGroup].forEach(function(value, index, array){
         app.stage.addChild(new PIXI.display.Layer(value));
     });
 
@@ -462,7 +463,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
                 state.battle_info.accuracy_time,
                 state.battle_info.additional_time
             )
-            currentProgressBar.setActivate(playerId === state.battle_info.current_player);
+            currentProgressBar.setActivate(!state.battle_info.ended && playerId === state.battle_info.current_player);
         }
         
         //TODO state.playerState;
