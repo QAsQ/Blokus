@@ -50,10 +50,11 @@ function ColorThemeFactory(type) {
                 initial_alpha: 0.7,
                 onselect_alpha: 0.9,
                 dropped_alpha: 1,
-                shadow: {
-                    legal: trans_color("#6f645e"),
-                    unlegal: trans_color("#e1d9c4")
-                },
+                shadow: trans_color("#6f645e"),
+                //shadow: {
+                //    legal: trans_color("#6f645e"),
+                //    unlegal: trans_color("#e1d9c4")
+                //},
                 spectator: trans_color("#b7b7b7"),
                 dividing_line: trans_color("#ffffff"),
                 dividing_line_width: 3,

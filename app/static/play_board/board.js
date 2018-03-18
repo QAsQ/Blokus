@@ -142,7 +142,7 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme){
 	var progressBarText = new PIXI.Text(
 		"",
 		new PIXI.TextStyle({
-            fontSize: 19
+            fontSize: 20
         })
 	);  
 	progressBarText.updText= function(text){
@@ -227,7 +227,7 @@ function PieceFactory(pieceId,
         this.anchorPoint = this.data.getLocalPosition(this);
         this.alpha = colorTheme.piece.onselect_alpha;
         this.dragging = true;
-        DragStartCallBack(pieceId, this.State());
+        DragStartCallBack(this, this.State());
     }
 
     function onDragMove() {
@@ -240,7 +240,7 @@ function PieceFactory(pieceId,
             this.x = Math.min(this.x, gWidth - offset.x - this.width)
             this.y = Math.min(this.y, gHeight - offset.y - this.height)
 
-            DragMoveCallBack(pieceId, this.State());
+            DragMoveCallBack(this, this.State());
         }
     }
 
@@ -249,10 +249,7 @@ function PieceFactory(pieceId,
         this.dragging = false;
         this.data = null;
         if (true)
-            DragEndCallBack(
-                pieceId, 
-                this.State()
-            );
+            DragEndCallBack(this, this.State());
     }
 
     function CellList_2_Polygon(cell_list, offset){
@@ -273,11 +270,12 @@ function PieceFactory(pieceId,
     }
 
     var pieces = new PIXI.Container();
+    pieces.piece_id = pieceId
     pieces.piece = []
 
-    shape.forEach(function(cellList, state){
+    function generateTexture(cellList, color){
         var graphics = new PIXI.Graphics();
-        graphics.beginFill(colorTheme.piece.cell[player_id], 1);
+        graphics.beginFill(color, 1);
 
         var polygon = CellList_2_Polygon(cellList, new PIXI.Point());
         graphics.drawPolygon(polygon);
@@ -293,12 +291,18 @@ function PieceFactory(pieceId,
                 last = bias
             })
         });
+        return graphics.generateTexture()
+    }
 
-        var piece = new PIXI.Sprite(graphics.generateTexture());
-        //piece.hitArea = polygon;
-        piece.shape = polygon;
+    shape.forEach(function(cellList, state){
+
+        var piece = new PIXI.Sprite(generateTexture(cellList, colorTheme.piece.cell[player_id]));
         piece.cellList = cellList;
         piece.visible = false;
+
+        piece.shadow = new PIXI.Sprite(generateTexture(cellList, colorTheme.piece.shadow))
+        piece.shadow.visible = false
+        piece.addChild(piece.shadow);
 
         pieces.piece.push(piece);
         pieces.addChild(piece);
@@ -328,6 +332,20 @@ function PieceFactory(pieceId,
             x: Math.floor(this.x / gCellSize + 0.5),
             y: Math.floor(this.y / gCellSize + 0.5),
         };
+    }
+
+    pieces.activeShadow = function(shadowGroup, x, y){
+        var piece = this.piece[this.state]
+        piece.shadow.parentGroup = shadowGroup;
+        piece.shadow.visible = true
+        piece.shadow.x = x
+        piece.shadow.y = y
+    }
+
+    pieces.deactiveShadow = function(){
+        this.piece.forEach(function (piece){
+            piece.shadow.visible = false
+        })
     }
 
     pieces.SetOwnership= function(rights){
@@ -388,24 +406,27 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
     board.y = 4  * gCellSize;
 
     current_piece_id = -1
-    function DragStartCallBack (id, position) {
-        current_piece_id = id;
+    function DragStartCallBack (piece, position) {
+        current_piece_id = piece.piece_id;
+        piece.activeShadow(shadowGroup, position.x * gCellSize - piece.x, position.y * gCellSize - piece.y)
         console.log(
-            "Drag start" + id,
-            Math.floor(position.x / gCellSize),
-            Math.floor(position.y / gCellSize)
+            "Drag start" + piece.piece_id,
+            position.x,
+            position.y
         );
     }
-    function DragMoveCallBack(id, position) {
+    function DragMoveCallBack(piece, position) {
+        piece.activeShadow(shadowGroup, position.x * gCellSize - piece.x, position.y * gCellSize - piece.y)
         console.log(
-            "Drag move " + id,
-            Math.floor(position.x / gCellSize),
-            Math.floor(position.y / gCellSize)
+            "Drag move " + piece.piece_id,
+            position.x,
+            position.y
         );
     }
-    function DragEndCallBack(id, position) {
+    function DragEndCallBack(piece, position) {
+        piece.deactiveShadow()
         data = {
-            piece_id: id,
+            piece_id: piece.piece_id,
             position: position
         }
         TryDropPiece(data);
