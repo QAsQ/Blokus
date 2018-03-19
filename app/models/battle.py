@@ -150,6 +150,7 @@ class Battle:
             for player_id, result in enumerate(self.board.get_result()):
                 self.players_info[player_id]['battle_result'] = result
         self.ended = ended
+        self._update_players()
 
     def _get_battle_info(self):
         return {
@@ -181,6 +182,8 @@ class Battle:
                 }
             }
         )
+    def _update_players(self):
+        self._update("players_info", self.players_info)
     
     def _update_player(self, player_id):
         self._update("players_info.{}".format(player_id), self.players_info[player_id])

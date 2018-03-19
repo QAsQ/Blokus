@@ -553,10 +553,11 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
         piece.deactiveShadow()
         piece.parentGroup = pieceGroup
         data = {
+            player_id: mPlayerId,
             piece_id: piece.piece_id,
             position: position
         }
-        TryDropPiece(data);
+        TryDropPiece(data)
     }
     board.progressBars = []
     for (var player_id = 0; player_id < 4; player_id++) {
@@ -694,7 +695,6 @@ function generateBoard(canvas, mPlayerId, boardData, colorTheme){
     gBoardSize = gCellSize * 20;
 
     function TryDropPiece(data){
-        data.player_id = mPlayerId
         $.ajax({
             method: "POST",
             url:"/api/battles/" + battle_inferface.battle_data.battle_id,
