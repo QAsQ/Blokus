@@ -47,8 +47,8 @@ function ColorThemeFactory(type) {
                 }
             },
             piece: {
-                initial_alpha: 0.7,
-                onselect_alpha: 0.9,
+                initial_alpha: 0.4,
+                onselect_alpha: 0.5,
                 dropped_alpha: 1,
                 //shadow: trans_color("#6f645e"),
                 shadow: trans_color("#ffffff"),

@@ -361,6 +361,12 @@ function PieceFactory(pieceId,
         pieces.alpha = colorTheme.piece.dropped_alpha
     }
 
+    pieces.PickUp= function(rights){
+        pieces.dropped = false
+        pieces.alpha =  pieces.dragging ? colorTheme.piece.onselect_alpha : colorTheme.piece.initial_alpha
+        pieces.SetOwnership(rights)
+    }
+
     pieces.Flip = function(){
         var new_state = this.state ^ 1
         this.SetState(new_state);
@@ -465,16 +471,17 @@ function HighlightLayerFactory(colorTheme, piecesCellList){
         highlightLayer.highlightCells.push(cells)
     }
 
-    highlightLayer.updateHighlight = function(history){
+    highlightLayer.updateHighlight = function(history, length){
         this.highlightCells.forEach(function(highlightCell){
             highlightCell.forEach(function(cell){
                 cell.visible = false
             })
         })
         last_drop = [-1, -1, -1, -1]
-        history.forEach(function(drop){
+        for (var index = 0 ; index < length; index++){
+            drop = history[index]
             last_drop[drop.player_id] = drop
-        })
+        }
         for (var player_id = 0; player_id < 4; player_id ++){
             if (last_drop[player_id] === -1)
                 continue
@@ -598,7 +605,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
     board.highlightLayer.parentGroup = highlightGrop
     board.addChild(board.highlightLayer)
 
-    board.loadState = function(state) {
+    board.loadState = function(state, position) {
         //update progressBar
         for (var playerId = 0; playerId < 4; playerId ++) {
             var currentProgressBar = this.progressBars[playerId];
@@ -614,10 +621,15 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
         var _pieceLists = this.pieceLists;
         for (var playerId = 0; playerId < 4; playerId ++){
             for (var pieceId = 0; pieceId < 21; pieceId ++){
-                _pieceLists[playerId][pieceId].SetOwnership(playerId === mPlayerId);
+                _pieceLists[playerId][pieceId].PickUp(playerId === mPlayerId)
             }
         }
-        state.board_info.history.forEach(function (piece) {
+        var length = state.board_info.history.length
+        if (position !== -1)
+            length = Math.min(length, position)
+        for (var index = 0 ; index < length; index++){
+            var piece = state.board_info.history[index]
+        
             var isCurrentPlayer = piece.player_id == mPlayerId;
             var currentPiece = _pieceLists[piece.player_id][piece.piece_id];
 
@@ -627,8 +639,9 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
             currentPiece.y = piece.position.y * gCellSize;
 
             currentPiece.parentGroup = placedGroup;
-        });
-        board.highlightLayer.updateHighlight(state.board_info.history)
+        }
+
+        board.highlightLayer.updateHighlight(state.board_info.history, length)
     };
     board.update_player = function(playerId){
         mPlayerId = playerId

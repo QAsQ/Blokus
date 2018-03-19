@@ -471,7 +471,7 @@ Vue.component("chat-box", {
 });
 
 Vue.component("control-panel", {
-    props: ['battle_data', 'player_id'],
+    props: ['battle_data', 'player_id', 'current_position'],
     template: `
         <div class="ui four wide column">
             <chat-box :chat_logs="battle_data.chat_logs"></chat-box>
@@ -481,11 +481,11 @@ Vue.component("control-panel", {
                 id="hosting_button">
                 {{ hosting ? "取消托管": "托管"}}
             </div>
-            <div v-if="battle_data.battle_info.ended" class="ui teal fluid icon buttons">
-                <button class="ui button" @click="move(-2)"><i class="fast backward icon"></i></button>
-                <button class="ui button" @click="move(-1)"><i class="step backward icon"></i></button>
-                <button class="ui button" @click="move(1)"><i class="step forward icon"></i></button>
-                <button class="ui button" @click="move(2)"><i class="fast forward icon"></i></button>
+            <div v-if="battle_data.battle_info.ended" class="ui teal fluid buttons">
+                <button class="ui button" :class="{disabled: !can_backward}" @click="$emit('move', -2)"><i class="fast backward icon"></i></button>
+                <button class="ui button" :class="{disabled: !can_backward}" @click="$emit('move', -1)"><i class="step backward icon"></i></button>
+                <button class="ui button" :class="{disabled: !can_forward}" @click="$emit('move', 1)"><i class="step forward icon"></i></button>
+                <button class="ui button" :class="{disabled: !can_forward}" @click="$emit('move', 2)"><i class="fast forward icon"></i></button>
             </div>
 
             <div class="ui tiny modal" id="result_modal">
@@ -539,9 +539,6 @@ Vue.component("control-panel", {
         }
     },
     methods: {
-        move: function(step){
-            console.log(step)
-        },
         update_hosting: function(){
             this.loading = true
             control_panel = this
@@ -579,6 +576,12 @@ Vue.component("control-panel", {
         },
         can_leave: function(){
             return this.player_id != -1
+        },
+        can_forward: function(){
+            return this.current_position < this.battle_data.board_info.history.length
+        },
+        can_backward: function(){
+            return this.current_position > 0
         },
         hosting: function(){
             if (this.player_id == -1) 
@@ -656,15 +659,42 @@ Vue.component("battle-interface", {
                     :board_progress="board_progress">
                 </battle-progress>
             </div>
-            <control-panel :battle_data="battle_data" :player_id="player_id"> </control-panel>
+            <control-panel 
+                :battle_data="battle_data" 
+                :player_id="player_id" 
+                :current_position="current_position"
+                @move="move"> 
+            </control-panel>
         </div>`,
+    data: function(){
+        return {
+            "current_position": this.battle_data.battle_info.ended ? this.battle_data.board_info.history.length : -1
+        }
+    },
     mounted: function(){
         this.board = generateBoard($("#board")[0], this.player_id, this.board_data, ColorThemeFactory("default"));
-        this.board.loadState(this.battle_data)
+        this.board.loadState(this.battle_data, this.current_position)
+    },
+    methods: {
+        "move" : function(step){
+            var bound = [0, this.battle_data.board_info.history.length]
+            if (Math.abs(step) === 1){
+                this.current_position += step
+                this.current_position = Math.max(bound[0], this.current_position)
+                this.current_position = Math.min(bound[1], this.current_position)
+            }
+            else{
+                this.current_position = step > 0 ? bound[1] : bound[0]
+            }
+            this.board.loadState(this.battle_data, this.current_position)
+        }
     },
     watch: {
+        'battle_data.battle_info.ended': function(){
+            this.current_position = this.battle_data.board_info.history.length 
+        },
         'battle_data.board_info': function(){
-            this.board.loadState(this.battle_data)
+            this.board.loadState(this.battle_data, this.current_position)
         },
         'player_id': function(){
             this.board.update_player(this.player_id)
