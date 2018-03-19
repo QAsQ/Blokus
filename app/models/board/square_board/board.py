@@ -64,6 +64,15 @@ class Board:
         else:
             return False
     
+    def get_result(self):
+        res = [ {"left": self.amount_cells / 4, "score": 0} for _ in range(4)]
+
+        for drop in self.drop_history:
+            res[drop['player_id']]["left"] -= self.pieces[drop['player_id']][drop['piece_id']].cell_num
+            res[drop['player_id']]["score"] += self.pieces[drop['player_id']][drop['piece_id']].cell_num
+        
+        return res
+    
     def is_ended(self):
         for player_id in range(4):
             piece_id, _ = self._get_one_possible_position(player_id)

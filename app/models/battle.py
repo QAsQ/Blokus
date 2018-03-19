@@ -124,7 +124,7 @@ class Battle:
 
         if self.board.try_drop_piece(player_id, piece_id, dict_position):
             self.current_player = (self.current_player + 1) % 4
-            self.ended = self.board.is_ended()
+            self._update_ended(self.board.is_ended())
 
             self._update("board_info", self.board.get_info())
             self._update("battle_info", self._get_battle_info())
@@ -142,6 +142,12 @@ class Battle:
 
         self._update("chat_logs", self.chat_logs)
         return self.get_state(timestamp)
+    
+    def _update_ended(self, ended):
+        if not self.ended and ended:
+            for player_id, result in enumerate(self.board.get_result()):
+                self.players_info[player_id]['battle_result'] = result
+        self.ended = ended
 
     def _get_battle_info(self):
         return {
@@ -188,7 +194,7 @@ class Battle:
     
         def auto_drop_piece():
             self.board.auto_drop_piece(self.current_player)
-            self.ended = self.board.is_ended()
+            self._update_ended(self.board.is_ended())
             current_player()['additional_time_left'] = self.additional_time
             self.current_player += 1
             self.current_player %= 4

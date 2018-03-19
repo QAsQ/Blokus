@@ -128,7 +128,7 @@ function try_leave(player_id, call_back){
 }
 
 Vue.component("playerinfo-item",{
-    props: ['player_info', 'item_id', 'player_id', 'description_type'],
+    props: ['player_info', 'item_id', 'player_id', 'ended', 'description_type'],
     template: `
         <div class="item" 
             :class="{link: !occupied}" 
@@ -169,14 +169,16 @@ Vue.component("playerinfo-item",{
 
         },
         dimmer: function(argument){
-            if ((this.player_id != -1 && this.item_id != this.player_id) || this.occupied)
+            if ((this.player_id != -1 && this.item_id != this.player_id) || 
+                 this.ended || 
+                 this.occupied)
                 return
             $("#playerinfo_item_"+this.item_id).dimmer(argument);
         }
     },
     computed: {
         occupied: function () {
-            return this.player_info.user_id != -1 && this.item_id != this.player_id
+            return this.ended || (this.player_info.user_id != -1 && this.item_id != this.player_id)
         },
         user_name: function () {
             if (this.player_info.user_id == -1)
@@ -189,24 +191,30 @@ Vue.component("playerinfo-item",{
         description: function(){
             if (this.player_info.user_id == -1)
                 return "";
-            if (this.description_type == "winning_rate")
+            if (this.description_type == "winning_rate"){
+                if (this.ended)
+                    return "得分: " + this.player_info.battle_result.score
                 return "胜率:" + (this.player_info.user_data.user_info.rate_of_victory * 100).toFixed(2) + "%"
-            else if (this.description_type == "battle_state")
+            }
+            else if (this.description_type == "battle_state"){
+                if (this.ended)
+                    return "剩余: " + this.player_info.battle_result.left + " 块"
                 return this.player_info.is_hosting? "托管中" : "在线"
+            }
         }
     }
 });
 
 Vue.component("playerinfo-list", {
-    props: ['players_info'],
+    props: ['players_info', 'ended'],
     template:`
         <div class='ui big list'>
             <playerinfo-item v-for="(player_info, index) in players_info" :key="index"
                 :item_id="index"
                 :player_id="-1"
                 :player_info="player_info"
+                :ended="ended"
                 description_type="winning_rate">
-
             </playerinfo-item>
         </div>`
 });
@@ -250,7 +258,7 @@ Vue.component("battle-info", {
         battle_type: function () {
             var battletype_translate = {
                 standard: "四人对局"
-            };
+            }
             return battletype_translate[this.board_info.board_type]
         },
         start_state : function () {
@@ -288,7 +296,10 @@ Vue.component("battle-item", {
             </div>
             <div class="ui popup">
                 <div class='header'>用户信息</div>
-                <playerinfo-list :players_info="battle_data.players_info"></playerinfo-list>
+                <playerinfo-list 
+                    :players_info="battle_data.players_info" 
+                    :ended="battle_data.battle_info.ended">
+                </playerinfo-list>
             </div>
         </div>`,
     methods: {
@@ -324,18 +335,49 @@ Vue.component("battle-list", {
 });
 
 Vue.component("playerinfo-table",{
-    props: ['players_info', 'player_id'],
+    props: ['players_info', 'ended', 'player_id'],
     template: `
-    <div class="ui vertical segment">
+    <div class="ui vertical segment" @click="show_result">
         <div class="left aligned attached ui two item menu">
-            <playerinfo-item :player_info="players_info[0]" :item_id="0" :player_id="player_id" description_type="battle_state"></playerinfo-item>
-            <playerinfo-item :player_info="players_info[3]" :item_id="3" :player_id="player_id" description_type="battle_state"></playerinfo-item>
+            <playerinfo-item 
+                :player_info="players_info[0]" 
+                :item_id="0" 
+                :player_id="player_id" 
+                :ended="ended"
+                description_type="battle_state">
+            </playerinfo-item>
+            <playerinfo-item 
+                :player_info="players_info[3]" 
+                :item_id="3" 
+                :player_id="player_id" 
+                :ended="ended"
+                description_type="battle_state">
+            </playerinfo-item>
         </div>
         <div class="left aligned attached ui two item menu">
-            <playerinfo-item :player_info="players_info[1]" :item_id="1" :player_id="player_id" description_type="battle_state"></playerinfo-item>
-            <playerinfo-item :player_info="players_info[2]" :item_id="2" :player_id="player_id" description_type="battle_state"></playerinfo-item>
+            <playerinfo-item 
+                :player_info="players_info[1]" 
+                :item_id="1" 
+                :player_id="player_id" 
+                :ended="ended"
+                description_type="battle_state">
+            </playerinfo-item>
+            <playerinfo-item 
+                :player_info="players_info[2]" 
+                :item_id="2" 
+                :player_id="player_id" 
+                :ended="ended"
+                description_type="battle_state">
+            </playerinfo-item>
         </div>
-    </div>`
+    </div>`,
+    methods: {
+        show_result: function(){
+            if (this.ended)
+                $("#result_modal").modal("show")
+        }
+    }
+
 });
 
 Vue.component("chat-item", {
@@ -433,14 +475,55 @@ Vue.component("control-panel", {
     template: `
         <div class="ui four wide column">
             <chat-box :chat_logs="battle_data.chat_logs"></chat-box>
-            <div class="ui teal fluid button" 
+            <div v-if="!battle_data.battle_info.ended" class="ui teal fluid button" 
                 :class="{disabled: !can_hosting, loading: loading, active: hosting}"
                 @mousedown="update_hosting"
                 id="hosting_button">
                 {{ hosting ? "取消托管": "托管"}}
             </div>
+            <div v-if="battle_data.battle_info.ended" class="ui teal fluid icon buttons">
+                <button class="ui button" @click="move(-2)"><i class="fast backward icon"></i></button>
+                <button class="ui button" @click="move(-1)"><i class="step backward icon"></i></button>
+                <button class="ui button" @click="move(1)"><i class="step forward icon"></i></button>
+                <button class="ui button" @click="move(2)"><i class="fast forward icon"></i></button>
+            </div>
+
+            <div class="ui tiny modal" id="result_modal">
+                    <div class="ui huge header ">
+                        对局结果
+                    </div>
+                    <div class="content">
+                    <table class="ui very basic selectable  single line table">
+                        <thead>
+                            <tr> <th>排名</th> <th>用户</th> <th>剩余</th> </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="result in battle_result">
+                                <td> {{result.rank}} </td>
+                                <td>
+                                    <h4 class="ui image header">
+                                        <img :src="'static/common/images/player/' + (1 << result.player_id) + '.jpg'" class="ui mini rounded image">
+                                        <div class="content">
+                                            {{result.username}}
+                                        </div>
+                                    </h4>
+                                </td>
+                                <td>{{result.left}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="actions">
+                    <div class="ui ok teal button">
+                        <i class="checkmark icon"></i>
+                        确定
+                    </div>
+                </div>
+            </div>
+
             <playerinfo-table 
                 :player_id="player_id"
+                :ended="battle_data.battle_info.ended"
                 :players_info="battle_data.players_info">
             </playerinfo-table>
             <div class="ui fluid negative button" @click="leave">离开</div>
@@ -450,7 +533,15 @@ Vue.component("control-panel", {
             loading: false
         }
     },
+    watch: {
+        "battle_data.battle_info.ended": function(){
+            $("#result_modal").modal("show")
+        }
+    },
     methods: {
+        move: function(step){
+            console.log(step)
+        },
         update_hosting: function(){
             this.loading = true
             control_panel = this
@@ -493,6 +584,44 @@ Vue.component("control-panel", {
             if (this.player_id == -1) 
                 return false
             return this.battle_data.players_info[this.player_id]['is_hosting']
+        },
+        battle_result: function(){
+            if (!this.battle_data.battle_info.ended){
+                var result = []
+                for (var player_id = 0; player_id < 4; player_id++){
+                    result.push({
+                        player_id: player_id,
+                        username: "null",
+                        score: -1,
+                        left: -1,
+                        rank: 0
+                    })
+                }
+                return result
+            }
+
+            var result = []
+            for (var player_id = 0; player_id < 4; player_id++){
+                var current_player = this.battle_data.players_info[player_id]
+                result.push({
+                    player_id: player_id,
+                    username: current_player.user_data.username,
+                    score: current_player.battle_result.score,
+                    left: current_player.battle_result.left
+                })
+            }
+
+            result = result.sort(function(a, b){
+                return b.score - a.score
+            })
+            for (var player_id = 0; player_id < 4; player_id++){
+                if (player_id === 0)
+                    result[player_id].rank = 1
+                else{
+                    result[player_id].rank = result[player_id - 1].rank + (result[player_id].left !== result[player_id - 1].left)
+                }
+            }
+            return result
         }
     }
 });
