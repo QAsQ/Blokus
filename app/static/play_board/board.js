@@ -693,8 +693,25 @@ function generateBoard(canvas, mPlayerId, boardData, colorTheme){
     gCellSize = Math.floor(Math.min(gWidth, gHeight) / 28)
     gBoardSize = gCellSize * 20;
 
-    function TryDropPiece(){
-
+    function TryDropPiece(data){
+        data.player_id = mPlayerId
+        $.ajax({
+            method: "POST",
+            url:"/api/battles/" + battle_inferface.battle_data.battle_id,
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function(data){
+                if (data.message == "success"){
+                    battle_inferface.battle_data = data.result
+                }
+                else{
+                    show_message(data.message)
+                }
+            },
+            error: function(data){
+                show_message("请求失败，请检查网络连接")
+            }
+        })
     }
 
     var board = BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData)

@@ -118,7 +118,9 @@ class Battle:
             "chat_logs": self.chat_logs
         }
 
-    def try_drop_piece(self, timestamp, player_id, piece_id, dict_position):
+    def try_drop_piece(self, timestamp, player_id, user_id, piece_id, dict_position):
+        if self.players_info[player_id]['user_id'] != user_id:
+            return "user and player does't match!"
         if not self.started or self.ended or self.current_player != player_id:
             return False
 

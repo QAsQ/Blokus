@@ -331,6 +331,10 @@ Vue.component("battle-list", {
     updated: function(){
         $('[name="head"]').popup({inline:true});
         $('[name="content"]').popup({inline: true});
+        $('.ui.sticky').sticky({
+            offset: 50,
+            context: '#battle_list'}
+        );
     }
 });
 

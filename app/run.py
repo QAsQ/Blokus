@@ -209,10 +209,11 @@ def battle(battle_id):
         battle.try_drop_piece(
             current_time(), 
             request_json['player_id'],
+            current_user.user_id,
             request_json['piece_id'],
             request_json['position']
         )
-        return jsonify(battle.get_state(current_time(), request_json['player_id']))
+        return success(battle.get_state(current_time(), request_json['player_id']))
 
 @app.route("/api/battles/<int:battle_id>/chat_logs", methods=['POST'])
 def chat_logs(battle_id):
@@ -287,4 +288,4 @@ def hosting(battle_id, player_id):
         return success(result)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=80, debug=True)

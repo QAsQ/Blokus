@@ -48,10 +48,10 @@ function ColorThemeFactory(type) {
             },
             piece: {
                 initial_alpha: 0.4,
-                onselect_alpha: 0.5,
+                onselect_alpha: 0.8,
                 dropped_alpha: 1,
                 //shadow: trans_color("#6f645e"),
-                shadow: trans_color("#ffffff"),
+                shadow: trans_color("#949293"),
                 //shadow: {
                 //    legal: trans_color("#6f645e"),
                 //    unlegal: trans_color("#e1d9c4")
