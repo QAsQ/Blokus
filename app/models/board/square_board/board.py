@@ -73,12 +73,16 @@ class Board:
         
         return res
     
-    def is_ended(self):
-        for player_id in range(4):
-            piece_id, _ = self._get_one_possible_position(player_id)
-            if piece_id != -1:
-                return False
-        return True
+    def is_ended(self, check_player_id = -1):
+        if check_player_id == -1:
+            for player_id in range(4):
+                piece_id, _ = self._get_one_possible_position(player_id)
+                if piece_id != -1:
+                    return False
+            return True
+
+        piece_id, _ = self._get_one_possible_position(check_player_id)
+        return piece_id == -1
 
     def _get_one_possible_position(self, player_id):
         position = Position()

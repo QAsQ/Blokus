@@ -222,7 +222,7 @@ class Battle:
                 if player_info["last_active_time"] + default_offline_time < timestamp:
                     player_info['is_hosting'] = True
 
-            if current_player()["is_hosting"]:
+            if current_player()["is_hosting"] or self.board.is_ended(self.current_player):
                auto_drop_piece()
             else:
                 if current_player()["additional_time_left"] + self.current_time > timestamp:
