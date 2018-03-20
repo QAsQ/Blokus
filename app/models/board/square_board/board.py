@@ -65,11 +65,11 @@ class Board:
             return False
     
     def get_result(self):
-        res = [ {"left": self.amount_cells / 4, "score": 0} for _ in range(4)]
+        res = [ {"left": int(self.amount_cells / 4), "score": 0} for _ in range(4)]
 
         for drop in self.drop_history:
             res[drop['player_id']]["left"] -= self.pieces[drop['player_id']][drop['piece_id']].cell_num
-            res[drop['player_id']]["score"] += self.pieces[drop['player_id']][drop['piece_id']].cell_num
+            res[drop['player_id']]["score"] += self.pieces[drop['player_id']][drop['piece_id']].cell_num * 15
         
         return res
     

@@ -70,6 +70,17 @@ class User(UserMixin):
         self.confirmed = True
         self.db.update({"user_id": self.user_id}, {"confirmed": True})
     
+    def update_battle_result(self, victory, rating):
+        self.user_info['rating'] = rating
+        self.user_info['number_of_battles'] += 1
+        if (victory):
+            self.user_info["number_of_victory"] += 1
+        self.user_info["rate_of_victory"] = self.user_info["number_of_victory"] * 1.0 / self.user_info['number_of_battles']
+        self.db.update(
+            {"user_id": self.user_id}, 
+            {"$set": {"user_info": self.user_info}}
+        )
+
     def update_perference(self, field, preference):
         if self.user_id != -1:
             self.user_info["perference"][field] = preference

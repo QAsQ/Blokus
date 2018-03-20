@@ -1,12 +1,15 @@
 from .board import BoardFactory
 from .board.square_board.piece import Position
 from .db_utility import id_generate
+from .user import User
+from .rating import calculate_rating
 
 default_offline_time = 300
 
 class Battle:
     def __init__(self, timestamp, battle_info, board, db, chat_logs=[], players_info=None, battle_id=None):
         self.db = db.battles
+        self.user_db = db
 
         self.board = board
         self.create_time = timestamp
@@ -149,6 +152,13 @@ class Battle:
         if not self.ended and ended:
             for player_id, result in enumerate(self.board.get_result()):
                 self.players_info[player_id]['battle_result'] = result
+            rating_result = calculate_rating(self.players_info)
+            for player_id, result in enumerate(rating_result):
+                self.players_info[player_id]['battle_result']['rating_delta'] = result['delta']
+                self.players_info[player_id]['battle_result']['updated_rating'] = result['rating']
+                user = User.load_from_id(self.user_db, self.players_info[player_id]['user_id'])
+                user.update_battle_result(result['victory'], result['rating'])
+
         self.ended = ended
         self._update_players()
 
@@ -278,7 +288,3 @@ class BattleFactory():
 
         buffer[battle_id] = battle
         return battle
-            
-
-        
-

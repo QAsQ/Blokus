@@ -499,7 +499,7 @@ Vue.component("control-panel", {
                     <div class="content">
                     <table class="ui very basic selectable  single line table">
                         <thead>
-                            <tr> <th>排名</th> <th>用户</th> <th>剩余</th> </tr>
+                            <tr> <th>排名</th> <th>用户</th> <th>剩余</th> <th>Rating 更新</th></tr>
                         </thead>
                         <tbody>
                             <tr v-for="result in battle_result">
@@ -513,6 +513,7 @@ Vue.component("control-panel", {
                                     </h4>
                                 </td>
                                 <td>{{result.left}}</td>
+                                <td>{{result.rating_state}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -599,6 +600,7 @@ Vue.component("control-panel", {
                     result.push({
                         player_id: player_id,
                         username: "null",
+                        rating_state: "none",
                         score: -1,
                         left: -1,
                         rank: 0
@@ -607,6 +609,12 @@ Vue.component("control-panel", {
                 return result
             }
 
+            function rating_state(rating, delta){
+                head_char = ""
+                if (delta >= 0)
+                    head_char = "+"
+                return rating + "(" + head_char + delta + ")"
+            }
             var result = []
             for (var player_id = 0; player_id < 4; player_id++){
                 var current_player = this.battle_data.players_info[player_id]
@@ -614,6 +622,10 @@ Vue.component("control-panel", {
                     player_id: player_id,
                     username: current_player.user_data.username,
                     score: current_player.battle_result.score,
+                    rating_state: rating_state(
+                        current_player.battle_result.updated_rating,
+                        current_player.battle_result.rating_delta
+                    ),
                     left: current_player.battle_result.left
                 })
             }
