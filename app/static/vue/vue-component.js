@@ -192,8 +192,12 @@ Vue.component("playerinfo-item",{
             if (this.player_info.user_id == -1)
                 return "";
             if (this.description_type == "winning_rate"){
-                if (this.ended)
-                    return "得分: " + this.player_info.battle_result.score
+                if (this.ended){
+                    head_char = ""
+                    if (this.player_info.battle_result.rating_delta > 0)
+                        head_char = "+"
+                    return "Rating " + head_char + this.player_info.battle_result.rating_delta
+                }
                 return "胜率:" + (this.player_info.user_data.user_info.rate_of_victory * 100).toFixed(2) + "%"
             }
             else if (this.description_type == "battle_state"){
