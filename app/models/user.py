@@ -11,7 +11,7 @@ default_info = {
     "rating": 1500,
     "perference":{
         "condition": {
-            "sort" : [],
+            "sort" : ["d:initiation_time"],
             "query" : {
                 "username": "",
                 "battle_state": [],
