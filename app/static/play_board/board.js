@@ -5,17 +5,17 @@ function ParticleFactory(direction, particleColor) {
 			"end": 0
 		},
 		"scale": {
-			"start": 0.1,
-			"end": 0.01,
+			"start": 0.2,
+			"end": 0.9,
 			"minimumScaleMultiplier": 1
 		},
 		"color": {
 			"start": particleColor.toString(16),
-			"end": "#FFFFFF"
+			"end": "#f2f0f1"
 		},
 		"speed": {
-			"start": 50,
-			"end": 10,
+			"start": 90,
+			"end": 0,
 			"minimumSpeedMultiplier": 1
 		},
 		"acceleration": {
@@ -24,8 +24,8 @@ function ParticleFactory(direction, particleColor) {
 		},
 		"maxSpeed": 0,
 		"startRotation": {
-			"min": -15,
-			"max": 15
+			"min": -45,
+			"max": 0 
 		},
 		"noRotation": false,
 		"rotationSpeed": {
@@ -34,10 +34,10 @@ function ParticleFactory(direction, particleColor) {
 		},
 		"lifetime": {
 			"min": 0.5,
-			"max": 1.5
+			"max": 2
 		},
 		"blendMode": "normal",
-		"frequency": 0.001,
+		"frequency": 0.01,
 		"emitterLifetime": -1,
 		"maxParticles": 500,
 		"pos": {
@@ -47,10 +47,10 @@ function ParticleFactory(direction, particleColor) {
 		"addAtBack": false,
 		"spawnType": "rect",
 		"spawnRect": {
-			"x": 0,
-			"y": 0,
-			"w": 3,
-			"h": 3
+			"x": -1,
+			"y": -1,
+			"w": 7,
+			"h": 7
 		}
 	}
     var emitter = null
@@ -124,14 +124,14 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme){
 
     progressBarContainer.extremity = ParticleFactory(
         progressBar.rotation,
-        colorTheme.board.progress_bar.accuracy[player_id]
+        colorTheme.board.progress_bar.particles.accuracy[player_id]
     );
 	progressBarContainer.addChild(progressBarContainer.extremity);
     progressBarContainer.extremity.rotation = angle
 
     progressBarContainer.additional_extremity = ParticleFactory(
         progressBar.rotation,
-        colorTheme.board.progress_bar.additional
+        colorTheme.board.progress_bar.particles.additional
 	);
 	progressBarContainer.addChild(progressBarContainer.additional_extremity);
     progressBarContainer.additional_extremity.rotation = angle
@@ -207,9 +207,9 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme){
 		additionalBar.scale.x = distance(total_end, additional_end);
 
 		this.extremity.x = additional_end.x
-		this.extremity.y = additional_end.y
+		this.extremity.y = additional_end.y 
 		this.additional_extremity.x = additional_end.x
-		this.additional_extremity.y = additional_end.y
+		this.additional_extremity.y = additional_end.y 
 	}
     return progressBarContainer;
 }
@@ -500,8 +500,8 @@ function HighlightLayerFactory(colorTheme, piecesCellList){
 
 function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) {
     var placedGroup = new PIXI.display.Group(-2, false); 
-    var boardGroup = new PIXI.display.Group(-1, false);
-    var highlightGrop = new PIXI.display.Group(0, false);
+    var highlightGrop = new PIXI.display.Group(1, false);
+    var boardGroup = new PIXI.display.Group(0, false);
     var shadowGroup = new PIXI.display.Group(1, false);
     var pieceGroup = new PIXI.display.Group(2, false);
     var draggedGroup = new PIXI.display.Group(3, false);
