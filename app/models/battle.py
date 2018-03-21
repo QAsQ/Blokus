@@ -44,6 +44,10 @@ class Battle:
         if self.players_info[player_id]["user_id"] != -1:
             return "this position was occupied"
 
+        for player_info in self.players_info:
+            if player_info['user_id'] == user_id:
+                return "already in battle"
+
         self.players_info[player_id] = {
             "user_id": user_id,
             "user_data": user_data,
