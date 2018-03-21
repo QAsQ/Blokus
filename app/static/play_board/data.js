@@ -41,7 +41,7 @@ function ColorThemeFactory(type) {
                     accuracy: [trans_color("#ed1c24"), trans_color("#23b14d"), trans_color("#00a2e8"), trans_color("#ffc90d")],
                     additional: trans_color("#a1a3a4"),
                     particles: {
-                        accuracy: [trans_color("#cf1b24"), trans_color("#239546"), trans_color("#006BA3"), trans_color("#D69723")],
+                        accuracy: [trans_color("#cf1b24"), trans_color("#239546"), trans_color("#5d92b1"), trans_color("#D69723")],
                         additional: trans_color("#a1a3a4")
                     }
                 }
