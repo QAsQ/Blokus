@@ -4,8 +4,8 @@ from .db_utility import id_generate
 from .user import User
 from .rating import calculate_rating
 
-default_offline_time = 30
-#30 无连接视为掉线
+default_offline_time = 60
+#60 无连接视为掉线
 
 class Battle:
     def __init__(self, timestamp, battle_info, board, db, chat_logs=[], players_info=None, battle_id=None):
