@@ -205,12 +205,10 @@ class Battle:
 
     def _update_info(self, timestamp, player_id):
         if player_id != -1:
-            self.players_info[player_id]['last_acive_time'] = timestamp
+            self.players_info[player_id]['last_active_time'] = timestamp
         if not self.started:
             for player_id, player_info in enumerate(self.players_info):
                 if player_info['user_id'] != -1 and player_info["last_active_time"] + default_offline_time < timestamp:
-                    print(player_info['user_id'])
-                    print(player_info["last_active_time"] + default_offline_time, timestamp)
                     self.players_info[player_id] = self.default_player_info
             self._update_players()
             return
