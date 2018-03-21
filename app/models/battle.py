@@ -4,7 +4,8 @@ from .db_utility import id_generate
 from .user import User
 from .rating import calculate_rating
 
-default_offline_time = 300
+default_offline_time = 30
+#30 无连接视为掉线
 
 class Battle:
     def __init__(self, timestamp, battle_info, board, db, chat_logs=[], players_info=None, battle_id=None):
@@ -203,6 +204,17 @@ class Battle:
         self._update("players_info.{}".format(player_id), self.players_info[player_id])
 
     def _update_info(self, timestamp, player_id):
+        if player_id != -1:
+            self.players_info[player_id]['last_acive_time'] = timestamp
+        if not self.started:
+            for player_id, player_info in enumerate(self.players_info):
+                if player_info['user_id'] != -1 and player_info["last_active_time"] + default_offline_time < timestamp:
+                    print(player_info['user_id'])
+                    print(player_info["last_active_time"] + default_offline_time, timestamp)
+                    self.players_info[player_id] = self.default_player_info
+            self._update_players()
+            return
+
         if not self.started or self.ended:
             return
 
