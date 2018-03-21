@@ -169,9 +169,10 @@ Vue.component("playerinfo-item",{
 
         },
         dimmer: function(argument){
-            if ((this.player_id != -1 && this.item_id != this.player_id) || 
-                 this.ended || 
-                 this.occupied)
+            if (argument != "hide" && (
+                (this.player_id != -1 && this.item_id != this.player_id) || 
+                 this.ended || this.occupied)
+            )
                 return
             $("#playerinfo_item_"+this.item_id).dimmer(argument);
         }
