@@ -414,7 +414,7 @@ Vue.component("chat-box", {
     props: ['chat_logs'],
     template: `
         <div class="ui segment">
-            <div class="ui horizontal chat-box" id="chat_box" @scroll="update_buttom">
+            <div class="ui horizontal chat-box" id="chat_box" @scroll="update_bottom">
                 <div class="ui comments">
                     <chat-item v-for="(chat_log, index) in chat_logs" :chat_log="chat_log" :key="index"></chat-item>
                 </div>
@@ -427,7 +427,7 @@ Vue.component("chat-box", {
         </div>`,
     data: function(){
         return {
-            "buttom": true
+            "bottom": true
         }
     },
     mounted: function(){
@@ -435,13 +435,13 @@ Vue.component("chat-box", {
     },
     updated: function(){
         var chat_box = $("#chat_box")
-        if(this.buttom)
+        if(this.bottom)
             this.roll_to_bottom()
     },
     methods: {
-        update_buttom: function(){
+        update_bottom: function(){
             var chat_box = $("#chat_box")
-            this.buttom = chat_box[0].scrollTop + chat_box.height() >= chat_box[0].scrollHeight
+            this.bottom = chat_box[0].scrollTop + chat_box.height() >= chat_box[0].scrollHeight
         },
         send_message: function(){
             self = this
@@ -460,8 +460,8 @@ Vue.component("chat-box", {
                 success: function(data){
                     if (data.message == "success"){
                         battle_inferface.battle_data = data.result
-                        $("#input_box").val("")
                         self.roll_to_bottom()
+                        $("#input_box").val("")
                     }
                     else{
                         show_message(data.message)
