@@ -1,6 +1,7 @@
 import time
 import json
 import re
+import pymongo
 from pymongo import MongoClient
 
 from flask import Flask, render_template, g, request, redirect, url_for, jsonify, flash
@@ -41,7 +42,12 @@ def battles_page():
 
 @app.route("/rank-list")
 def userlist_page():
-    pass
+    projection = {"password" : False}
+    sort = [("user_info.rating", pymongo.DESCENDING)]
+    users = id_clear(db.users.find(
+        projection=projection,
+        sort=sort))
+    return render_template("rank_list.html", users=users)
 
 @app.route("/users")
 def user_page():

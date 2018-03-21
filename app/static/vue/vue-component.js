@@ -1057,3 +1057,36 @@ Vue.component("battle-creater", {
         }
     }
 })
+
+Vue.component("rank-list", {
+    props: ['users_data'],
+    template: `
+        <table class="ui basic selectable large table">
+        <thead>
+            <tr>
+                <th><h1>排名     </h1>  </th>
+                <th><h1>用户名    </h1> </th>
+                <th><h1>Rating </h1>    </th>
+                <th><h1>胜率     </h1>  </th>
+                <th><h1>胜场     </h1>  </th>
+                <th><h1>总场次    </h1> </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="tr-link" v-for="(user_data, index) in users_data" @click="jump_to(user_data.user_id)">
+                <td><h1>{{index + 1}}                                                     </h1></td>
+                <td><h1>{{user_data.username}}                                            </h1></td>
+                <td><h1>{{user_data.user_info.rating}}                                    </h1></td>
+                <td><h1>{{ (user_data.user_info.rate_of_victory * 100).toFixed(2) + "%" }}</h1></td>
+                <td><h1>{{user_data.user_info.number_of_victory}}                         </h1></td>
+                <td><h1>{{user_data.user_info.number_of_battles}}                         </h1></td>
+            </tr>
+        </tbody>
+        </table>
+    `,
+    methods: {
+        "jump_to": function(user_id){
+            location.href = "/users?user_id=" + user_id
+        }
+    }
+});

@@ -1,3 +1,6 @@
+.tr-link:hover { 
+    cursor: pointer; 
+}
 .background{
     background-image: url('background.jpg');
     background-repeat: repeat;
