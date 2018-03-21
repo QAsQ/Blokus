@@ -368,12 +368,16 @@ function PieceFactory(pieceId,
     }
 
     pieces.Flip = function(){
-        var new_state = this.state ^ 1
-        this.SetState(new_state);
+        if (pieces.dropped == false){
+            var new_state = this.state ^ 1
+            this.SetState(new_state);
+        }
     };
     pieces.Rotate = function(clock){
-        var new_state = (this.state + ((this.state % 2) ^ clock ? 2 : 6)) % 8
-        this.SetState(new_state);
+        if (pieces.dropped == false){
+            var new_state = (this.state + ((this.state % 2) ^ clock ? 2 : 6)) % 8
+            this.SetState(new_state);
+        }
     };
 
     return pieces;
@@ -659,6 +663,10 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
         var positionState = this.position;
         //if (this.cellList[mPlayerId][pieceId].)
         
+    };
+
+    board.detach = function(){
+        current_piece_id = -1
     };
 
     window.addEventListener(

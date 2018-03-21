@@ -420,7 +420,7 @@ Vue.component("chat-box", {
             </div>
             <div class="ui divider"></div>
             <div class="ui fluid icon input">
-                <input type="text" id='input_box' @keydown.enter="send_message">
+                <input type="text" id='input_box' @keydown.enter="send_message" @focus="$emit('focus_input')">
                 <i class="inverted circular send link teal icon" @click="send_message"></i>
             </div>
         </div>`,
@@ -482,7 +482,7 @@ Vue.component("control-panel", {
     props: ['battle_data', 'player_id', 'current_position'],
     template: `
         <div class="ui four wide column">
-            <chat-box :chat_logs="battle_data.chat_logs"></chat-box>
+            <chat-box :chat_logs="battle_data.chat_logs" @focus_input="$emit('focus_input')"></chat-box>
             <div v-if="!battle_data.battle_info.ended" class="ui teal fluid button" 
                 :class="{disabled: !can_hosting, loading: loading, active: hosting}"
                 @mousedown="update_hosting"
@@ -548,6 +548,9 @@ Vue.component("control-panel", {
         }
     },
     methods: {
+        detach: function(){
+            this.b
+        },
         update_hosting: function(){
             this.loading = true
             control_panel = this
@@ -683,6 +686,7 @@ Vue.component("battle-interface", {
                 :battle_data="battle_data" 
                 :player_id="player_id" 
                 :current_position="current_position"
+                @focus_input="board_detach_active_piece"
                 @move="move"> 
             </control-panel>
         </div>`,
@@ -696,6 +700,9 @@ Vue.component("battle-interface", {
         this.board.loadState(this.battle_data, this.current_position)
     },
     methods: {
+        "board_detach_active_piece": function(){
+            this.board.detach()
+        },
         "move" : function(step){
             var bound = [0, this.battle_data.board_info.history.length]
             if (Math.abs(step) === 1){
