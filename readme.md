@@ -4,9 +4,11 @@
 
 Blokus 是四个玩家参与的抽象策略类桌游，由法国数学家 Bernard Tavitian 发明
 
+这里实现了一个四人在线版本 https://blokus.io
+
 # 对局
 
-标准的 Blokus 游戏由 21 种形状的棋子（todo），每个形状四个颜色（红，绿，蓝，黄）各一份共 84 个棋子和 20 * 20 的正方形棋盘（todo）构成。
+标准的 Blokus 游戏由 21 种形状的棋子，每个形状四个颜色（红，绿，蓝，黄）各一份共 84 个棋子和 20 * 20 的正方形棋盘构成。
 
 ## 开始
 
@@ -24,9 +26,9 @@ Blokus 是四个玩家参与的抽象策略类桌游，由法国数学家 Bernar
 
 ### 落子规则
 
-1. 每个放下的棋子不得越过棋盘的边界
+1. 每个放下的棋子不得越过棋盘的边界 ![out.jpg](https://i.loli.net/2018/03/22/5ab37bba6cd01.jpg)
 
-2. 每个放下的棋子不得和之前任何棋子有格子重叠
+2. 每个放下的棋子不得和之前任何棋子有格子重叠 ![occupied.jpg](https://i.loli.net/2018/03/22/5ab3815c38f52.jpg)
 
 3. 每个放下的棋子不得和之前放下的同色棋子有边相邻 ![not.jpg](https://i.loli.net/2018/03/22/5ab376baa7116.jpg)
 
@@ -53,9 +55,9 @@ Blokus 是四个玩家参与的抽象策略类桌游，由法国数学家 Bernar
 鼠标点击或者按住不放选择某一个棋子后，使用按键 wasd 旋转/翻转棋子
 假设棋子原来的状态为 ![s.jpg](https://i.loli.net/2018/03/22/5ab376baa87a0.jpg)
 
-用按键 w或s 水平翻转为 ![w.jpg](https://i.loli.net/2018/03/22/5ab376bab5d13.jpg)
-用按键 a 逆时针旋转为 ![a.jpg](https://i.loli.net/2018/03/22/5ab376bac4183.jpg)
-用按键 d 顺时针旋转为 ![d.jpg](https://i.loli.net/2018/03/22/5ab376bac9cfe.jpg)
+1. 用按键 w/s 水平翻转为 ![w.jpg](https://i.loli.net/2018/03/22/5ab376bab5d13.jpg)
+2. 用按键 a 逆时针旋转为 ![a.jpg](https://i.loli.net/2018/03/22/5ab376bac4183.jpg)
+3. 用按键 d 顺时针旋转为 ![d.jpg](https://i.loli.net/2018/03/22/5ab376bac9cfe.jpg)
 
 
 
