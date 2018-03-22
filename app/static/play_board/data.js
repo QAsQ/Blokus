@@ -60,6 +60,7 @@ function ColorThemeFactory(type) {
                 dividing_line: trans_color("#ffffff"),
                 dividing_line_width: 3,
                 cell: [trans_color("#f2542d"), trans_color("#80ba04"), trans_color("#1da6f0"), trans_color("#feb923")],
+                initial:[trans_color("#cf1b24"), trans_color("#239546"), trans_color("#006BA3"), trans_color("#D69723")],
                 last_drop: [trans_color("#cf1b24"), trans_color("#239546"), trans_color("#006BA3"), trans_color("#D69723")]
             }
         }

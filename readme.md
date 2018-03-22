@@ -1,7 +1,5 @@
 # Blokus
 
-[TOC]
-
 Blokus 是四个玩家参与的抽象策略类桌游，由法国数学家 Bernard Tavitian 发明
 
 这里实现了一个四人在线版本 https://blokus.io
@@ -26,17 +24,11 @@ Blokus 是四个玩家参与的抽象策略类桌游，由法国数学家 Bernar
 
 ### 落子规则
 
-1. 每个放下的棋子不得越过棋盘的边界 ![out.jpg](https://i.loli.net/2018/03/22/5ab37bba6cd01.jpg)
-
-2. 每个放下的棋子不得和之前任何棋子有格子重叠 ![occupied.jpg](https://i.loli.net/2018/03/22/5ab3815c38f52.jpg)
-
+1. 第一个棋子必须有一个格子和对应颜色起始点的格子重合 ![first.jpg](https://i.loli.net/2018/03/22/5ab389ea16fb6.jpg)
+2. 除第一个棋子之外，每个放下的棋子至少有一个角和之前的同色棋子相邻  ![dropped.jpg](https://i.loli.net/2018/03/22/5ab376bac852e.jpg)
 3. 每个放下的棋子不得和之前放下的同色棋子有边相邻 ![not.jpg](https://i.loli.net/2018/03/22/5ab376baa7116.jpg)
-
-4. 第一个棋子必须有至少占据一个对应颜色的起始点的格子
-
-5. 除第一个棋子之外，每个放下的棋子至少有一个角和之前的同色棋子相邻  ![dropped.jpg](https://i.loli.net/2018/03/22/5ab376bac852e.jpg)
-
-   ​
+4. 每个放下的棋子不得越过棋盘的边界 ![out.jpg](https://i.loli.net/2018/03/22/5ab37bba6cd01.jpg)
+5. 每个放下的棋子不得和之前任何棋子有格子重叠 ![occupied.jpg](https://i.loli.net/2018/03/22/5ab3815c38f52.jpg)
 
    ​
 

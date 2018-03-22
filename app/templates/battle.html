@@ -13,7 +13,6 @@ $(document).ready(function() {
 
         board_data = board_data.result
         battle_data = {{ battle|tojson|safe }};
-        console.log(battle_data.chat_logs)
 
         battle_interface = new Vue({
             el: "#battle_interface",

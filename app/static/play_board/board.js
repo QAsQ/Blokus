@@ -525,6 +525,22 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
         graphics.moveTo(0, i * gCellSize);
         graphics.lineTo(gCellSize * 20, i * gCellSize);
     }
+
+    //Draw initial place
+    function draw_initial_posiiton(position, color){
+        graphics.beginFill(color, 1)
+        graphics.lineWidth = 0
+        graphics.drawRect(
+            position[0] * gCellSize + gCellSize / 4, 
+            position[1] * gCellSize + gCellSize / 4, 
+            gCellSize / 2, gCellSize / 2
+        )
+    }
+    var initial_position = [[0, 0], [0, 19], [19, 19], [19, 0]]
+    for (var player_id = 0 ; player_id < 4; player_id ++){
+        draw_initial_posiiton(initial_position[player_id], colorTheme.piece.initial[player_id])
+    }
+
     var boardShape = new PIXI.Sprite(graphics.generateTexture());
     boardShape.parentGroup = boardGroup;
 
