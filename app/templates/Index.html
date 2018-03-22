@@ -12,3 +12,221 @@
     </div>
 </div>
 {% endblock %}
+
+{% block content %}
+<div class="ui vertical stripe segment">
+    <div class="ui middle aligned stackable grid container">
+        <div class="row">
+            <div class="ten wide column">
+                <p> Blokus 是四个玩家参与的抽象策略类桌游，由法国数学家 Bernard Tavitian 发明。</p>
+                <p>标准的 Blokus 游戏由 21 种形状的棋子，每个形状四个颜色（红，绿，蓝，黄）各一份共 84 个棋子和 20 * 20 的正方形棋盘构成。每个颜色有对应的起始点。</p>
+            </div>
+            <div class="six wide right floated column">
+                <img src="static/common/images/intro/full.jpg" class="ui large bordered image">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="ui vertical stripe segment">
+    <div class="ui stackable grid container">
+        <div class="row">
+            <div class="six wide column">
+                <img src="static/common/images/battle/15.jpg" class="ui circular bordered large left floted image">
+            </div>
+            <div class="ten wide column">
+                <h1>对局进程</h1>
+                <div class="ui header">开始</div>
+                <p>每个玩家选择一个颜色后，对局开始。</p>
+                <div class="ui header">进行</div>
+                <p>玩家按照按照红，绿，蓝，黄的顺序依次在棋盘上按规则放下棋子。</p>
+                <div class="ui header">结束</div>
+                <p>当某一个玩家无法在棋盘上放下棋子时，该玩家的回合会被跳过。当所有玩家无法在棋盘上放下棋子时，该对局结束。</p>
+                <p>随后按照计分规则累积分数决定排名。</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ui vertical stripe segment container">
+    <h3>落子规则</h3>
+    <div class="ui stackable grid five column">
+        <div class="ui column">
+            <div class="ui card">
+                <div class="image">
+                    <img src="static/common/images/intro/first.jpg">
+                </div>
+                <div class="content">
+                    <p> 第一个棋子必须有一个格子和对应颜色起始点的格子重合 </p>
+                </div>
+            </div>
+        </div>
+        <div class="ui column">
+            <div class="ui card">
+                <div class="image">
+                    <img src="static/common/images/intro/dropped.jpg">
+                </div>
+                <div class="content">
+                    <p> 除第一个棋子之外，每个放下的棋子至少有一个角和之前的同色棋子相邻 </p>
+                </div>
+            </div>
+        </div>
+        <div class="ui column">
+            <div class="ui card">
+                <div class="image">
+                    <img src="static/common/images/intro/share_edge.jpg">
+                </div>
+                <div class="content">
+                    <p> 每个放下的棋子不得和之前放下的同色棋子有边相邻</p>
+                </div>
+            </div>
+        </div>
+        <div class="ui column">
+            <div class="ui card">
+                <div class="image">
+                    <img src="static/common/images/intro/out.jpg">
+                </div>
+                <div class="content">
+                    <p> 每个放下的棋子不得越过棋盘的边界</p>
+                </div>
+            </div>
+        </div>
+        <div class="ui column">
+            <div class="ui card">
+                <div class="image">
+                    <img src="static/common/images/intro/occupied.jpg">
+                </div>
+                <div class="content">
+                    <p> 每个放下的棋子不得和之前任何棋子有格子重叠 </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ui vertical stripe quote segment">
+    <div class="ui equal width stackable internally celled grid container">
+        <div class="row">
+            <div class="seven wide column">
+                <h3>操作</h3>
+                <p>鼠标点击选中某一个棋子后，使用按键旋转/翻转棋子</p>
+                <div class="ui compact segment">
+                    <div class="ui horizontal list">
+                        <div class="item"> <div class="content"> 
+                            <p>使用按键 S/W 将</p>
+                        </div> </div>
+                        <div class="item">
+                            <img class="ui bordered middle aligned image" src="static/common/images/intro/w.jpg">
+                            <div class="content">
+                                <p>上下翻转为</p> 
+                            </div>
+                        </div>
+                        <div class="item">
+                            <img class="ui bordered middle aligned image" src="static/common/images/intro/s.jpg">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="ui compact segment">
+                        <div class="ui horizontal list">
+                            <div class="item"> <div class="content"> 
+                                <p>使用按键 A 将</p>
+                            </div> </div>
+                            <div class="item">
+                                <img class="ui bordered middle aligned image" src="static/common/images/intro/w.jpg">
+                                <div class="content">
+                                    <p>逆时针旋转为</p>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <img class="ui bordered middle aligned image" src="static/common/images/intro/a.jpg">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui compact segment">
+                        <div class="ui horizontal list">
+                            <div class="item"> <div class="content"> 
+                                <p>使用按键 D 将</p>
+                            </div> </div>
+                            <div class="item">
+                                <img class="ui bordered middle aligned image" src="static/common/images/intro/w.jpg">
+                                <div class="content">
+                                    <p>顺时针旋转为</p>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <img class="ui bordered middle aligned image" src="static/common/images/intro/d.jpg">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nine wide column">
+                <h3>计时规则 </h3>
+                <p> 对每一局游戏，每个玩家有总用时和额外用时，其中额外计时每回合重置。 </p>
+                <p> 当轮到某个玩家的回合时，会首先消耗这一步的用时，当这一步的用时消耗完后，会消耗这一局的总用时。总用时也消耗完后会由系统随机放下一个棋子并强制进入下一个玩家的回合。 </p>
+                <div class="ui divider"></div>
+                <h3>计分规则</h3>
+                <p>对局结束后，按照玩家未能放在棋盘上棋子的格子个数排名。</p>
+                <p>格子越少排名越靠前</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="ui vertical stripe segment container">
+    <h3>显示</h3>
+    <div class="ui fluid card">
+        <div class="image">
+            <img src="static/common/images/intro/progress_bar.jpg">
+        </div>
+        <div class="content">
+            <p>每个玩家有对应的进度条，该玩家对应的颜色表示总用时，灰色表示额外用时。进度条下方会标有具体数值。</p>
+            <p>该图中玩家总用时为 3 分钟，额外用时为 15 秒。</p>
+            <p>在 3 分 15 秒内不落子会由系统随机放下一个棋子并强制进入下一个玩家的回合。</p>
+        </div>
+    </div>
+    <div class="ui stackable grid four column">
+        <div class="ui column">
+            <div class="ui card">
+                <div class="image">
+                    <img src="static/common/images/intro/additional.png">
+                </div>
+                <div class="content">
+                    <p> 消耗额外用时，在对应玩家的进度条上会有灰色的燃烧效果 </p>
+                </div>
+            </div>
+        </div>
+        <div class="ui column">
+            <div class="ui card">
+                <div class="image">
+                    <img src="static/common/images/intro/accuracy.png">
+                </div>
+                <div class="content">
+                    <p> 消耗总用时，在对应玩家的进度条上会有对应颜色的燃烧效果 </p>
+                </div>
+            </div>
+        </div>
+        <div class="ui column">
+            <div class="ui card">
+                <div class="image">
+                    <img src="static/common/images/intro/shadow.jpg">
+                </div>
+                <div class="content">
+                    <p> 棋子在落下前是半透明状态，当移动一个棋子时，该棋子会以阴影效果显示落下后在棋盘所占据的位置 </p>
+                </div>
+            </div>
+        </div>
+        <div class="ui column">
+            <div class="ui card">
+                <div class="image">
+                    <img src="static/common/images/intro/texture.jpg">
+                </div>
+                <div class="content">
+                    <p>每个玩家最后一个落下的棋子会带有纹理的特殊显示</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
