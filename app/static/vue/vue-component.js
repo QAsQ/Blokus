@@ -97,12 +97,12 @@ Vue.component("user-data", {
 
 function try_join(player_id){
     if (!check_login()) return
-    $.post("/api/battles/" + battle_inferface.battle_data.battle_id + "/players/" + player_id, {}, function(data){
+    $.post("/api/battles/" + battle_interface.battle_data.battle_id + "/players/" + player_id, {}, function(data){
         if(data.message != "success"){
             show_message(data.message)
             return
         }
-        battle_inferface.battle_data = data.result
+        battle_interface.battle_data = data.result
     })
 }
 
@@ -110,13 +110,13 @@ function try_leave(player_id, call_back){
     if (!check_login()) return
     $.ajax({
         method: "delete",
-        url:"/api/battles/" + battle_inferface.battle_data.battle_id + "/players/" + player_id, 
+        url:"/api/battles/" + battle_interface.battle_data.battle_id + "/players/" + player_id, 
         success: function(data){
             if(data.message != "success"){
                 show_message(data.message)
                 return
             }
-            battle_inferface.battle_data = data.result
+            battle_interface.battle_data = data.result
             if (typeof(call_back) != "undefined")
                 call_back()
         },
@@ -444,22 +444,22 @@ Vue.component("chat-box", {
             this.bottom = chat_box[0].scrollTop + chat_box.height() >= chat_box[0].scrollHeight
         },
         send_message: function(){
-            self = this
+            var self = this
             if (!check_login())
                 return
             var content = $("#input_box").val()
             if (content == "")
                 return
-            var battle_id = battle_inferface.battle_data.battle_id
+            var battle_id = battle_interface.battle_data.battle_id
             var url = "/api/battles/" + battle_id + "/chat_logs"
             $.ajax({
                 type: "POST",
                 url: url,
-                data: JSON.stringify({"content": content}),
+                data: JSON.stringify({"content": content, require: battle_interface.generate_require()}),
                 contentType: 'application/json; charset=UTF-8',
                 success: function(data){
                     if (data.message == "success"){
-                        battle_inferface.battle_data = data.result
+                        battle_interface.update_battle_data(data.result)
                         self.roll_to_bottom()
                         $("#input_box").val("")
                     }
@@ -562,7 +562,7 @@ Vue.component("control-panel", {
                 success: function(data){
                     control_panel.loading = false
                     if (data.message == "success"){
-                        battle_inferface.battle_data = data.result
+                        battle_interface.battle_data = data.result
                     }
                     else{
                         show_message(data.message)
@@ -701,10 +701,10 @@ Vue.component("battle-interface", {
         this.board.loadState(this.battle_data, this.current_position)
     },
     methods: {
-        "board_detach_active_piece": function(){
+        board_detach_active_piece: function(){
             this.board.detach()
         },
-        "move" : function(step){
+        move : function(step){
             var bound = [0, this.battle_data.board_info.history.length]
             if (Math.abs(step) === 1){
                 this.current_position += step
@@ -721,8 +721,11 @@ Vue.component("battle-interface", {
         'battle_data.battle_info.ended': function(){
             this.current_position = this.battle_data.board_info.history.length 
         },
-        'battle_data.board_info': function(){
-            this.board.loadState(this.battle_data, this.current_position)
+        'battle_data.board_info': {
+            handler(){
+                this.board.loadState(this.battle_data, this.current_position)
+            },
+            deep: true
         },
         'player_id': function(){
             this.board.update_player(this.player_id)

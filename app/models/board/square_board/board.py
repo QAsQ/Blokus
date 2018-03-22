@@ -24,12 +24,22 @@ class Board:
                 self.pieces[player_id].append(piece)
 
 
-    def get_info(self):
-        return {
-            "board_type": "square_standard",
-            "history": self.drop_history,
-            "board_progress": self.dropped_cells * 1.0 /  self.amount_cells
-        }
+    def get_info(self, start=-1):
+        if start < 0:
+            return {
+                "board_type": "square_standard",
+                "history": self.drop_history,
+                "board_progress": self.dropped_cells * 1.0 /  self.amount_cells
+            }
+        else:
+            return {
+                "board_type": "square_standard",
+                "history": {
+                    "start": start,
+                    "result": self.drop_history[start:]
+                },
+                "board_progress": self.dropped_cells * 1.0 /  self.amount_cells
+            }
 
     def try_drop_piece(self, player_id, piece_id, dict_position):
         position = Position.from_dict(dict_position)

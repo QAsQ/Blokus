@@ -359,6 +359,7 @@ function PieceFactory(pieceId,
         pieces.visible = true
         pieces.interactive = false
         pieces.alpha = colorTheme.piece.dropped_alpha
+        pieces.deactiveShadow()
     }
 
     pieces.PickUp= function(rights){
@@ -703,14 +704,15 @@ function generateBoard(canvas, mPlayerId, boardData, colorTheme){
     gBoardSize = gCellSize * 20;
 
     function TryDropPiece(data){
+
         $.ajax({
             method: "POST",
-            url:"/api/battles/" + battle_inferface.battle_data.battle_id,
+            url:"/api/battles/" + battle_interface.battle_data.battle_id,
             data: JSON.stringify(data),
             contentType: 'application/json; charset=UTF-8',
             success: function(data){
                 if (data.message == "success"){
-                    battle_inferface.battle_data = data.result
+                    battle_interface.battle_data = data.result
                 }
                 else{
                     show_message(data.message)

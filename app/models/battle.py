@@ -106,7 +106,7 @@ class Battle:
 
         return self.get_state(timestamp)
     
-    def get_state(self, timestamp=-1, user_id=-1):
+    def get_state(self, timestamp=-1, user_id=-1, require={}):
         def get_player_id():
             if user_id == -1:
                 return -1
@@ -118,13 +118,55 @@ class Battle:
         player_id = get_player_id()
         self._update_info(timestamp, player_id)
 
-        return {
-            "battle_id": self.id,
-            "players_info": self.players_info,
-            "board_info": self.board.get_info(),
-            "battle_info": self._get_battle_info(),
-            "chat_logs": self.chat_logs
+        generator = {
+            "battle_id": self._get_battle_id,
+            "players_info": self._get_players_info,
+            "board_info": self.board.get_info,
+            "battle_info": self._get_battle_info,
+            "chat_logs": self._get_chat_logs
         }
+
+        result = {}
+
+        for field in generator:
+            if field in require:
+                result[field] = generator[field](require[field])
+            else:
+                result[field] = generator[field]()
+        
+        return result
+    
+    def _get_battle_id(self):
+        return self.id
+    
+    def _get_players_info(self, mode='full'):
+        if mode == 'mini':
+            fields = ["user_id", "accuracy_time_left", "additional_time_left", "is_hosting", "battle_result"]
+            user_data_fields = ['username']
+            result = []
+            for player_info in self.players_info:
+                info = {}
+                for field in fields:
+                    if field in player_info:
+                        info[field] = player_info[field]
+                for field in user_data_fields:
+                    if "user_data" in player_info and field in player_info['user_data']:
+                        if 'user_data' not in info:
+                            info['user_data'] = {}
+                        info['user_data'][field] = player_info['user_data'][field]
+                result.append(info)
+            return result
+        elif mode =='full':
+            return self.players_info
+    
+    def _get_chat_logs(self, start=-1):
+        if start < 0:
+            return self.chat_logs
+        else:
+            return {
+                "start": start,
+                "result": self.chat_logs[start:]
+            }
 
     def try_drop_piece(self, timestamp, player_id, user_id, piece_id, dict_position):
         if self.players_info[player_id]['user_id'] != user_id:
@@ -133,6 +175,7 @@ class Battle:
             return False
 
         if self.board.try_drop_piece(player_id, piece_id, dict_position):
+            self.players_info[self.current_player]['additional_time_left'] = self.additional_time
             self.current_player = (self.current_player + 1) % 4
             self._update_ended(self.board.is_ended())
 
@@ -143,7 +186,7 @@ class Battle:
         else:
             return False
 
-    def appent_chat_log(self, timestamp, username, content):
+    def append_chat_log(self, timestamp, username, content, require={}):
         self.chat_logs.append({
             "timestamp": timestamp,
             "username": username,
@@ -151,7 +194,7 @@ class Battle:
         })
 
         self._update("chat_logs", self.chat_logs)
-        return self.get_state(timestamp)
+        return self.get_state(timestamp, require=require)
     
     def _update_ended(self, ended):
         if not self.ended and ended:
@@ -167,20 +210,32 @@ class Battle:
         self.ended = ended
         self._update_players()
 
-    def _get_battle_info(self):
-        return {
-            "battle_name": self.battle_name,
-            "accuracy_time": self.accuracy_time,
-            "additional_time": self.additional_time,
-            "started": self.started,
-            "ended": self.ended,
-            "create_time": self.create_time,
-            "start_time": self.start_time,
-            "initiation_time": self.initiation_time,
-            "left_position": self._get_left_position(),
-            "current_player": self.current_player,
-            "current_time": self.current_time
-        }
+    def _get_battle_info(self, field='full'):
+        if field == 'full':
+            return {
+                "battle_name": self.battle_name,
+                "accuracy_time": self.accuracy_time,
+                "additional_time": self.additional_time,
+                "started": self.started,
+                "ended": self.ended,
+                "create_time": self.create_time,
+                "start_time": self.start_time,
+                "initiation_time": self.initiation_time,
+                "left_position": self._get_left_position(),
+                "current_player": self.current_player,
+                "current_time": self.current_time
+            }
+        elif field == 'mini':
+            return {
+                "battle_name": self.battle_name,
+                "accuracy_time": self.accuracy_time,
+                "additional_time": self.additional_time,
+                "started": self.started,
+                "ended": self.ended,
+                "current_player": self.current_player,
+                "initiation_time": self.initiation_time
+            }
+
 
     def _get_left_position(self):
         left_position = 0

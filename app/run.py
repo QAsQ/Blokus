@@ -11,7 +11,7 @@ from models.battle import Battle, BattleFactory
 from models.board import BoardFactory
 from models.user import User
 from models.db_utility import init_generate, id_clear, id_generate, auth_db, filter_condition_generate, sort_condition_generate, username_checker
-from models.app_utility import success, failure, field_checker, current_time
+from models.app_utility import success, failure, field_checker, current_time, require_format
 
 from config import db_config, app_config
 
@@ -146,7 +146,6 @@ def battles():
             return failure("request syntax error! need json string!")
 
         if "username" in query and not username_checker(db, query['username']):
-            print("wtf")
             return failure("user not exist")
         
         mongo_query = filter_condition_generate(query)
@@ -202,7 +201,9 @@ def battle(battle_id):
         return failure(battle)
 
     if request.method == 'GET':
-        return success(battle.get_state(current_time(), user_id))
+        require = require_format(request.args)
+        return success(battle.get_state(current_time(), user_id, require))
+
 
     elif request.method == 'POST':
         #todo check user_id match player_id
@@ -234,11 +235,13 @@ def chat_logs(battle_id):
     battle = BattleFactory.load_battle(battle_id, db)
     if isinstance(battle, str):
         return failure(battle)
-
-    result = battle.appent_chat_log(
+    
+    require = request_json.get("require", {})
+    result = battle.append_chat_log(
         current_time(),
         current_user.username,
-        request_json['content']
+        request_json['content'],
+        require=require
     )
     if isinstance(result, str):
         return failure(result)
