@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block head %}
+<script>
+$(document).ready(function() {
+    user: {{ target_user.dump()|tojson|safe }}
+</script>
+{% endblock %}
+
+{% block content %}
+{% endblock %}

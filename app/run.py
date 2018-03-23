@@ -11,9 +11,10 @@ from models.battle import Battle, BattleFactory
 from models.board import BoardFactory
 from models.user import User
 from models.db_utility import init_generate, id_clear, id_generate, auth_db, filter_condition_generate, sort_condition_generate, username_checker
-from models.app_utility import success, failure, field_checker, current_time, require_format
+from models.app_utility import success, failure, field_checker, current_time, require_format, generate_register_token, get_email_from_token
+from models.mail_utility import send_register_mail, send_reset_mail
 
-from config import db_config, app_config
+from config import db_config, app_config, email_config, url_head
 
 
 db = MongoClient(host=db_config['host'], port=db_config['port'])[db_config['db_name']]
@@ -45,6 +46,7 @@ def userlist_page():
     projection = {"password" : False}
     sort = [("user_info.rating", pymongo.DESCENDING)]
     users = id_clear(db.users.find(
+        filter={"user_info.number_of_battles": {"$ne": 0}},
         projection=projection,
         sort=sort))
     return render_template("rank_list.html", users=users)
@@ -62,6 +64,34 @@ def user_page():
 
     return render_template("user.html", target_user=user)
 
+@app.route("/users_setting")
+def user_settint_page():
+    try:
+        user_id = int(request.args.get("user_id"))
+    except:
+        return render_template("error.html", message="该用户不存在")
+
+    user = User.load_from_id(db, user_id)
+    if user is None:
+        return render_template("error.html", message="该用户不存在")
+    
+    if user.user_id != current_user.user_id:
+        return render_template("error.html", message="没有权限")
+
+    return render_template("user_setting.html", target_user=user)
+
+@app.route("/register")
+def regiester_page():
+    try:
+        token = request.args.get("token")
+        email = get_email_from_token(token)
+        if email == False:
+            return redirect("error.html", "没有权限")
+    except Exception as e:
+        return redirect("error.html", "没有权限")
+    
+    return render_template("register.html", email=email, token=token)
+
 @app.route("/battle")
 def battle_page():
     try:
@@ -75,6 +105,24 @@ def battle_page():
         return render_template("error.html", message=battle)
 
     return render_template("battle.html", battle=battle.get_state(current_time(), current_user.user_id))
+
+@app.route("/api/register", methods=['POST'])
+def regiester():
+    request_json = request.get_json(force=True)
+
+    check_res = field_checker(request_json, ['email'])
+    if check_res is not None:
+        return failure(check_res)
+
+    result = send_register_mail(
+        request_json['email'], 
+        url_head + "/register?token=" + generate_register_token(request_json['email']), 
+        email_config
+    )
+
+    if result != "success":
+        return failure(result)
+    return success("")
 
 @app.route("/api/users", methods=['GET', 'POST'])
 def users():
@@ -95,9 +143,14 @@ def users():
     elif request.method == 'POST':
         request_json = request.get_json(force=True)
 
-        check_res = field_checker(request_json, ['username', 'email', 'password'])
+        check_res = field_checker(request_json, ['username', 'email', 'password', 'token'])
         if check_res is not None:
             return failure(check_res)
+        
+        try:
+            assert(get_email_from_token(request_json['token']) == request_json['email'])
+        except Exception as e:
+            return failure("Permission Denied")
 
         user = User.create(
             db, 

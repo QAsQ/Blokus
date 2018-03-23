@@ -1,6 +1,5 @@
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_login import UserMixin
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app
 import json
 
@@ -35,7 +34,6 @@ class User(UserMixin):
         self.username = user_data["username"]
         self.email = user_data["email"]
         self.password = user_data['password']
-        self.confirmed = user_data['confirmed']
         self.user_info = user_data["user_info"]
 
         self.db = db.users
@@ -45,7 +43,6 @@ class User(UserMixin):
             "user_id": self.user_id,
             "username": self.username,
             "email": self.email,
-            "confirmed": self.confirmed,
             "user_info": self.user_info
         }
 
@@ -53,22 +50,6 @@ class User(UserMixin):
             dict_data["password"] = self.password
 
         return dict_data
-
-    def generate_confirmation_token(self, expiration=3600):
-        s = Serializer(current_app.config['SECRET_KEY'], expiration)
-        return s.dumps({'user_id': self.user_id})
-
-    def confirm(self, token):
-        s = Serializer(current_app.config['SECRET_KEY'])
-        try:
-            data = s.loads(token)
-            if data.get('user_id') != self.user_id:
-                return False
-        except:
-            return False
-
-        self.confirmed = True
-        self.db.update({"user_id": self.user_id}, {"confirmed": True})
     
     def update_battle_result(self, victory, rating):
         self.user_info['rating'] = rating
@@ -115,7 +96,6 @@ class User(UserMixin):
                 "user_id": -1,
                 "username": "not login",
                 "email": "anonymous@blokus.io",
-                "confirmed": True,
                 "password": "",
                 "user_info": default_info
             })
@@ -145,7 +125,6 @@ class User(UserMixin):
             "email": email,
             "password": generate_password_hash(password),
             "user_id": id_generate(db, "users"),
-            "confirmed": False,
             "user_info": default_info
         }
 

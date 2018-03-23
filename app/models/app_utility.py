@@ -1,4 +1,5 @@
-from flask import jsonify
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from flask import jsonify, current_app
 import time
 
 def success(result):
@@ -42,4 +43,18 @@ def require_format(request_args):
     
     return require
 
+def generate_register_token(email, expiration=3600):
+    s = Serializer(current_app.config['SECRET_KEY'], expiration)
+    token = s.dumps({'email': email}).decode()
+    return s.dumps({'email': email}).decode()
+
+def get_email_from_token(token):
+    s = Serializer(current_app.config['SECRET_KEY'])
+    try:
+        data = s.loads(token)
+        if 'email' not in data:
+            return False
+    except:
+        return False
     
+    return data.get("email")

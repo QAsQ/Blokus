@@ -11,7 +11,7 @@ Vue.component("user-item", {
             <a v-show="!logged" class="ui labeled icon teal button" href="javascript:void(0)" onclick="$('#login').modal('show')">
                 <i class="sign in icon"></i>
                 登录</a>
-            <a v-show="!logged" class="ui labeled icon teal button" href="javascript:void(0)" onclick="$('#regiester').modal('show')">
+            <a v-show="!logged" class="ui labeled icon teal button" href="javascript:void(0)" onclick="$('#email').modal('show')">
                 <i class="add user icon"></i>
                 注册</a>
             <a v-show="logged" class="ui basic black right labeled icon dropdown">
