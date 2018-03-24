@@ -57,3 +57,9 @@ def get_email_from_token(token):
         return False
     
     return data.get("email")
+
+def token_verify(db, token):
+    if list(db.token.find({"token": token})) == []:
+        db.token.insert({"token": token})
+        return True
+    return False 

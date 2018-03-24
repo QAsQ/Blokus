@@ -11,7 +11,7 @@ from models.battle import Battle, BattleFactory
 from models.board import BoardFactory
 from models.user import User
 from models.db_utility import init_generate, id_clear, id_generate, auth_db, filter_condition_generate, sort_condition_generate, username_checker
-from models.app_utility import success, failure, field_checker, current_time, require_format, generate_register_token, get_email_from_token
+from models.app_utility import success, failure, field_checker, current_time, require_format, generate_register_token, get_email_from_token, token_verify
 from models.mail_utility import send_register_mail, send_reset_mail, send_confirm_email
 
 from config import db_config, app_config, email_config, url_head
@@ -89,6 +89,8 @@ def regiester_page():
         email = get_email_from_token(token)
         if email == False:
             return render_template("error.html", message="没有权限")
+        if not token_verify(db, token):
+            return render_template("error.html", message="网址已过期")
     except Exception:
         return render_template("error.html", message="没有权限")
     
@@ -101,6 +103,8 @@ def confirm_page():
         email = get_email_from_token(token)
         if email == False or current_user.user_id == -1:
             return render_template("error.html", message="没有权限")
+        if not token_verify(db, token):
+            return render_template("error.html", message="网址已过期")
     except Exception:
             return render_template("error.html", message="没有权限")
     
@@ -116,6 +120,8 @@ def password_resetter_page():
         user = User.load_from_email(db, email)
         if email == False:
             return render_template("error.html", message="没有权限")
+        if not token_verify(db, token):
+            return render_template("error.html", message="网址已过期")
     except Exception:
         return render_template("error.html", message="没有权限")
     
