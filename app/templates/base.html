@@ -12,7 +12,7 @@
     <link rel="stylesheet" type="text/css" href="static/base/base.css">
     <link rel="shortcut icon" href="static/favicon.ico">
     <script>
-        function Callback(form, url, message, on_success){
+        function Callback(url, method, form, message, on_success){
             return function(){
                 form.addClass("loading")
                 var res = false
@@ -20,17 +20,24 @@
 
                 if(data.register_password !== undefined)
                     data.password = data.register_password
+                if(data.old_password !== undefined)
+                    data.password = data.old_password
+                if(data.new_password !== undefined)
+                    data.password = data.new_password
                 if("undefined" !== typeof(token))
                     data.token = token
                 
+                console.log(url)
+                
                 $.ajax({
-                    type: "POST",
+                    type: method,
                     url:  url, 
                     data: JSON.stringify(data),
                     contentType: 'application/json; charset=UTF-8',
                     async: false,
                     success: function(data){
                         form.removeClass("loading")
+                        console.log(data)
                         if (data.message == "success"){
                             form.addClass("success")
                             on_success(data)
@@ -102,8 +109,9 @@
                     }  
                 },
                 onSuccess: Callback(
-                    $("#login_form"),
                     "/api/users/online",
+                    "POST",
+                    $("#login_form"),
                     $("#login_message"),
                     function(data){
                         user_item.user = Object.assign(user_item.user, data.result)
@@ -124,8 +132,9 @@
                     }
                 },
                 onSuccess: Callback(
-                    $("#email_form"),
                     "/api/register",
+                    "POST",
+                    $("#email_form"),
                     $("#email_message"),
                     function(data){
                         $('#email_notify').modal("show")
@@ -150,6 +159,7 @@
     <a class="active item">主页</a>
     <a class="item">在线对局</a>
     <a class="item">用户排名</a>
+    <a class="item">关于</a>
     <a class="item" onclick="$('#login').modal('show')">登录</a>
     <a class="item" onclick="$('#email').modal('show')">注册</a>
 </div>
@@ -174,6 +184,7 @@
                     </a>
                     <a class="item" href="/battles">在线对局</a>
                     <a class="item" href="/rank-list">用户排名</a>
+                    <a class="item" href="/about">关于</a>
                     <div class="right item">
                         <user-item id="user_item" :user="user"></user-item>
                     </div>

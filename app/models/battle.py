@@ -5,7 +5,7 @@ from .user import User
 from .rating import calculate_rating
 
 default_offline_time = 60
-#60 无连接视为掉线
+#60s 无连接视为掉线
 
 class Battle:
     def __init__(self, timestamp, battle_info, board, db, chat_logs=[], players_info=None, battle_id=None):
@@ -252,6 +252,7 @@ class Battle:
                 }
             }
         )
+
     def _update_players(self):
         self._update("players_info", self.players_info)
     

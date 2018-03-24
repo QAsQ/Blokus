@@ -45,7 +45,6 @@ def require_format(request_args):
 
 def generate_register_token(email, expiration=3600):
     s = Serializer(current_app.config['SECRET_KEY'], expiration)
-    token = s.dumps({'email': email}).decode()
     return s.dumps({'email': email}).decode()
 
 def get_email_from_token(token):

@@ -74,6 +74,17 @@ class User(UserMixin):
                 }
             )
 
+    def update(self, key, value):
+        if key == "password":
+            value = generate_password_hash(value)
+        
+        self.__setattr__(key, value)
+
+        self.db.update(
+            {"user_id": self.user_id}, 
+            {"$set": {key: value}}
+        )
+
     def check_password(self, password):
         if self.password is None:
             return False

@@ -66,6 +66,22 @@ def send_register_mail(user_email, url, config):
 
     return send_mail(user_email, message_head, message_body, config)
 
+def send_confirm_email(username, user_email, url, config):
+    message_body = '''
+    <h1>Blokus 激活邮箱</h1>
+
+    <p>您好！请点击<a href="{url}">这里</a> 激活您的邮箱<p>
+    <p>如果连接失效，也可以手动复制以下网址到浏览器访问 {url}</p>
+    <p>最后祝您，身体健康</p>
+    <p>再见</p>
+
+    <p> 如果您不是 {username} ,请忽略此邮件 </p>
+    '''.format(url=url, username=username)
+    message_head = '[Blokus] 激活邮箱'
+
+    return send_mail(user_email, message_head, message_body, config)
+
+
 def send_reset_mail(username, user_email, url, config):
     message_body = '''
     <h1>Blokus 重置密码</h1>

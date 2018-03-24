@@ -19,7 +19,7 @@ Vue.component("user-item", {
                 <i class="dropdown icon"></i>
                 <div class="menu">
                     <a class="item" :href="my_index"><i class="user icon"></i>我的主页</a>
-                    <div class="item"><i class="setting icon"></i>设置</div>
+                    <a class="item" :href="setting"><i class="setting icon"></i>设置</a>
                     <div class="item" v-on:click="logout"><i class="sign out icon"></i>退出</div>
                 </div>
             </a>
@@ -50,6 +50,9 @@ Vue.component("user-item", {
         },
         my_index: function(){
             return "/users?user_id=" + this.user.user_id
+        },
+        setting: function(){
+            return "/user_setting?user_id=" + this.user.user_id
         }
     }
 });

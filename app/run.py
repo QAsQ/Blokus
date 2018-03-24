@@ -12,7 +12,7 @@ from models.board import BoardFactory
 from models.user import User
 from models.db_utility import init_generate, id_clear, id_generate, auth_db, filter_condition_generate, sort_condition_generate, username_checker
 from models.app_utility import success, failure, field_checker, current_time, require_format, generate_register_token, get_email_from_token
-from models.mail_utility import send_register_mail, send_reset_mail
+from models.mail_utility import send_register_mail, send_reset_mail, send_confirm_email
 
 from config import db_config, app_config, email_config, url_head
 
@@ -41,6 +41,10 @@ def index_page():
 def battles_page():
     return render_template("battles.html")
 
+@app.route("/about")
+def about_page():
+    return render_template("about.html")
+
 @app.route("/rank-list")
 def userlist_page():
     projection = {"password" : False}
@@ -64,21 +68,19 @@ def user_page():
 
     return render_template("user.html", target_user=user)
 
-@app.route("/users_setting")
-def user_settint_page():
+@app.route("/user_setting")
+def user_setting_page():
     try:
         user_id = int(request.args.get("user_id"))
     except:
         return render_template("error.html", message="该用户不存在")
-
     user = User.load_from_id(db, user_id)
     if user is None:
         return render_template("error.html", message="该用户不存在")
-    
     if user.user_id != current_user.user_id:
         return render_template("error.html", message="没有权限")
 
-    return render_template("user_setting.html", target_user=user)
+    return render_template("user_setting.html", target_user=user, updated=False)
 
 @app.route("/register")
 def regiester_page():
@@ -87,10 +89,25 @@ def regiester_page():
         email = get_email_from_token(token)
         if email == False:
             return redirect("error.html", "没有权限")
-    except Exception as e:
+    except Exception:
         return redirect("error.html", "没有权限")
     
     return render_template("register.html", email=email, token=token)
+
+@app.route("/confirm")
+def confirm_page():
+    try:
+        token = request.args.get("token")
+        email = get_email_from_token(token)
+        if email == False or current_user.user_id == -1:
+            return redirect("error.html", "没有权限")
+    except Exception:
+        return redirect("error.html", "没有权限")
+    
+    current_user.update("email", email)
+    
+    return render_template("user_setting.html", target_user=current_user, updated=True)
+
 
 @app.route("/battle")
 def battle_page():
@@ -120,6 +137,27 @@ def regiester():
         email_config
     )
 
+    if result != "success":
+        return failure(result)
+    return success("")
+
+@app.route("/api/confirm", methods=['POST'])
+def confirm():
+    request_json = request.get_json(force=True)
+    check_res = field_checker(request_json, ['email', 'password'])
+    if check_res is not None:
+        return failure(check_res)
+    if not current_user.check_password(request_json['password']):
+        return failure("原密码错误")
+
+    result = send_confirm_email(
+        current_user.username,
+        request_json['email'], 
+        url_head + "/confirm?token=" + generate_register_token(request_json['email']), 
+        email_config
+    )
+
+    result='success'
     if result != "success":
         return failure(result)
     return success("")
@@ -164,6 +202,29 @@ def users():
         login_user(user)
 
         return success(user.dump())
+
+@app.route("/api/users/<int:user_id>", methods=['PUT'])
+def user(user_id):
+    if current_user.user_id == -1 or current_user.user_id != user_id:
+        return failure("perission denied")
+    request_json = request.get_json(force=True)
+
+    check_res = field_checker(request_json, ['old_password'])
+    if check_res is not None:
+        return failure(check_res)
+    
+    if not current_user.check_password(request_json['old_password']):
+        return failure("原密码错误")
+    
+    legal_field = ['username', 'password']
+    for key in list(request_json):
+        if key not in legal_field:
+            request_json.pop(key)
+
+    for key in request_json:
+        current_user.update(key, request_json[key])
+    
+    return success(current_user.dump())
 
 @app.route("/api/users/online", methods=['POST', 'DELETE'])
 def login():
