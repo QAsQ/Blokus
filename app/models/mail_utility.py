@@ -82,7 +82,7 @@ def send_confirm_email(username, user_email, url, config):
     return send_mail(user_email, message_head, message_body, config)
 
 
-def send_reset_mail(username, user_email, url, config):
+def send_reset_mail(user_email, url, config):
     message_body = '''
     <h1>Blokus 重置密码</h1>
 
@@ -90,9 +90,7 @@ def send_reset_mail(username, user_email, url, config):
     <p>如果连接失效，也可以手动复制以下网址到浏览器访问 {url}</p>
     <p>最后祝您，身体健康</p>
     <p>再见</p>
-
-    <p> 如果您不是 {username} ,请忽略此邮件 </p>
-    '''.format(url="https://blokus.io", username=username)
+    '''.format(url=url)
     message_head = '[Blokus] 重置密码'
 
     return send_mail(user_email, message_head, message_body, config)

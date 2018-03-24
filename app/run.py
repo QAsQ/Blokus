@@ -88,9 +88,9 @@ def regiester_page():
         token = request.args.get("token")
         email = get_email_from_token(token)
         if email == False:
-            return redirect("error.html", "没有权限")
+            return render_template("error.html", message="没有权限")
     except Exception:
-        return redirect("error.html", "没有权限")
+        return render_template("error.html", message="没有权限")
     
     return render_template("register.html", email=email, token=token)
 
@@ -100,13 +100,26 @@ def confirm_page():
         token = request.args.get("token")
         email = get_email_from_token(token)
         if email == False or current_user.user_id == -1:
-            return redirect("error.html", "没有权限")
+            return render_template("error.html", message="没有权限")
     except Exception:
-        return redirect("error.html", "没有权限")
+            return render_template("error.html", message="没有权限")
     
     current_user.update("email", email)
     
     return render_template("user_setting.html", target_user=current_user, updated=True)
+
+@app.route("/password_resetter")
+def password_resetter_page():
+    try:
+        token = request.args.get("token")
+        email = get_email_from_token(token)
+        user = User.load_from_email(db, email)
+        if email == False:
+            return render_template("error.html", message="没有权限")
+    except Exception:
+        return render_template("error.html", message="没有权限")
+    
+    return render_template("password_resetter.html", token=token, user_id=user.user_id)
 
 
 @app.route("/battle")
@@ -141,6 +154,24 @@ def regiester():
         return failure(result)
     return success("")
 
+@app.route("/api/password_resetter", methods=['POST'])
+def password_resetter():
+    request_json = request.get_json(force=True)
+
+    check_res = field_checker(request_json, ['email'])
+    if check_res is not None:
+        return failure(check_res)
+
+    result = send_reset_mail(
+        request_json['email'], 
+        url_head + "/password_resetter?token=" + generate_register_token(request_json['email']), 
+        email_config
+    )
+
+    if result != "success":
+        return failure(result)
+    return success("")
+
 @app.route("/api/confirm", methods=['POST'])
 def confirm():
     request_json = request.get_json(force=True)
@@ -157,7 +188,6 @@ def confirm():
         email_config
     )
 
-    result='success'
     if result != "success":
         return failure(result)
     return success("")
@@ -225,6 +255,27 @@ def user(user_id):
         current_user.update(key, request_json[key])
     
     return success(current_user.dump())
+
+@app.route("/api/users/<int:user_id>/email_password_resetter", methods=['PUT'])
+def user_email_password_resetter(user_id):
+    request_json = request.get_json(force=True)
+
+    check_res = field_checker(request_json, ['token', 'password'])
+    if check_res is not None:
+        return failure(check_res)
+    try:
+        token = request_json["token"]
+        email = get_email_from_token(token)
+        user = User.load_from_email(db, email)
+        if email == False:
+            return failure("Permission denied")
+    except Exception:
+        return failure("Permission denied")
+    
+    user.update('password', request_json['password'])
+    login_user(user)
+    
+    return success("")
 
 @app.route("/api/users/online", methods=['POST', 'DELETE'])
 def login():

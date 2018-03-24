@@ -92,6 +92,23 @@
                 })
                 return result
             }
+            $.fn.form.settings.rules.used = function(value, type) {
+                var data = {}
+                data[type] = value
+                var result = false
+                $.ajax({
+                    type: "get",
+                    url:  "/api/users", 
+                    data: {query: JSON.stringify(data)},
+                    contentType: 'application/json; charset=UTF-8',
+                    async: false,
+                    success: function(data){
+                        result = data.message == "success" 
+                                 && data.result.length !== 0
+                    }                
+                })
+                return result
+            }
             $('#login_form').form({
                 fields: {
                     email : {
@@ -138,6 +155,27 @@
                     $("#email_message"),
                     function(data){
                         $('#email_notify').modal("show")
+                    }
+                )
+            })
+            $('#reset_form').form({
+                fields: {
+                    email: {
+                        identifier: 'email',
+                        rules: [
+                            {type: 'empty', prompt: '邮箱不能为空'},
+                            {type: 'email', prompt: '邮箱格式不正确'},
+                            {type: 'used[email]', prompt: '该邮箱未被注册'}
+                        ]
+                    }
+                },
+                onSuccess: Callback(
+                    "/api/password_resetter",
+                    "POST",
+                    $("#reset_form"),
+                    $("#reset_message"),
+                    function(data){
+                        $('#reset_notify').modal("show")
                     }
                 )
             })
@@ -263,7 +301,8 @@
             <div class="ui error message" id='login_message'></div>
         </form>
         <div class="ui message">
-            还没有账号？<a href="javascript:void(0)" onclick="$('#email').modal('show')">点此注册</a>
+            <p> 还没有账号？<a href="javascript:void(0)" onclick="$('#email').modal('show')">点此注册</a></p>
+            <p> 忘记密码？<a href="javascript:void(0)" onclick="$('#reset').modal('show')">点此重置</a></p>
         </div>
     </div>
 
@@ -286,6 +325,36 @@
     </form>
     <div class="ui message">
         已有账号？<a href="javascript:void(0)" onclick="$('#login').modal('toggle')">点此登陆</a>
+    </div>
+</div>
+
+<div class="ui mini modal" id="reset">
+    <div class="ui header">
+        <i class="teal lock icon"></i>
+        <div class="content"> 重置密码</div>
+    </div>
+    <form class="ui form" id='reset_form' action="javascript:void(0)">
+        <div class="ui segment">
+            <div class="field">
+                <div class="ui left icon input">
+                    <i class="mail icon"></i>
+                    <input type="text" name="email" placeholder="邮箱">
+                </div>
+            </div>
+            <div class="ui fluid large teal submit button">重置密码</div>
+        </div>
+        <div class="ui error message" id="reset_message"></div>
+    </form>
+</div>
+
+<div class="ui mini modal" id="reset_notify">
+    <div class="ui header">
+        <i class="teal lock icon"></i>
+        <div class="content"> 重置密码</div>
+    </div>
+    <div class="ui content">
+        <P>重置密码邮件已经发送到您的电子邮箱。若未能找到对应邮件，请检查是否被归类到垃圾邮件。</P>
+        <div class="ui fluid teal button" onclick="$('#reset_notify').modal('hide')">确定</div>
     </div>
 </div>
 

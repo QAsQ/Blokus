@@ -41,8 +41,9 @@
                 }
             },
             onSuccess: Callback(
-                $("#register_form"),
                 "/api/users",
+                "POST",
+                $("#register_form"),
                 $("#register_message"),
                 function(data){
                     window.location.href="/battles"
@@ -90,7 +91,7 @@
                     </div>
                 </div>
                 <div class="ui fluid large teal submit button">注册</div>
-                <div class="ui error message"></div>
+                <div class="ui error message" id="register_message"></div>
             </form>
         </div>
     </div>
