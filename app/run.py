@@ -43,7 +43,9 @@ def battles_page():
 
 @app.route("/about")
 def about_page():
-    return render_template("about.html")
+    user_number = db.users.find().count()
+    battle_number = db.battles.find().count()
+    return render_template("about.html", user_number=user_number, battle_number=battle_number)
 
 @app.route("/rank-list")
 def userlist_page():
