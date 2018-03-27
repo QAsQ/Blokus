@@ -2,7 +2,17 @@
 
 {% block head %}
 <script>
-    function load_battles(){
+    next_start = 0;
+    $(window).bind('scroll', function () {
+        var bottom = $(window).scrollTop() + $(window).height()
+        var len = $("#gtmdqaq").offset().top
+        if (next_start != -1 && bottom >= len - 61 * 5) {
+            load_battles(flush=false, start=next_start)
+        }
+    })
+    function load_battles(flush = true, start = 0, limit = 30){
+        next_start = -1
+        battle_list.ended = false
         var res = ""
         $.ajax({
             type: "GET",
@@ -11,17 +21,37 @@
             contentType: "applicaton/json",
             data: {
                 sort: JSON.stringify(battle_condition.condition.sort),
-                query: JSON.stringify(battle_condition.condition.query)
+                query: JSON.stringify(battle_condition.condition.query),
+                start: JSON.stringify({"start": start}),
+                limit: JSON.stringify({"limit": limit})
             },
             error: function(){
-                show_message("网络连接超时");
+                show_message("网络连接超时")
+                next_start = start
             }, 
             success: function(data){
                 res = data.message
                 if (data.message != 'success'){
                 }
-                else
-                    battle_list.battles_data = data.result
+                else {
+                    if (flush) {
+                        battle_list.battles_data = data.result.battle_list
+                        if (limit != data.result.length)
+                            battle_list.ended = true
+                    }
+                    else {
+                        if (data.result.start == battle_list.battles_data.length) {
+                            battle_list.battles_data = battle_list.battles_data.concat(data.result.battle_list)
+                        }
+                        else {
+                            battle_list.ended = true
+                            next_start = -1
+                            // console.log("error, battles start does't match")
+                            return
+                        }
+                    }
+                    next_start = data.result.start + limit
+                }
             }
         });
         return res;
@@ -35,7 +65,8 @@
             battle_list = new Vue({
                 el: "#battle_list",
                 data:{
-                    battles_data: null
+                    battles_data: null,
+                    ended: false
                 }
             });
             battle_condition = new Vue({
@@ -98,7 +129,8 @@
             <i class="sync alternate icon"></i> 刷新
         </div>
     </div>
-    <battle-list id="battle_list" :battles_data="battles_data" :show_create="false"></battle-list>
+    <battle-list id="battle_list" :battles_data="battles_data" :ended="ended" :show_create="false"></battle-list>
+    <div id="gtmdqaq"></div>
 </div>
 {% endblock %}
 

@@ -329,12 +329,13 @@ Vue.component("battle-item", {
 });
 
 Vue.component("battle-list", {
-    props: ['battles_data'],
+    props: ['battles_data', 'ended'],
     template: `
         <div class="ui huge divided selection list">
             <battle-item v-for="(battle_data, index) in battles_data"  :key="index"
                 :battle_data="battle_data">
             </battle-item>
+            <div class="ui horizontal divider" v-if="ended"> 我是有底线的 </div>
         </div>`,
     updated: function(){
         $('[name="head"]').popup({inline:true});

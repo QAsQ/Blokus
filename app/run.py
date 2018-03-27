@@ -315,6 +315,8 @@ def battles():
         try:
             query = json.loads(request.args.get("query", "{}"))
             sort = json.loads(request.args.get("sort", "[]"))
+            start = json.loads(request.args.get('start', "{'start': 0}"))['start']
+            limit = json.loads(request.args.get('limit', "{'limit': 30}"))['limit']
         except:
             return failure("request syntax error! need json string!")
 
@@ -337,9 +339,11 @@ def battles():
         # return success(id_clear(db.battles.find(
         #     filter=mongo_query,
         #     sort=mongo_sort)))
-        return success(history_clear(db.battles.find(
+        return success({
+            "start": start,
+            "battle_list": history_clear(db.battles.find(
             filter=mongo_query,
-            sort=mongo_sort)))
+            sort=mongo_sort)[start : start + limit])})
 
     elif request.method == 'POST':
         if current_user.user_id == -1:
