@@ -10,7 +10,7 @@ from flask_login import LoginManager, current_user, login_user, login_required, 
 from models.battle import Battle, BattleFactory
 from models.board import BoardFactory
 from models.user import User
-from models.db_utility import init_generate, id_clear, id_generate, auth_db, filter_condition_generate, sort_condition_generate, username_checker
+from models.db_utility import init_generate, id_clear, history_clear, id_generate, auth_db, filter_condition_generate, sort_condition_generate, username_checker
 from models.app_utility import success, failure, field_checker, current_time, require_format, generate_register_token, get_email_from_token, token_verify
 from models.mail_utility import send_register_mail, send_reset_mail, send_confirm_email
 
@@ -315,6 +315,8 @@ def battles():
         try:
             query = json.loads(request.args.get("query", "{}"))
             sort = json.loads(request.args.get("sort", "[]"))
+            start = json.loads(request.args.get('start', "{'start': 0}"))['start']
+            limit = json.loads(request.args.get('limit', "{'limit': 30}"))['limit']
         except:
             return failure("request syntax error! need json string!")
 
@@ -334,9 +336,14 @@ def battles():
             {"query": query, "sort": sort}
         )
         
-        return success(id_clear(db.battles.find(
+        # return success(id_clear(db.battles.find(
+        #     filter=mongo_query,
+        #     sort=mongo_sort)))
+        return success({
+            "start": start,
+            "battle_list": history_clear(db.battles.find(
             filter=mongo_query,
-            sort=mongo_sort)))
+            sort=mongo_sort)[start : start + limit])})
 
     elif request.method == 'POST':
         if current_user.user_id == -1:
