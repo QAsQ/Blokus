@@ -35,6 +35,15 @@ def id_clear(data_list):
 
     return ret
 
+def history_clear(data_list):
+    ret = []
+    for data in data_list:
+        data.pop("_id")
+        ret.append(data)
+        ret[-1]['board_info']['history'] = []
+        ret[-1]['chat_logs'] = []
+    return ret
+
 def username_checker(db, username):
     return username == "" or db.users.find({"username": username}).count() != 0 
 
