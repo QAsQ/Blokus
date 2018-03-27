@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>Blokus</title>
     <script src="static/jquery/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="static/semantic-ui/semantic.min.css">
+    <script src="static/semantic-ui/semantic.min.js"></script>
     <script src="static/jquery/js.cookie.js"></script>
     <script src='static/vue/vue.js'></script>
     <script src="static/vue/vue-component.js"></script>
-    <link rel="stylesheet" type="text/css" href="static/semantic-ui/semantic.min.css">
-    <script src="static/semantic-ui/semantic.min.js"></script>
     <link rel="stylesheet" type="text/css" href="static/base/base.css">
     <link rel="shortcut icon" href="static/favicon.ico">
     <script>
@@ -69,7 +71,7 @@
                     user: {{ current_user.dump()|tojson|safe }}
                 }
             });
-           // $('.ui.sidebar').sidebar('attach events', '.toc.item');
+            $('.ui.sidebar').sidebar('attach events', '.toc.item');
             $('.ui.modal').modal({
                 duration: 300,
                 transition: 'horizontal flip'
@@ -194,10 +196,10 @@
 
 <body>
 <div class="ui vertical inverted sidebar menu">
-    <a class="active item">主页</a>
-    <a class="item">在线对局</a>
-    <a class="item">用户排名</a>
-    <a class="item">关于</a>
+    <a class="active item" href='/'>主页</a>
+    <a class="item" href="/battles">在线对局</a>
+    <a class="item" href="/rank-list">用户排名</a>
+    <a class="item" href="/about"> 关于</a>
     <a class="item" onclick="$('#login').modal('show')">登录</a>
     <a class="item" onclick="$('#email').modal('show')">注册</a>
 </div>
