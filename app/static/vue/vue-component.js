@@ -1,4 +1,4 @@
-function show_message(message){
+function show_message(message) {
     $("#hit_nag_message").text(message)
     $("#hit_nag").nag('show')
     $("#hit_nag").nag('clear')
@@ -25,33 +25,32 @@ Vue.component("user-item", {
             </a>
         </div>`,
     methods: {
-        logout: function(){
+        logout: function () {
             $.ajax({
                 type: "DELETE",
                 url: "/api/users/online",
-                success: function(data){
-                    if (data.message == "success"){
+                success: function (data) {
+                    if (data.message == "success") {
                         show_message("退出登录成功")
                         user_item.user = Object.assign(user_item.user, data.result)
-                    }
-                    else{
+                    } else {
                         show_message(data.message)
                     }
                 },
-                error: function(data){
+                error: function (data) {
                     show_message("请求失败，请检查网络连接")
                 }
             })
         }
     },
     computed: {
-        logged: function(){
+        logged: function () {
             return this.user.user_id !== -1
         },
-        my_index: function(){
+        my_index: function () {
             return "/users?user_id=" + this.user.user_id
         },
-        setting: function(){
+        setting: function () {
             return "/user_setting?user_id=" + this.user.user_id
         }
     }
@@ -92,16 +91,16 @@ Vue.component("user-data", {
         </div>
     </div>`,
     computed: {
-        rate_of_victory: function(){
+        rate_of_victory: function () {
             return (this.user.user_info.rate_of_victory * 100).toFixed(2) + "%"
         }
     }
 })
 
-function try_join(player_id){
+function try_join(player_id) {
     if (!check_login()) return
-    $.post("/api/battles/" + battle_interface.battle_data.battle_id + "/players/" + player_id, {}, function(data){
-        if(data.message != "success"){
+    $.post("/api/battles/" + battle_interface.battle_data.battle_id + "/players/" + player_id, {}, function (data) {
+        if (data.message != "success") {
             show_message(data.message)
             return
         }
@@ -109,28 +108,28 @@ function try_join(player_id){
     })
 }
 
-function try_leave(player_id, call_back){
+function try_leave(player_id, call_back) {
     if (!check_login()) return
     $.ajax({
         method: "delete",
-        url:"/api/battles/" + battle_interface.battle_data.battle_id + "/players/" + player_id, 
-        success: function(data){
-            if(data.message != "success"){
+        url: "/api/battles/" + battle_interface.battle_data.battle_id + "/players/" + player_id,
+        success: function (data) {
+            if (data.message != "success") {
                 show_message(data.message)
                 return
             }
             battle_interface.battle_data = data.result
-            if (typeof(call_back) != "undefined")
+            if (typeof (call_back) != "undefined")
                 call_back()
         },
-        error: function(data){
-            if (typeof(call_back) != "undefined")
+        error: function (data) {
+            if (typeof (call_back) != "undefined")
                 call_back()
         }
     })
 }
 
-Vue.component("playerinfo-item",{
+Vue.component("playerinfo-item", {
     props: ['player_info', 'item_id', 'player_id', 'ended', 'description_type'],
     template: `
         <div class="item" 
@@ -151,33 +150,31 @@ Vue.component("playerinfo-item",{
             </div>
         </div>`,
     methods: {
-        operator: function(){
+        operator: function () {
             this.dimmer('hide')
-            if (this.player_id === -1){
+            if (this.player_id === -1) {
                 if (this.occupied)
                     return
                 try_join(this.item_id)
-            }
-            else{
+            } else {
                 try_leave(this.item_id)
             }
         },
-        change: function(){
+        change: function () {
             if (this.occupied)
                 return
-            if (this.player_id != this.item_id &&this.player_id !== -1){
+            if (this.player_id != this.item_id && this.player_id !== -1) {
                 try_leave(this.player_id)
                 try_join(this.item_id)
             }
 
         },
-        dimmer: function(argument){
+        dimmer: function (argument) {
             if (argument != "hide" && (
-                (this.player_id != -1 && this.item_id != this.player_id) || 
-                 this.ended || this.occupied)
-            )
+                    (this.player_id != -1 && this.item_id != this.player_id) ||
+                    this.ended || this.occupied))
                 return
-            $("#playerinfo_item_"+this.item_id).dimmer(argument);
+            $("#playerinfo_item_" + this.item_id).dimmer(argument);
         }
     },
     computed: {
@@ -192,22 +189,21 @@ Vue.component("playerinfo-item",{
         image_path: function () {
             return "static/common/images/player/" + (1 << this.item_id) + '.jpg'
         },
-        description: function(){
+        description: function () {
             if (this.player_info.user_id == -1)
                 return "";
-            if (this.description_type == "winning_rate"){
-                if (this.ended){
+            if (this.description_type == "winning_rate") {
+                if (this.ended) {
                     head_char = ""
                     if (this.player_info.battle_result.rating_delta > 0)
                         head_char = "+"
                     return "Rating " + head_char + this.player_info.battle_result.rating_delta
                 }
                 return "胜率:" + (this.player_info.user_data.user_info.rate_of_victory * 100).toFixed(2) + "%"
-            }
-            else if (this.description_type == "battle_state"){
+            } else if (this.description_type == "battle_state") {
                 if (this.ended)
                     return "剩余: " + this.player_info.battle_result.left + " 块"
-                return this.player_info.is_hosting? "托管中" : "在线"
+                return this.player_info.is_hosting ? "托管中" : "在线"
             }
         }
     }
@@ -215,7 +211,7 @@ Vue.component("playerinfo-item",{
 
 Vue.component("playerinfo-list", {
     props: ['players_info', 'ended'],
-    template:`
+    template: `
         <div class='ui big list'>
             <playerinfo-item v-for="(player_info, index) in players_info" :key="index"
                 :item_id="index"
@@ -229,7 +225,7 @@ Vue.component("playerinfo-list", {
 
 Vue.component("battle-info", {
     props: ['battle_info', 'board_info'],
-    template:`
+    template: `
         <div class="ui fluid card">
             <div class="ui image">
                 <img src="static/common/images/standard.png">
@@ -250,9 +246,9 @@ Vue.component("battle-info", {
                 预计剩余时间: {{ remaining_time }}
             </div>
         </div>`,
-    methods:{
+    methods: {
         format_time: function (second) {
-            let minute = Math.floor( second / 60 );
+            let minute = Math.floor(second / 60);
             if (minute < 60)
                 return minute + "分钟";
             let hour = Math.floor(second / 60);
@@ -269,12 +265,12 @@ Vue.component("battle-info", {
             }
             return battletype_translate[this.board_info.board_type]
         },
-        start_state : function () {
-            if (! this.battle_info.started)
+        start_state: function () {
+            if (!this.battle_info.started)
                 return "未开始";
             else
                 return "开始于" + this.format_time(
-                    (Math.floor(new Date().valueOf() / 1000) - this.battle_info.start_time )) + "前"
+                    (Math.floor(new Date().valueOf() / 1000) - this.battle_info.start_time)) + "前"
         },
         accuracy_time: function () {
             return this.battle_info.accuracy_time + "s"
@@ -290,7 +286,7 @@ Vue.component("battle-info", {
 
 Vue.component("battle-item", {
     props: ['battle_data'],
-    template:`
+    template: `
         <div class="item" v-on:click="goto_battle">
             <div class="ui image" name="head">
                 <img class="ui avatar image" :src="image_path">
@@ -311,12 +307,12 @@ Vue.component("battle-item", {
             </div>
         </div>`,
     methods: {
-        goto_battle: function(){
+        goto_battle: function () {
             window.open("/battle?battle_id=" + this.battle_data.battle_id)
         }
     },
-    computed:{
-        image_path: function(){
+    computed: {
+        image_path: function () {
             if (this.battle_data.battle_info.ended)
                 return "static/common/images/battle/ended.jpg"
             state = 0
@@ -337,17 +333,21 @@ Vue.component("battle-list", {
             </battle-item>
             <div class="ui horizontal divider" v-if="ended"> 我是有底线的 </div>
         </div>`,
-    updated: function(){
-        $('[name="head"]').popup({inline:true});
-        $('[name="content"]').popup({inline: true});
+    updated: function () {
+        $('[name="head"]').popup({
+            inline: true
+        });
+        $('[name="content"]').popup({
+            inline: true
+        });
         $('.ui.sticky').sticky({
             offset: 50,
-            context: '#battle_list'}
-        );
+            context: '#battle_list'
+        });
     }
 });
 
-Vue.component("playerinfo-table",{
+Vue.component("playerinfo-table", {
     props: ['players_info', 'ended', 'player_id'],
     template: `
     <div class="ui vertical segment" @click="show_result">
@@ -385,7 +385,7 @@ Vue.component("playerinfo-table",{
         </div>
     </div>`,
     methods: {
-        show_result: function(){
+        show_result: function () {
             if (this.ended)
                 $("#result_modal").modal("show")
         }
@@ -407,7 +407,7 @@ Vue.component("chat-item", {
             </div>
         </div>`,
     computed: {
-        time_format: function(){
+        time_format: function () {
             var date = new Date(this.chat_log.timestamp * 1000)
             return date.getHours() + ":" + date.getMinutes()
         }
@@ -429,25 +429,25 @@ Vue.component("chat-box", {
                 <i class="inverted circular send link teal icon" @click="send_message"></i>
             </div>
         </div>`,
-    data: function(){
+    data: function () {
         return {
             "bottom": true
         }
     },
-    mounted: function(){
+    mounted: function () {
         this.roll_to_bottom()
     },
-    updated: function(){
+    updated: function () {
         var chat_box = $("#chat_box")
-        if(this.bottom)
+        if (this.bottom)
             this.roll_to_bottom()
     },
     methods: {
-        update_bottom: function(){
+        update_bottom: function () {
             var chat_box = $("#chat_box")
             this.bottom = chat_box[0].scrollTop + chat_box.height() >= chat_box[0].scrollHeight
         },
-        send_message: function(){
+        send_message: function () {
             var self = this
             if (!check_login())
                 return
@@ -459,24 +459,26 @@ Vue.component("chat-box", {
             $.ajax({
                 type: "POST",
                 url: url,
-                data: JSON.stringify({"content": content, require: battle_interface.generate_require()}),
+                data: JSON.stringify({
+                    "content": content,
+                    require: battle_interface.generate_require()
+                }),
                 contentType: 'application/json; charset=UTF-8',
-                success: function(data){
-                    if (data.message == "success"){
+                success: function (data) {
+                    if (data.message == "success") {
                         battle_interface.update_battle_data(data.result)
                         self.roll_to_bottom()
                         $("#input_box").val("")
-                    }
-                    else{
+                    } else {
                         show_message(data.message)
                     }
                 },
-                error: function(data){
+                error: function (data) {
                     show_message("请求失败，请检查网络连接")
                 }
             })
         },
-        roll_to_bottom: function(){
+        roll_to_bottom: function () {
             this.bottom = true
             $('#chat_box').scrollTop($('#chat_box')[0].scrollHeight)
         }
@@ -542,43 +544,42 @@ Vue.component("control-panel", {
             </playerinfo-table>
             <div class="ui fluid negative button" @click="leave">离开</div>
         </div> `,
-    data: function(){
+    data: function () {
         return {
             loading: false
         }
     },
     watch: {
-        "battle_data.battle_info.ended": function(){
+        "battle_data.battle_info.ended": function () {
             $("#result_modal").modal("show")
         }
     },
     methods: {
-        detach: function(){
+        detach: function () {
             this.b
         },
-        update_hosting: function(){
+        update_hosting: function () {
             this.loading = true
             control_panel = this
             target_url = "/api/battles/" + this.battle_data.battle_id + "/players/" + this.player_id + "/hosting"
             $.ajax({
-                type: control_panel.hosting? "DELETE": "POST",
+                type: control_panel.hosting ? "DELETE" : "POST",
                 url: target_url,
-                success: function(data){
+                success: function (data) {
                     control_panel.loading = false
-                    if (data.message == "success"){
+                    if (data.message == "success") {
                         battle_interface.battle_data = data.result
-                    }
-                    else{
+                    } else {
                         show_message(data.message)
                     }
                 },
-                error: function(data){
+                error: function (data) {
                     control_panel.loading = false
                     show_message("请求失败，请检查网络连接")
                 }
             })
         },
-        leave: function(){
+        leave: function () {
             if (this.player_id !== -1)
                 try_leave(this.player_id, window.close)
             else
@@ -587,28 +588,28 @@ Vue.component("control-panel", {
     },
     computed: {
         can_hosting: function () {
-            return !this.battle_data.battle_info.ended && 
-                    !this.loading && 
-                    this.player_id != -1
+            return !this.battle_data.battle_info.ended &&
+                !this.loading &&
+                this.player_id != -1
         },
-        can_leave: function(){
+        can_leave: function () {
             return this.player_id != -1
         },
-        can_forward: function(){
+        can_forward: function () {
             return this.current_position < this.battle_data.board_info.history.length
         },
-        can_backward: function(){
+        can_backward: function () {
             return this.current_position > 0
         },
-        hosting: function(){
-            if (this.player_id == -1) 
+        hosting: function () {
+            if (this.player_id == -1)
                 return false
             return this.battle_data.players_info[this.player_id]['is_hosting']
         },
-        battle_result: function(){
-            if (!this.battle_data.battle_info.ended){
+        battle_result: function () {
+            if (!this.battle_data.battle_info.ended) {
                 var result = []
-                for (var player_id = 0; player_id < 4; player_id++){
+                for (var player_id = 0; player_id < 4; player_id++) {
                     result.push({
                         player_id: player_id,
                         username: "null",
@@ -621,14 +622,14 @@ Vue.component("control-panel", {
                 return result
             }
 
-            function rating_state(rating, delta){
+            function rating_state(rating, delta) {
                 head_char = ""
                 if (delta >= 0)
                     head_char = "+"
                 return rating + "(" + head_char + delta + ")"
             }
             var result = []
-            for (var player_id = 0; player_id < 4; player_id++){
+            for (var player_id = 0; player_id < 4; player_id++) {
                 var current_player = this.battle_data.players_info[player_id]
                 result.push({
                     player_id: player_id,
@@ -642,13 +643,13 @@ Vue.component("control-panel", {
                 })
             }
 
-            result = result.sort(function(a, b){
+            result = result.sort(function (a, b) {
                 return b.score - a.score
             })
-            for (var player_id = 0; player_id < 4; player_id++){
+            for (var player_id = 0; player_id < 4; player_id++) {
                 if (player_id === 0)
                     result[player_id].rank = 1
-                else{
+                else {
                     result[player_id].rank = result[player_id - 1].rank + (result[player_id].left !== result[player_id - 1].left)
                 }
             }
@@ -668,7 +669,7 @@ Vue.component("battle-progress", {
             </div>
         </div>`,
     watch: {
-        "board_progress": function(){
+        "board_progress": function () {
             $("#battle_progress").progress("set percent", this.board_progress)
         }
     }
@@ -695,55 +696,54 @@ Vue.component("battle-interface", {
                 @move="move"> 
             </control-panel>
         </div>`,
-    data: function(){
+    data: function () {
         return {
             "current_position": this.battle_data.battle_info.ended ? this.battle_data.board_info.history.length : -1
         }
     },
-    mounted: function(){
+    mounted: function () {
         this.board = generateBoard($("#board")[0], this.player_id, this.board_data, ColorThemeFactory("default"));
         this.board.loadState(this.battle_data, this.current_position)
     },
     methods: {
-        board_detach_active_piece: function(){
+        board_detach_active_piece: function () {
             this.board.detach()
         },
-        move : function(step){
+        move: function (step) {
             var bound = [0, this.battle_data.board_info.history.length]
-            if (Math.abs(step) === 1){
+            if (Math.abs(step) === 1) {
                 this.current_position += step
                 this.current_position = Math.max(bound[0], this.current_position)
                 this.current_position = Math.min(bound[1], this.current_position)
-            }
-            else{
+            } else {
                 this.current_position = step > 0 ? bound[1] : bound[0]
             }
             this.board.loadState(this.battle_data, this.current_position)
         }
     },
     watch: {
-        'battle_data.battle_info.ended': function(){
-            this.current_position = this.battle_data.board_info.history.length 
+        'battle_data.battle_info.ended': function () {
+            this.current_position = this.battle_data.board_info.history.length
         },
         'battle_data.board_info': {
-            handler(){
+            handler() {
                 this.board.loadState(this.battle_data, this.current_position)
             },
             deep: true
         },
-        'player_id': function(){
+        'player_id': function () {
             this.board.update_player(this.player_id)
         }
     },
     computed: {
         running: function () {
             return this.battle_data.battle_info.started &&
-                    !this.battle_data.battle_info.ended
+                !this.battle_data.battle_info.ended
         },
-        board_progress: function(){
+        board_progress: function () {
             return 100 * this.battle_data.board_info.board_progress
         },
-        player_id: function(){
+        player_id: function () {
             if (this.user_info.user_id === -1)
                 return -1
             for (var id = 0; id < this.battle_data.players_info.length; id++)
@@ -852,37 +852,36 @@ Vue.component("battle-condition", {
             <i class="erase icon"></i> 清空条件
         </div>
     </form>`,
-    mounted: function(){
+    mounted: function () {
         if (this.condition.sort !== [])
-            $("#sort_condition").dropdown("set selected",this.condition.sort)
+            $("#sort_condition").dropdown("set selected", this.condition.sort)
         $('#board_type').dropdown();
     },
     methods: {
-        reset_condition: function(){
+        reset_condition: function () {
             this.condition = Object.assign(this.condition, {
                 sort: [],
                 query: {
                     username: "",
                     battle_state: [],
                     battle_name: "",
-                    board_type: "" 
+                    board_type: ""
                 }
             })
             $("#sort_condition").dropdown("clear")
         }
     },
     watch: {
-        "condition.sort": function(){
-            $("#sort_condition").dropdown("set selected",this.condition.sort);
+        "condition.sort": function () {
+            $("#sort_condition").dropdown("set selected", this.condition.sort);
         },
         "condition": {
-            handler(){
+            handler() {
                 $("#username_condition").removeClass("error")
                 var res = load_battles()
-                if (res === "user not exist"){
+                if (res === "user not exist") {
                     $("#username_condition").addClass("error")
-                }
-                else if (res !== "success"){
+                } else if (res !== "success") {
                     show_message(res)
                 }
             },
@@ -893,7 +892,7 @@ Vue.component("battle-condition", {
 
 Vue.component("battle-creater", {
     props: ["parameter", "timer_scheme"],
-    template:`
+    template: `
         <div class="ui two column grid">
             <div class="ui six width column">
                 <form class="ui form" id='create_form'>
@@ -953,12 +952,12 @@ Vue.component("battle-creater", {
                 <img class="ui middle image" src="static/common/images/standard.png">
             </div>
         </div>`,
-    data: function(){
+    data: function () {
         return {
             timer_identity: 'custom',
         }
     },
-    mounted: function(){
+    mounted: function () {
         this.update_timer_identity()
         $('#timer_type_selector').dropdown()
         $('#board_type_selector').dropdown()
@@ -966,27 +965,42 @@ Vue.component("battle-creater", {
             fields: {
                 battle_name: {
                     identifier: 'battle_name',
-                    rules: [
-                        {type: 'empty', prompt: '对局名称不能为空'},
-                        {type: 'maxLength[20]', prompt: '对局名称长度要短于20'}
+                    rules: [{
+                            type: 'empty',
+                            prompt: '对局名称不能为空'
+                        },
+                        {
+                            type: 'maxLength[20]',
+                            prompt: '对局名称长度要短于20'
+                        }
                     ]
                 },
                 accuracy_time: {
                     identifier: 'accuracy_time',
-                    rules: [
-                        {type: 'empty', prompt: '计时不能为空'},
-                        {type: 'integer[0..]', prompt : '计时必须为正整数'}
+                    rules: [{
+                            type: 'empty',
+                            prompt: '计时不能为空'
+                        },
+                        {
+                            type: 'integer[0..]',
+                            prompt: '计时必须为正整数'
+                        }
                     ]
                 },
                 additional_time: {
                     identifier: 'additional_time',
-                    rules: [
-                        {type: 'empty', prompt: '额外用时不能为空'},
-                        {type: 'integer[0..]', prompt : '额外用时必须为正整数'}
+                    rules: [{
+                            type: 'empty',
+                            prompt: '额外用时不能为空'
+                        },
+                        {
+                            type: 'integer[0..]',
+                            prompt: '额外用时必须为正整数'
+                        }
                     ]
-                }  
+                }
             },
-            onSuccess: function(){
+            onSuccess: function () {
                 form = $("#create_form")
                 form.addClass("loading")
 
@@ -995,25 +1009,24 @@ Vue.component("battle-creater", {
                 data.additional_time = parseInt(data.additional_time)
                 $.ajax({
                     type: "POST",
-                    url:  "/api/battles", 
+                    url: "/api/battles",
                     data: JSON.stringify(data),
                     contentType: 'application/json; charset=UTF-8',
                     async: false,
-                    success: function(data){
+                    success: function (data) {
                         form.removeClass("loading")
-                        if (data.message == "success"){
+                        if (data.message == "success") {
                             form.removeClass("loading")
                             $("#create_modal").modal("hide");
                             window.open("/battle?battle_id=" + data.result.id);
-                        }
-                        else{
+                        } else {
                             form
                                 .removeClass("success")
                                 .addClass("error")
                             $("#create_message").text(data.message)
                         }
                     },
-                    error: function(data){
+                    error: function (data) {
                         form
                             .removeClass("loading")
                             .removeClass("success")
@@ -1025,10 +1038,10 @@ Vue.component("battle-creater", {
         })
     },
     methods: {
-        update_timer_identity: function(){
-            for (var id = 0; id < this.timer_scheme.length; id++){
-                if(this.timer_scheme[id].additional_time === this.parameter.additional_time
-                    && this.timer_scheme[id].accuracy_time === this.parameter.accuracy_time){
+        update_timer_identity: function () {
+            for (var id = 0; id < this.timer_scheme.length; id++) {
+                if (this.timer_scheme[id].additional_time === this.parameter.additional_time &&
+                    this.timer_scheme[id].accuracy_time === this.parameter.accuracy_time) {
                     this.timer_identity = this.timer_scheme[id].identity
                     $('#timer_type_selector').dropdown("set selected", this.timer_scheme[id].identity)
                     return
@@ -1039,11 +1052,11 @@ Vue.component("battle-creater", {
         }
     },
     watch: {
-        "timer_identity": function(){
-            if(this.timer_identity === "custom")
+        "timer_identity": function () {
+            if (this.timer_identity === "custom")
                 return true
-            for (var id = 0; id < this.timer_scheme.length; id++){
-                if(this.timer_scheme[id].identity == this.timer_identity){
+            for (var id = 0; id < this.timer_scheme.length; id++) {
+                if (this.timer_scheme[id].identity == this.timer_identity) {
                     this.parameter.accuracy_time = this.timer_scheme[id].accuracy_time
                     this.parameter.additional_time = this.timer_scheme[id].additional_time
                     return true
@@ -1051,20 +1064,20 @@ Vue.component("battle-creater", {
             }
             console.log("ERROR! unknow identity " + this.timer_identity)
         },
-        "parameter.accuracy_time": function(){
+        "parameter.accuracy_time": function () {
             this.update_timer_identity()
         },
-        "parameter.additional_time": function(){
+        "parameter.additional_time": function () {
             this.update_timer_identity()
         }
     },
     computed: {
-        expect_time: function(){
+        expect_time: function () {
             second = (this.parameter.accuracy_time + this.parameter.additional_time * 21) * 4
-            var minute = Math.floor( second / 60 )
+            var minute = Math.floor(second / 60)
             if (minute < 60)
                 return minute + "分钟"
-            var hour = Math.floor(second / 60)
+            var hour = Math.floor(minute / 60)
             if (hour < 24)
                 return hour + "小时"
             var day = Math.floor(hour / 24)
@@ -1100,7 +1113,7 @@ Vue.component("rank-list", {
         </table>
     `,
     methods: {
-        "jump_to": function(user_id){
+        "jump_to": function (user_id) {
             location.href = "/users?user_id=" + user_id
         }
     }
