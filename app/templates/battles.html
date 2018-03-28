@@ -120,17 +120,18 @@
             <battle-condition :condition="condition" id='battle_condition'></battle-condition>
         </div>
     </div>
-<div class="column">
-    <div class="ui fluid buttons">
-        <div class="ui teal button" onclick="try_create()">
-            <i class="plus icon"></i> 新建 
+    <div class="column">
+        <div class="ui fluid buttons">
+            <div class="ui teal button" onclick="try_create()">
+                <i class="plus icon"></i> 新建 
+            </div>
+            <div class="ui button" onclick="load_battles()">
+                <i class="sync alternate icon"></i> 刷新
+            </div>
         </div>
-        <div class="ui button" onclick="load_battles()">
-            <i class="sync alternate icon"></i> 刷新
-        </div>
+        <battle-list id="battle_list" :battles_data="battles_data" :ended="ended" :show_create="false"></battle-list>
+        <div id="gtmdqaq"></div>
     </div>
-    <battle-list id="battle_list" :battles_data="battles_data" :ended="ended" :show_create="false"></battle-list>
-    <div id="gtmdqaq"></div>
 </div>
 {% endblock %}
 
