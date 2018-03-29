@@ -248,13 +248,13 @@ Vue.component("battle-info", {
         </div>`,
     methods: {
         format_time: function (second) {
-            let minute = Math.floor(second / 60);
+            let minute = Math.ceil(second / 60);
             if (minute < 60)
                 return minute + "分钟";
-            let hour = Math.floor(second / 60);
+            let hour = Math.ceil(second / 60);
             if (hour < 24)
                 return hour + "小时";
-            let day = Math.floor(hour / 24);
+            let day = Math.ceil(hour / 24);
             return day + "天";
         }
     },
@@ -270,7 +270,7 @@ Vue.component("battle-info", {
                 return "未开始";
             else
                 return "开始于" + this.format_time(
-                    (Math.floor(new Date().valueOf() / 1000) - this.battle_info.start_time)) + "前"
+                    (Math.ceil(new Date().valueOf() / 1000) - this.battle_info.start_time)) + "前"
         },
         accuracy_time: function () {
             return this.battle_info.accuracy_time + "s"
@@ -340,10 +340,12 @@ Vue.component("battle-list", {
         $('[name="content"]').popup({
             inline: true
         });
-        $('.ui.sticky').sticky({
-            offset: 50,
-            context: '#battle_list'
-        });
+        var width = document.body.clientWidth
+        if (width > 767)
+            $('.ui.sticky').sticky({
+                offset: 50,
+                context: '#battle_list'
+            });
     }
 });
 
@@ -680,8 +682,8 @@ Vue.component("battle-interface", {
     template: `
         <div class="ui grid container stackable">
             <div class="ui center aligned eleven wide column">
-                <div class="ui segment">
-                    <canvas id="board" height="642px" width="700px"></canvas>
+                <div class="ui segment" id="board_container">
+                    <canvas id="board" :height="board_height" :width="board_width"></canvas>
                 </div>
                 <battle-progress
                     :running="running"
@@ -702,7 +704,7 @@ Vue.component("battle-interface", {
         }
     },
     mounted: function () {
-        this.board = generateBoard($("#board")[0], this.player_id, this.board_data, ColorThemeFactory("default"));
+        this.board = generateBoard($("#board")[0], this.player_id, this.board_data, ColorThemeFactory("default"),this.mobile_version);
         this.board.loadState(this.battle_data, this.current_position)
     },
     methods: {
@@ -743,6 +745,21 @@ Vue.component("battle-interface", {
         board_progress: function () {
             return 100 * this.battle_data.board_info.board_progress
         },
+        board_width: function () {
+            var width = document.body.clientWidth
+            if (width > 767)
+                return 700
+            else
+                return width - 50
+        },
+        board_height: function () {
+            var width = document.body.clientWidth
+            if (width > 767)
+                return 646
+            else
+                return document.body.clientHeight - 150
+
+        },
         player_id: function () {
             if (this.user_info.user_id === -1)
                 return -1
@@ -750,6 +767,9 @@ Vue.component("battle-interface", {
                 if (this.user_info.user_id === this.battle_data.players_info[id].user_id)
                     return id
             return -1
+        },
+        mobile_version: function(){
+            return document.body.clientWidth < 767
         }
     }
 });
@@ -1074,13 +1094,13 @@ Vue.component("battle-creater", {
     computed: {
         expect_time: function () {
             second = (this.parameter.accuracy_time + this.parameter.additional_time * 21) * 4
-            var minute = Math.floor(second / 60)
+            var minute = Math.ceil(second / 60)
             if (minute < 60)
                 return minute + "分钟"
-            var hour = Math.floor(minute / 60)
+            var hour = Math.ceil(minute / 60)
             if (hour < 24)
                 return hour + "小时"
-            var day = Math.floor(hour / 24)
+            var day = Math.ceil(hour / 24)
             return day + "天"
         }
     }

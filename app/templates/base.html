@@ -68,11 +68,7 @@
             user_item = new Vue({
                 el: "#user_item",
                 data: {
-                    user: {
-                        {
-                            current_user.dump() | tojson | safe
-                        }
-                    }
+                    user: {{ current_user.dump() | tojson | safe }}
                 }
             });
             $('.ui.sidebar').sidebar('attach events', '.toc.item');
