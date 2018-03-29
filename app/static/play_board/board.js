@@ -880,10 +880,10 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, 
         function(event){
             if (current_piece_id === -1)    
                 return
-            if (event.key == "w" || event.key == "s")
+            if (event.keyCode === 87 || event.keyCode === 83)
                 board.pieceLists[mPlayerId][current_piece_id].Flip();
-            if (event.key == "a" || event.key == "d")
-                board.pieceLists[mPlayerId][current_piece_id].Rotate(event.key == 'a');
+            if (event.keyCode === 65 || event.keyCode === 68)
+                board.pieceLists[mPlayerId][current_piece_id].Rotate(event.keyCode === 65 );
         },
         false
     );
