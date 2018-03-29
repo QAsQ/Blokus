@@ -51,9 +51,15 @@ function ColorThemeFactory(type) {
                 onselect_alpha: 0.8,
                 dropped_alpha: 1,
                 controller:{
-                    alpha: 0.4,
-                    bound: trans_color("#000000"),
-
+                    control_parts:{
+                        initial_alpha: 0.3,
+                        active_alpha: 1,
+                        color: trans_color("#333333")
+                    },
+                    body: {
+                        alpha: 0.1,
+                        color: trans_color("#333333")
+                    }
                 } , 
                 shadow: trans_color("#949293"),
                 //shadow: {

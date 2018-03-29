@@ -86,7 +86,7 @@ function ParticleFactory(direction, particleColor) {
 	return emitterContainer
 }
 
-function PieceControllerFactory(colorTheme, controllerGroup, TryDropPiece){
+function PieceControllerFactory(colorTheme, controllerGroup){
     var bodySize = 6
     var half_a = bodySize * (Math.SQRT2 - 1)
 
@@ -113,8 +113,8 @@ function PieceControllerFactory(colorTheme, controllerGroup, TryDropPiece){
                 [-half_a,  bodySize], 
                 [bodySize, bodySize]
             ], 
-            0x000000, 
-            0.1
+            colorTheme.piece.controller.body.color, 
+            colorTheme.piece.controller.body.alpha
         )
 
         var body = new PIXI.Sprite(graphics.generateTexture())
@@ -122,34 +122,61 @@ function PieceControllerFactory(colorTheme, controllerGroup, TryDropPiece){
         return body
     }
 
-    function generateTag(){
+    function generateTag(vertical){
+        function onDragStart(event) {
+            this.dragging = true
+            this.alpha = colorTheme.piece.controller.control_parts.active_alpha
+            event.stopped = true
+        }
+        function onDragEnd() {
+            if (this.dragging){
+                this.dragging = false
+                this.alpha = colorTheme.piece.controller.control_parts.initial_alpha
+                if (vertical)
+                    this.parent.attachPiece.Flip()
+                else
+                    this.parent.attachPiece.HorizontalFlip()
+            }
+        }
         var graphics = generateGraphics(
             [
                 [half_a, 0],
                 [-half_a, 0], 
                 [0, -half_a], 
             ], 
-            0x000000, 
-            0.4
+            colorTheme.piece.controller.control_parts.color,
+            1
         )
         var tag = new PIXI.Sprite(graphics.generateTexture())
         tag.anchor.x = 0.5
         tag.anchor.y = 1
-        tag.y = -bodySize * gCellSize
+        tag.alpha = colorTheme.piece.controller.control_parts.initial_alpha
+        if (vertical)
+            tag.y = -bodySize * gCellSize
+        else{
+            tag.x = -bodySize * gCellSize
+            tag.rotation = -Math.PI / 2
+        }
+
+        tag.interactive = true
+        tag 
+            .on('pointerdown', onDragStart)
+            .on('pointerup', onDragEnd)
+            .on('pointerupoutside', onDragEnd)
         return tag
     }
 
     function generateRotateCircle(){
         var graphics = new PIXI.Graphics()
         var radius = (bodySize - 1) * gCellSize
-        graphics.lineStyle(2, 0x000000, 1)
+        graphics.lineStyle(2, colorTheme.piece.controller.control_parts.color, 1)
         graphics.drawCircle(0, 0, radius)
 
         var thickWidth = gCellSize * Math.SQRT2
         graphics.lineWidth = thickWidth
         graphics.arc(0, 0, radius - thickWidth / 2, -Math.PI / 8 * 8, -Math.PI / 8 * 4)
         var rotateCircle = new PIXI.Sprite(graphics.generateTexture())
-        rotateCircle.alpha = 0.4
+        rotateCircle.alpha = colorTheme.piece.controller.control_parts.initial_alpha
         rotateCircle.anchor.set(0.5)
         rotateCircle.interactive = true
 
@@ -177,7 +204,7 @@ function PieceControllerFactory(colorTheme, controllerGroup, TryDropPiece){
             }
             this.oldState = this.getState()
             this.dragging = true;
-            this.alpha = 0.8
+            this.alpha = colorTheme.piece.controller.control_parts.active_alpha
             this.rotation = this.getAngel(position)
             event.stopped = true
         }
@@ -192,7 +219,7 @@ function PieceControllerFactory(colorTheme, controllerGroup, TryDropPiece){
             if (this.dragging){
                 this.dragging = false
                 this.data = null
-                this.alpha = 0.6
+                this.alpha = colorTheme.piece.controller.control_parts.initial_alpha
                 piece = this.parent.attachPiece
                 piece.rotation = 0
                 var newState = this.getState()
@@ -247,8 +274,11 @@ function PieceControllerFactory(colorTheme, controllerGroup, TryDropPiece){
     var conrtollerBody = generateConrtollerBody()
     pieceController.addChild(conrtollerBody)
 
-    var horizenTag = generateTag()
-    pieceController.addChild(horizenTag)
+    var horizontalTag = generateTag(true)
+    pieceController.addChild(horizontalTag)
+
+    var verticalTag = generateTag(false)
+    pieceController.addChild(verticalTag)
 
     var rotateCircle = generateRotateCircle()
     pieceController.addChild(rotateCircle)
@@ -620,6 +650,12 @@ function PieceFactory(pieceId,
             this.SetState(new_state);
         }
     };
+    pieces.HorizontalFlip = function(){
+        if (pieces.dropped == false){
+            var new_state = (this.state + ((this.state % 2) ? 3 : 5)) % 8
+            this.SetState(new_state);
+        }
+    }
     pieces.Rotate = function(clock){
         if (pieces.dropped == false){
             var new_state = (this.state + ((this.state % 2) ^ clock ? 2 : 6)) % 8
@@ -857,10 +893,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, 
         board.pieceController.detach()
     })
 
-    function adhoc(){
-
-    }
-    board.pieceController = PieceControllerFactory(colorTheme, controllerGroup, adhoc)
+    board.pieceController = PieceControllerFactory(colorTheme, controllerGroup)
     board.addChild(board.pieceController)
 
     //Create piece
@@ -882,8 +915,8 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, 
                 DragMoveCallBack,
                 DragEndCallBack
             );
-            piece.SetPosition(gPiecesLocate[pieceId])
             piece.SetState(gInitState[pieceId])
+            piece.SetPosition(gPiecesLocate[pieceId])
             if (playerId !== mPlayerId) 
                 piece.SetOwnership(false)
             pieceList.push(piece);
