@@ -1,3 +1,6 @@
+Math.square = function(x){
+    return x * x
+}
 function ParticleFactory(direction, particleColor) {
 	particle_config = {
 		"alpha": {
@@ -127,7 +130,7 @@ function PieceControllerFactory(colorTheme, controllerGroup, TryDropPiece){
                 [0, -half_a], 
             ], 
             0x000000, 
-            0.8
+            0.4
         )
         var tag = new PIXI.Sprite(graphics.generateTexture())
         tag.anchor.x = 0.5
@@ -139,18 +142,72 @@ function PieceControllerFactory(colorTheme, controllerGroup, TryDropPiece){
     function generateRotateCircle(){
         var graphics = new PIXI.Graphics()
         var radius = (bodySize - 1) * gCellSize
-        graphics.lineStyle(2, 0x000000, 0.6)
+        graphics.lineStyle(2, 0x000000, 1)
         graphics.drawCircle(0, 0, radius)
 
-        graphics.lineWidth = gCellSize * Math.SQRT2
-        graphics.arc(0, 0, radius, Math.PI / 8, Math.PI / 8 * 3)
+        var thickWidth = gCellSize * Math.SQRT2
+        graphics.lineWidth = thickWidth
+        graphics.arc(0, 0, radius - thickWidth / 2, -Math.PI / 8 * 8, -Math.PI / 8 * 4)
         var rotateCircle = new PIXI.Sprite(graphics.generateTexture())
+        rotateCircle.alpha = 0.4
         rotateCircle.anchor.set(0.5)
+        rotateCircle.interactive = true
+
+        rotateCircle.getAngel = function(position){
+            return -(Math.atan2(position.x, position.y) + Math.PI / 4 * 3)
+        }
+        rotateCircle.getState = function(){
+            var res = this.rotation
+            if (res < 0)
+                res += Math.PI * 2
+            return Math.floor(res / Math.PI * 2 + 0.5) % 4
+        }
+        rotateCircle.Reset = function(){
+            this.rotation = 0
+        }
+
+        function onDragStart(event) {
+            this.data = event.data;
+            var position = this.data.getLocalPosition(this.parent);
+            var distance = Math.sqrt(Math.square(position.x) + Math.square(position.y))
+            if(distance < radius - thickWidth || distance > radius){
+                return
+            }
+            this.oldState = this.getState()
+            this.dragging = true;
+            this.alpha = 0.8
+            this.rotation = this.getAngel(position)
+            event.stopped = true
+        }
+        function onDragMove() {
+            if (this.dragging) {
+                var position = this.data.getLocalPosition(this.parent);
+                this.rotation = this.getAngel(position)
+                this.parent.attachPiece.rotation = this.rotation - this.oldState * Math.PI / 2
+            }
+        }
+        function onDragEnd() {
+            if (this.dragging){
+                this.dragging = false
+                this.data = null
+                this.alpha = 0.6
+                piece = this.parent.attachPiece
+                piece.rotation = 0
+                var newState = this.getState()
+                for (var i = 0 ; i < newState - this.oldState + 4; i ++)
+                    piece.Rotate(false)
+                this.rotation = newState * Math.PI / 2
+            }
+        }
+        rotateCircle
+            .on('pointerdown', onDragStart)
+            .on('pointerup', onDragEnd)
+            .on('pointerupoutside', onDragEnd)
+            .on('pointermove', onDragMove);
         return rotateCircle
     }
 
     function onDragStart(event) {
-        console.log("cont")
         this.data = event.data;
         this.anchorPoint = this.data.getLocalPosition(this);
         this.dragging = true;
@@ -176,8 +233,6 @@ function PieceControllerFactory(colorTheme, controllerGroup, TryDropPiece){
 
     var pieceController = new PIXI.Container()
     pieceController.visible = false
-    pieceController.x = 10 * gCellSize
-    pieceController.y = 10 * gCellSize
     pieceController.parentGroup = controllerGroup
     pieceController.attachPiece = null
     pieceController.interactive = true
@@ -197,7 +252,7 @@ function PieceControllerFactory(colorTheme, controllerGroup, TryDropPiece){
     pieceController.addChild(rotateCircle)
 
     pieceController.follow = function(){
-        if (this.attachPiece == null)
+        if (this.attachPiece === null)
             return
         var pieceCenter = this.attachPiece.getCenter()
         this.x = pieceCenter.x
@@ -205,12 +260,15 @@ function PieceControllerFactory(colorTheme, controllerGroup, TryDropPiece){
     }
 
     pieceController.attach = function(piece){
+        if (this.attachPiece !== null)
+            this.detach()
         this.attachPiece = piece
         this.visible = true
         this.follow()
     }
 
     pieceController.detach = function(){
+        rotateCircle.Reset()
         this.attachPiece = null
         this.visible = false
     }
@@ -231,7 +289,7 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme, mobile_vers
 	var endPoint = Point(edPoint.x * gCellSize, edPoint.y * gCellSize);
 
     function distance(pointA, pointB){
-        return Math.sqrt((pointA.x - pointB.x) * (pointA.x - pointB.x) + (pointA.y - pointB.y) * (pointA.y - pointB.y))
+        return Math.sqrt(Math.square(pointA.x - pointB.x) + Math.square(pointA.y - pointB.y))
 	}
 
 	function formTime(time){
@@ -362,7 +420,6 @@ function PieceFactory(pieceId,
                       DragMoveCallBack,
                       DragEndCallBack) {
     function onDragStart(event) {
-        console.log("piece")
         this.data = event.data;
         this.anchorPoint = this.data.getLocalPosition(this);
         this.dragging = true;
@@ -433,22 +490,32 @@ function PieceFactory(pieceId,
         return graphics.generateTexture()
     }
 
+    function getOffset(cellList){
+        var x = 0, y = 0
+        cellList.forEach(function(point){
+            x = Math.max(x, point[0] + 1)
+            y = Math.max(y, point[1] + 1)
+        })
+        return new PIXI.Point(x * gCellSize / 2, y * gCellSize / 2)
+    }
+
     shape.forEach(function(cellList, state){
         var piece = new PIXI.Sprite(generateTexture(cellList, colorTheme.piece.cell[player_id]));
-        piece.cellList = cellList;
-        piece.visible = false;
+        piece.cellList = cellList
+        piece.offset = getOffset(cellList)
+        piece.visible = false
+        piece.anchor.set(0.5)
 
         piece.shadow = new PIXI.Sprite(generateTexture(cellList, colorTheme.piece.shadow))
         piece.shadow.visible = false
         piece.shadow.parentGroup = shadowGroup
         piece.addChild(piece.shadow)
 
-        pieces.piece.push(piece);
-        pieces.addChild(piece);
+        pieces.piece.push(piece)
+        pieces.addChild(piece)
     })
 
     pieces.alpha = colorTheme.piece.initial_alpha
-    pieces.anchor = new PIXI.Point();
     pieces.interactive = true
     pieces.dropped = false
     pieces.parentGroup = pieceGroup
@@ -467,11 +534,12 @@ function PieceFactory(pieceId,
     pieces.SetState(0);
 
     pieces.insideBound = function(){
+        var pieceOffset = this.piece[this.state].offset
         var oldX = this.x, oldY = this.y
-        this.x = Math.max(this.x, -offset.x)
-        this.y = Math.max(this.y, -offset.y)
-        this.x = Math.min(this.x, gWidth - offset.x - this.width)
-        this.y = Math.min(this.y, gHeight - offset.y - this.height)
+        this.x = Math.max(this.x, -offset.x + pieceOffset.x)
+        this.y = Math.max(this.y, -offset.y + pieceOffset.y)
+        this.x = Math.min(this.x, gWidth - offset.x - pieceOffset.x)
+        this.y = Math.min(this.y, gHeight - offset.y - pieceOffset.y)
         return oldX === this.x && oldY === this.y
     }
 
@@ -488,22 +556,26 @@ function PieceFactory(pieceId,
     }
 
     pieces.State = function() {
+        var piece = this.piece[this.state]
         return {
             state: this.state, 
-            x: Math.floor(this.x / gCellSize + 0.5),
-            y: Math.floor(this.y / gCellSize + 0.5),
-        };
+            x: Math.floor((this.x - piece.offset.x) / gCellSize + 0.5),
+            y: Math.floor((this.y - piece.offset.y) / gCellSize + 0.5)
+        }
+    }
+
+    pieces.SetPosition = function(position){
+        var piece = this.piece[this.state]
+        this.x = position.x * gCellSize + piece.offset.x
+        this.y = position.y * gCellSize + piece.offset.y
     }
 
     pieces.getCenter = function(){
-        return new PIXI.Point(
-            this.x + this.width / 2,
-            this.y + this.height / 2
-        )
+        return new PIXI.Point(this.x, this.y)
     }
     pieces.setCenter = function(x, y){
-        this.x = x - this.width / 2,
-        this.y = y - this.height / 2
+        this.x = x
+        this.y = y
     }
 
     pieces.activeShadow = function(){
@@ -808,8 +880,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, 
                 DragMoveCallBack,
                 DragEndCallBack
             );
-            piece.x = gPiecesLocate[pieceId].x * gCellSize;
-            piece.y = gPiecesLocate[pieceId].y * gCellSize;
+            piece.SetPosition(gPiecesLocate[pieceId])
             piece.SetState(gInitState[pieceId])
             if (playerId !== mPlayerId) 
                 piece.SetOwnership(false)
@@ -855,8 +926,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, 
 
             currentPiece.DropDown();
             currentPiece.SetState(piece.position.state);
-            currentPiece.x = piece.position.x * gCellSize;
-            currentPiece.y = piece.position.y * gCellSize;
+            currentPiece.SetPosition(piece.position)
 
             currentPiece.parentGroup = placedGroup;
         }
