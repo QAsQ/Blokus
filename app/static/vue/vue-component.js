@@ -965,7 +965,7 @@ Vue.component("battle-creater", {
                             <h4>预计游戏时间: {{expect_time}}</h4>
                         </div> 
                     </timer-scheme-selector>
-                    <div class="ui error message"></div>
+                    <div class="ui error message" id="create_message"></div>
                 </form>
             </div>
             <div class="ui column">
@@ -1002,8 +1002,12 @@ Vue.component("battle-creater", {
                             prompt: '计时不能为空'
                         },
                         {
-                            type: 'integer[0..]',
-                            prompt: '计时必须为正整数'
+                            type: 'integer[1..]',
+                            prompt: '计时必须大于1秒'
+                        },
+                        {
+                            type: 'integer[0..3600]',
+                            prompt: '计时必须小于3600秒'
                         }
                     ]
                 },
@@ -1014,8 +1018,12 @@ Vue.component("battle-creater", {
                             prompt: '额外用时不能为空'
                         },
                         {
-                            type: 'integer[0..]',
-                            prompt: '额外用时必须为正整数'
+                            type: 'integer[1..]',
+                            prompt: '额外用时必须大于1秒'
+                        },
+                        {
+                            type: 'integer[0..3600]',
+                            prompt: '额外用时必须小于3600秒'
                         }
                     ]
                 }
