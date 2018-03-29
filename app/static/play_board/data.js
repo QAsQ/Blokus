@@ -34,10 +34,10 @@ function ColorThemeFactory(type) {
             backgroundColor: trans_color("#f2f0f1"),
             board: {
                 dividing_line: trans_color("#ffffff"),
-                dividing_line_width: 3,
+                dividing_line_width: [3, 1],
                 frame: trans_color("#e6eae9"),
                 progress_bar:{
-                    bar_width: 7,
+                    bar_width: [7, 2],
                     accuracy: [trans_color("#ed1c24"), trans_color("#23b14d"), trans_color("#00a2e8"), trans_color("#ffc90d")],
                     additional: trans_color("#a1a3a4"),
                     particles: {
@@ -50,7 +50,11 @@ function ColorThemeFactory(type) {
                 initial_alpha: 0.4,
                 onselect_alpha: 0.8,
                 dropped_alpha: 1,
-                //shadow: trans_color("#6f645e"),
+                controller:{
+                    alpha: 0.4,
+                    bound: trans_color("#000000"),
+
+                } , 
                 shadow: trans_color("#949293"),
                 //shadow: {
                 //    legal: trans_color("#6f645e"),
@@ -58,7 +62,7 @@ function ColorThemeFactory(type) {
                 //},
                 spectator: trans_color("#b7b7b7"),
                 dividing_line: trans_color("#ffffff"),
-                dividing_line_width: 3,
+                dividing_line_width: [3, 1],
                 cell: [trans_color("#f2542d"), trans_color("#80ba04"), trans_color("#1da6f0"), trans_color("#feb923")],
                 initial:[trans_color("#cf1b24"), trans_color("#239546"), trans_color("#006BA3"), trans_color("#D69723")],
                 last_drop: [trans_color("#cf1b24"), trans_color("#239546"), trans_color("#006BA3"), trans_color("#D69723")]

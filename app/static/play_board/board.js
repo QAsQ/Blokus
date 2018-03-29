@@ -83,7 +83,142 @@ function ParticleFactory(direction, particleColor) {
 	return emitterContainer
 }
 
-function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme){
+function PieceControllerFactory(colorTheme, TryDropPiece){
+    var bodySize = 6
+    var half_a = bodySize * (Math.SQRT2 - 1)
+
+    function generateGraphics(pointList, color, alpha){
+        var graphics = new PIXI.Graphics();
+        var vertex_list = []
+        pointList.forEach(function (point){
+            vertex_list.push(new PIXI.Point(point[0] * gCellSize, point[1] * gCellSize))
+        })
+        graphics.beginFill(color, alpha);
+        graphics.drawPolygon(new PIXI.Polygon(vertex_list))
+        graphics.endFill()
+        return graphics
+    }
+
+    function generateConrtollerBody(){
+        var graphics = generateGraphics(
+            [
+                [bodySize, -half_a],
+                [half_a, -bodySize],
+                [-half_a, -bodySize], 
+                [-bodySize, -half_a], 
+                [-bodySize,  half_a], 
+                [-half_a,  bodySize], 
+                [bodySize, bodySize]
+            ], 
+            0x000000, 
+            0.2
+        )
+
+        var body = new PIXI.Sprite(graphics.generateTexture())
+        body.anchor.set(0.5)
+        return body
+    }
+
+    function generateTag(){
+        var graphics = generateGraphics(
+            [
+                [half_a, 0],
+                [-half_a, 0], 
+                [0, -half_a], 
+            ], 
+            0x000000, 
+            0.5
+        )
+        var tag = new PIXI.Sprite(graphics.generateTexture())
+        tag.anchor.x = 0.5
+        tag.anchor.y = 1
+        tag.y = -bodySize * gCellSize
+        return tag
+    }
+
+    function generateRotateCircle(){
+        var graphics = new PIXI.Graphics()
+        var radius = (bodySize - 1) * gCellSize
+        graphics.lineStyle(2, 0x000000, 0.6)
+        graphics.drawCircle(0, 0, radius)
+
+        graphics.lineWidth = gCellSize * Math.SQRT2
+        graphics.arc(0, 0, radius, Math.PI / 8, Math.PI / 8 * 3)
+        var rotateCircle = new PIXI.Sprite(graphics.generateTexture())
+        rotateCircle.anchor.set(0.5)
+        return rotateCircle
+    }
+
+
+    function onDragStart(event) {
+        this.data = event.data;
+        this.anchorPoint = this.data.getLocalPosition(this);
+        this.dragging = true;
+        this.attachPiece.Select()
+        event.stopped = true
+    }
+    function onDragMove() {
+        if (this.dragging) {
+            var new_position = this.data.getLocalPosition(this.parent);
+            this.x = new_position.x - this.anchorPoint.x;
+            this.y = new_position.y - this.anchorPoint.y;
+            this.attachPiece.setCenter(this.x, this.y)
+            this.attachPiece.Select()
+            if(!this.attachPiece.insideBound())
+                this.follow()
+        }
+    }
+    function onDragEnd() {
+        this.dragging = false;
+        this.data = null;
+        this.attachPiece.Unselect()
+    }
+
+    var pieceController = new PIXI.Container()
+    pieceController.visible = false
+    pieceController.x = 10 * gCellSize
+    pieceController.y = 10 * gCellSize
+    pieceController.attachPiece = null
+    pieceController.interactive = true
+    pieceController 
+        .on('pointerdown', onDragStart)
+        .on('pointerup', onDragEnd)
+        .on('pointerupoutside', onDragEnd)
+        .on('pointermove', onDragMove);
+
+    var conrtollerBody = generateConrtollerBody()
+    pieceController.addChild(conrtollerBody)
+
+    var horizenTag = generateTag()
+    pieceController.addChild(horizenTag)
+
+    var rotateCircle = generateRotateCircle()
+    pieceController.addChild(rotateCircle)
+
+    pieceController.follow = function(){
+        if (this.attachPiece == null)
+            return
+        var pieceCenter = this.attachPiece.getCenter()
+        this.x = pieceCenter.x
+        this.y = pieceCenter.y
+    }
+
+    pieceController.attach = function(piece){
+        this.attachPiece = piece
+        this.visible = true
+        this.follow()
+    }
+
+    pieceController.detach = function(){
+        this.attachPiece = null
+        this.visible = false
+
+    }
+
+    return pieceController;
+}
+
+function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme, mobile_version){
 	var graphics = new PIXI.Graphics();
     graphics.beginFill(colorTheme.board.progress_bar.accuracy[player_id], 1);
 	graphics.drawRect(0, 0, 1, 1)
@@ -98,7 +233,7 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme){
     function distance(pointA, pointB){
         return Math.sqrt((pointA.x - pointB.x) * (pointA.x - pointB.x) + (pointA.y - pointB.y) * (pointA.y - pointB.y))
 	}
-	
+
 	function formTime(time){
 		minute = Math.floor(time / 60)
 		seconds = (time % 60)
@@ -114,7 +249,7 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme){
 	additionalBar.y = progressBar.y = startPoint.y
 	var length = distance(startPoint, endPoint);
 	additionalBar.scale.x = progressBar.scale.x = length;
-    additionalBar.scale.y = progressBar.scale.y = colorTheme.board.progress_bar.bar_width;
+    additionalBar.scale.y = progressBar.scale.y = colorTheme.board.progress_bar.bar_width[mobile_version];
 	additionalBar.rotation = progressBar.rotation = angle;
 
 	progressBarContainer.addChild(progressBar)
@@ -142,7 +277,7 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme){
 	var progressBarText = new PIXI.Text(
 		"",
 		new PIXI.TextStyle({
-            fontSize: 20
+            fontSize: mobile_version ? 5 : 20 
         })
 	);  
 	progressBarText.updText= function(text){
@@ -219,15 +354,20 @@ function PieceFactory(pieceId,
                       offset,
                       player_id,
                       colorTheme,
+                      mobile_version,
+                      pieceGroup,
+                      shadowGroup,
+                      draggedGroup,
                       DragStartCallBack,
                       DragMoveCallBack,
                       DragEndCallBack) {
     function onDragStart(event) {
         this.data = event.data;
         this.anchorPoint = this.data.getLocalPosition(this);
-        this.alpha = colorTheme.piece.onselect_alpha;
         this.dragging = true;
-        DragStartCallBack(this, this.State());
+        this.Select()
+        DragStartCallBack(this, this.State())
+        event.stopped = true
     }
 
     function onDragMove() {
@@ -235,17 +375,15 @@ function PieceFactory(pieceId,
             var new_position = this.data.getLocalPosition(this.parent);
             this.x = new_position.x - this.anchorPoint.x;
             this.y = new_position.y - this.anchorPoint.y;
-            this.x = Math.max(this.x, -offset.x)
-            this.y = Math.max(this.y, -offset.y)
-            this.x = Math.min(this.x, gWidth - offset.x - this.width)
-            this.y = Math.min(this.y, gHeight - offset.y - this.height)
 
-            DragMoveCallBack(this, this.State());
+            this.insideBound()
+            this.activeShadow()
+            DragMoveCallBack(this, this.State())
         }
     }
 
     function onDragEnd() {
-        this.alpha = colorTheme.piece.initial_alpha
+        this.Unselect()
         this.dragging = false;
         this.data = null;
         if (true)
@@ -281,7 +419,7 @@ function PieceFactory(pieceId,
         graphics.drawPolygon(polygon);
 
         graphics.lineColor = colorTheme.piece.dividing_line;
-        graphics.lineWidth = colorTheme.piece.dividing_line_width;
+        graphics.lineWidth = colorTheme.piece.dividing_line_width[mobile_version];
         cellList.forEach(function (cell){
             last = [0, 0]
             lis = [[1, 0], [1, 1], [0, 1], [0, 0]]
@@ -295,14 +433,14 @@ function PieceFactory(pieceId,
     }
 
     shape.forEach(function(cellList, state){
-
         var piece = new PIXI.Sprite(generateTexture(cellList, colorTheme.piece.cell[player_id]));
         piece.cellList = cellList;
         piece.visible = false;
 
         piece.shadow = new PIXI.Sprite(generateTexture(cellList, colorTheme.piece.shadow))
         piece.shadow.visible = false
-        piece.addChild(piece.shadow);
+        piece.shadow.parentGroup = shadowGroup
+        piece.addChild(piece.shadow)
 
         pieces.piece.push(piece);
         pieces.addChild(piece);
@@ -326,6 +464,27 @@ function PieceFactory(pieceId,
     };
     pieces.SetState(0);
 
+    pieces.insideBound = function(){
+        var oldX = this.x, oldY = this.y
+        this.x = Math.max(this.x, -offset.x)
+        this.y = Math.max(this.y, -offset.y)
+        this.x = Math.min(this.x, gWidth - offset.x - this.width)
+        this.y = Math.min(this.y, gHeight - offset.y - this.height)
+        return oldX === this.x && oldY === this.y
+    }
+
+    pieces.Select = function(){
+        this.alpha = colorTheme.piece.onselect_alpha;
+        this.parentGroup = draggedGroup
+        this.activeShadow()
+    }
+
+    pieces.Unselect = function(){
+        this.alpha = colorTheme.piece.initial_alpha
+        this.parentGroup = pieceGroup
+        this.deactiveShadow()
+    }
+
     pieces.State = function() {
         return {
             state: this.state, 
@@ -334,12 +493,23 @@ function PieceFactory(pieceId,
         };
     }
 
-    pieces.activeShadow = function(shadowGroup, x, y){
+    pieces.getCenter = function(){
+        return new PIXI.Point(
+            this.x + this.width / 2,
+            this.y + this.height / 2
+        )
+    }
+    pieces.setCenter = function(x, y){
+        this.x = x - this.width / 2,
+        this.y = y - this.height / 2
+    }
+
+    pieces.activeShadow = function(){
+        var position = this.State()
         var piece = this.piece[this.state]
-        piece.shadow.parentGroup = shadowGroup;
         piece.shadow.visible = true
-        piece.shadow.x = x
-        piece.shadow.y = y
+        piece.shadow.x = position.x * gCellSize - this.x, 
+        piece.shadow.y = position.y * gCellSize - this.y
     }
 
     pieces.deactiveShadow = function(){
@@ -402,7 +572,7 @@ function CheckerFactory(piece_shape_set, player_id){
 }
 */
 
-function HighlightLayerFactory(colorTheme, piecesCellList){
+function HighlightLayerFactory(colorTheme, mobile_version, piecesCellList){
     
     var highlightLayer = new PIXI.Container();
     function highlightCellGenerate(color, player_id){
@@ -432,16 +602,16 @@ function HighlightLayerFactory(colorTheme, piecesCellList){
         ]
 
         graphics.beginFill(color, 1);
-        lCellSize = (gCellSize - colorTheme.piece.dividing_line_width) / 3 - 1
+        lCellSize = (gCellSize - colorTheme.piece.dividing_line_width[mobile_version]) / 3 - 1
         player_shape[player_id].forEach(function(shape){
             graphics.drawRect(
-                shape[0] * lCellSize + colorTheme.piece.dividing_line_width, 
-                shape[1] * lCellSize + colorTheme.piece.dividing_line_width, 
+                shape[0] * lCellSize + colorTheme.piece.dividing_line_width[mobile_version], 
+                shape[1] * lCellSize + colorTheme.piece.dividing_line_width[mobile_version], 
                 lCellSize, lCellSize);
         })
 
         graphics.lineColor = colorTheme.piece.dividing_line;
-        graphics.lineWidth = colorTheme.piece.dividing_line_width;
+        graphics.lineWidth = colorTheme.piece.dividing_line_width[mobile_version];
         last = [0, 0]
         lis = [[1, 0], [1, 1], [0, 1], [0, 0]]
         lis.forEach(function (bias){
@@ -503,21 +673,23 @@ function HighlightLayerFactory(colorTheme, piecesCellList){
     return highlightLayer;
 }
 
-function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) {
+function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, mobile_version) {
+    var backgroundGroup = new PIXI.display.Group(-3, false); 
     var placedGroup = new PIXI.display.Group(-2, false); 
-    var highlightGrop = new PIXI.display.Group(1, false);
+    var highlightGroup = new PIXI.display.Group(1, false);
     var boardGroup = new PIXI.display.Group(0, false);
     var shadowGroup = new PIXI.display.Group(1, false);
-    var pieceGroup = new PIXI.display.Group(2, false);
-    var draggedGroup = new PIXI.display.Group(3, false);
-    [placedGroup, boardGroup, highlightGrop, shadowGroup, pieceGroup, draggedGroup].forEach(function(value, index, array){
+    var controllerGroup= new PIXI.display.Group(2, false);
+    var pieceGroup = new PIXI.display.Group(3, false);
+    var draggedGroup = new PIXI.display.Group(4, false);
+    [backgroundGroup, placedGroup, boardGroup, highlightGroup, shadowGroup, controllerGroup, pieceGroup, draggedGroup].forEach(function(value, index, array){
         app.stage.addChild(new PIXI.display.Layer(value));
     });
 
     var graphics = new PIXI.Graphics();
 
     graphics.lineColor = colorTheme.board.dividing_line
-    graphics.lineWidth = colorTheme.board.dividing_line_width
+    graphics.lineWidth = colorTheme.board.dividing_line_width[mobile_version]
     //Draw board line
     for (var i = 0; i <= 20; i++) {
         graphics.moveTo(i * gCellSize, 0);
@@ -547,32 +719,20 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
     var board = new PIXI.Container();
     board.addChild(boardShape);
 
-    //TODO Adhoc
-    board.x = 4  * gCellSize;
-    board.y = 4  * gCellSize;
+    if (mobile_version)
+        board.x = board.y = 2 * gCellSize;
+    else
+        board.x = board.y = 4  * gCellSize;
 
     current_piece_id = -1
     function DragStartCallBack (piece, position) {
         current_piece_id = piece.piece_id;
-        piece.parentGroup = draggedGroup
-        piece.activeShadow(shadowGroup, position.x * gCellSize - piece.x, position.y * gCellSize - piece.y)
-        console.log(
-            "Drag start" + piece.piece_id,
-            position.x,
-            position.y
-        );
+        board.pieceController.attach(piece)
     }
     function DragMoveCallBack(piece, position) {
-        piece.activeShadow(shadowGroup, position.x * gCellSize - piece.x, position.y * gCellSize - piece.y)
-        console.log(
-            "Drag move " + piece.piece_id,
-            position.x,
-            position.y
-        );
+        board.pieceController.follow()
     }
     function DragEndCallBack(piece, position) {
-        piece.deactiveShadow()
-        piece.parentGroup = pieceGroup
         data = {
             player_id: mPlayerId,
             piece_id: piece.piece_id,
@@ -586,13 +746,30 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
             gProgressBarEndPointList[player_id * 2],
             gProgressBarEndPointList[player_id * 2 + 1],
             player_id,
-            colorTheme
+            colorTheme,
+            mobile_version
         )
         progressBar.parentGroup = boardGroup
         board.addChild(progressBar)
         progressBar.setProgressRate(1);
         board.progressBars.push(progressBar);
     }
+
+    function generateBackground(){
+        var graphics = new PIXI.Graphics()
+        graphics.beginFill(colorTheme.backgroundColor, 1)
+        graphics.drawShape(app.screen)
+        var background = new PIXI.Sprite(graphics.generateTexture())
+        background.x = - gCellSize * 2
+        background.y = - gCellSize * 2
+        background.parentGroup = backgroundGroup
+        return background
+    }
+    board.addChild(generateBackground())
+    board.interactive = true
+    board.on("pointerdown", function(event){
+        board.pieceController.detach()
+    })
 
     //Create piece
     var pieceLists = [];
@@ -605,6 +782,10 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
                 new PIXI.Point(board.x, board.y),
                 playerId,
                 colorTheme,
+                mobile_version,
+                pieceGroup,
+                shadowGroup,
+                draggedGroup,
                 DragStartCallBack,
                 DragMoveCallBack,
                 DragEndCallBack
@@ -623,9 +804,17 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
     board.pieceLists = pieceLists;
     //Create piece Done
 
-    board.highlightLayer = HighlightLayerFactory(colorTheme,  piecesCellList)
-    board.highlightLayer.parentGroup = highlightGrop
+    board.highlightLayer = HighlightLayerFactory(colorTheme, mobile_version, piecesCellList)
+    board.highlightLayer.parentGroup = highlightGroup
     board.addChild(board.highlightLayer)
+
+    function adhoc(){
+
+    }
+
+    board.pieceController = PieceControllerFactory(colorTheme, adhoc)
+    board.pieceController.parentGroup = controllerGroup
+    board.addChild(board.pieceController)
 
     board.loadState = function(state, position) {
         //update progressBar
@@ -702,7 +891,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList) 
     return board;
 }
 
-function generateBoard(canvas, mPlayerId, boardData, colorTheme){
+function generateBoard(canvas, mPlayerId, boardData, colorTheme, mobile_version){
     gWidth = canvas.width;
     gHeight = canvas.height;
 
@@ -716,7 +905,10 @@ function generateBoard(canvas, mPlayerId, boardData, colorTheme){
     );
     app.stage = new PIXI.display.Stage();
 
-    gCellSize = Math.floor(Math.min(gWidth, gHeight) / 28)
+    if (mobile_version)
+        gCellSize = Math.floor(Math.min(gWidth, gHeight) / 24)
+    else
+        gCellSize = Math.floor(Math.min(gWidth, gHeight) / 28)
     gBoardSize = gCellSize * 20;
 
     function TryDropPiece(data){
@@ -740,7 +932,7 @@ function generateBoard(canvas, mPlayerId, boardData, colorTheme){
         })
     }
 
-    var board = BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData)
+    var board = BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobile_version ? 1 : 0)
     app.stage.addChild(board);
 
     return board;
