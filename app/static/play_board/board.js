@@ -164,6 +164,8 @@ function PieceControllerFactory(colorTheme, controllerGroup, TryDropPiece){
         }
         rotateCircle.Reset = function(){
             this.rotation = 0
+            if (this.parent.attachPiece !== null)
+                this.parent.attachPiece.rotation = 0
         }
 
         function onDragStart(event) {
