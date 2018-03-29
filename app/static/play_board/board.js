@@ -83,7 +83,7 @@ function ParticleFactory(direction, particleColor) {
 	return emitterContainer
 }
 
-function PieceControllerFactory(colorTheme, TryDropPiece){
+function PieceControllerFactory(colorTheme, controllerGroup, TryDropPiece){
     var bodySize = 6
     var half_a = bodySize * (Math.SQRT2 - 1)
 
@@ -111,7 +111,7 @@ function PieceControllerFactory(colorTheme, TryDropPiece){
                 [bodySize, bodySize]
             ], 
             0x000000, 
-            0.2
+            0.1
         )
 
         var body = new PIXI.Sprite(graphics.generateTexture())
@@ -127,7 +127,7 @@ function PieceControllerFactory(colorTheme, TryDropPiece){
                 [0, -half_a], 
             ], 
             0x000000, 
-            0.5
+            0.8
         )
         var tag = new PIXI.Sprite(graphics.generateTexture())
         tag.anchor.x = 0.5
@@ -149,8 +149,8 @@ function PieceControllerFactory(colorTheme, TryDropPiece){
         return rotateCircle
     }
 
-
     function onDragStart(event) {
+        console.log("cont")
         this.data = event.data;
         this.anchorPoint = this.data.getLocalPosition(this);
         this.dragging = true;
@@ -178,6 +178,7 @@ function PieceControllerFactory(colorTheme, TryDropPiece){
     pieceController.visible = false
     pieceController.x = 10 * gCellSize
     pieceController.y = 10 * gCellSize
+    pieceController.parentGroup = controllerGroup
     pieceController.attachPiece = null
     pieceController.interactive = true
     pieceController 
@@ -212,7 +213,6 @@ function PieceControllerFactory(colorTheme, TryDropPiece){
     pieceController.detach = function(){
         this.attachPiece = null
         this.visible = false
-
     }
 
     return pieceController;
@@ -362,6 +362,7 @@ function PieceFactory(pieceId,
                       DragMoveCallBack,
                       DragEndCallBack) {
     function onDragStart(event) {
+        console.log("piece")
         this.data = event.data;
         this.anchorPoint = this.data.getLocalPosition(this);
         this.dragging = true;
@@ -450,6 +451,7 @@ function PieceFactory(pieceId,
     pieces.anchor = new PIXI.Point();
     pieces.interactive = true
     pieces.dropped = false
+    pieces.parentGroup = pieceGroup
     pieces
         .on('pointerdown', onDragStart)
         .on('pointerup', onDragEnd)
@@ -676,13 +678,23 @@ function HighlightLayerFactory(colorTheme, mobile_version, piecesCellList){
 function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, mobile_version) {
     var backgroundGroup = new PIXI.display.Group(-3, false); 
     var placedGroup = new PIXI.display.Group(-2, false); 
-    var highlightGroup = new PIXI.display.Group(1, false);
+    var highlightGroup = new PIXI.display.Group(-1, false);
     var boardGroup = new PIXI.display.Group(0, false);
     var shadowGroup = new PIXI.display.Group(1, false);
-    var controllerGroup= new PIXI.display.Group(2, false);
-    var pieceGroup = new PIXI.display.Group(3, false);
+    var pieceGroup = new PIXI.display.Group(2, false);
+    var controllerGroup = new PIXI.display.Group(3, false);
     var draggedGroup = new PIXI.display.Group(4, false);
-    [backgroundGroup, placedGroup, boardGroup, highlightGroup, shadowGroup, controllerGroup, pieceGroup, draggedGroup].forEach(function(value, index, array){
+    [
+        backgroundGroup, 
+        placedGroup, 
+        highlightGroup, 
+        boardGroup, 
+        shadowGroup, 
+        pieceGroup, 
+        controllerGroup, 
+        draggedGroup
+    ].
+        forEach(function(value, index, array){
         app.stage.addChild(new PIXI.display.Layer(value));
     });
 
@@ -725,7 +737,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, 
         board.x = board.y = 4  * gCellSize;
 
     current_piece_id = -1
-    function DragStartCallBack (piece, position) {
+    function DragStartCallBack(piece, position) {
         current_piece_id = piece.piece_id;
         board.pieceController.attach(piece)
     }
@@ -771,6 +783,12 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, 
         board.pieceController.detach()
     })
 
+    function adhoc(){
+
+    }
+    board.pieceController = PieceControllerFactory(colorTheme, controllerGroup, adhoc)
+    board.addChild(board.pieceController)
+
     //Create piece
     var pieceLists = [];
     for(var playerId = 0; playerId < 4; playerId ++) {
@@ -790,7 +808,6 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, 
                 DragMoveCallBack,
                 DragEndCallBack
             );
-            piece.parentGroup = pieceGroup;
             piece.x = gPiecesLocate[pieceId].x * gCellSize;
             piece.y = gPiecesLocate[pieceId].y * gCellSize;
             piece.SetState(gInitState[pieceId])
@@ -807,14 +824,6 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, 
     board.highlightLayer = HighlightLayerFactory(colorTheme, mobile_version, piecesCellList)
     board.highlightLayer.parentGroup = highlightGroup
     board.addChild(board.highlightLayer)
-
-    function adhoc(){
-
-    }
-
-    board.pieceController = PieceControllerFactory(colorTheme, adhoc)
-    board.pieceController.parentGroup = controllerGroup
-    board.addChild(board.pieceController)
 
     board.loadState = function(state, position) {
         //update progressBar
