@@ -330,6 +330,12 @@ class BattleFactory():
         board = BoardFactory.createBoard(board_type)
         if isinstance(board, str):
             return board
+        accuracy_time = battle_info['accuracy_time']
+        additional_time = battle_info['additional_time']
+        if accuracy_time <= 0 or accuracy_time > 3600:
+            return "计时必须大于1秒小于3600秒"
+        if additional_time <= 0 or additional_time > 3600:
+            return "额外用时必须大于1秒小于3600秒"
         return Battle(start_timestamp, battle_info, board, db=db)
     
     @staticmethod

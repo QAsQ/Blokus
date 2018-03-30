@@ -331,7 +331,7 @@ Vue.component("battle-list", {
             <battle-item v-for="(battle_data, index) in battles_data"  :key="index"
                 :battle_data="battle_data">
             </battle-item>
-            <div class="ui horizontal divider" v-if="ended"> 我是有底线的 </div>
+            <div class="ui horizontal divider" v-if="ended"> 已经。。。到极限了QAQ</div>
         </div>`,
     updated: function () {
         $('[name="head"]').popup({
@@ -1008,7 +1008,7 @@ Vue.component("battle-creater", {
                         },
                         {
                             type: 'integer[1..]',
-                            prompt: '计时必须大于1秒'
+                            prompt: '计时必须大于0秒'
                         },
                         {
                             type: 'integer[0..3600]',
@@ -1024,7 +1024,7 @@ Vue.component("battle-creater", {
                         },
                         {
                             type: 'integer[1..]',
-                            prompt: '额外用时必须大于1秒'
+                            prompt: '额外用时必须大于0秒'
                         },
                         {
                             type: 'integer[0..3600]',

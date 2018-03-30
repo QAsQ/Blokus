@@ -1,6 +1,5 @@
 import time
 import json
-import re
 import pymongo
 from pymongo import MongoClient
 
@@ -336,9 +335,6 @@ def battles():
             {"query": query, "sort": sort}
         )
         
-        # return success(id_clear(db.battles.find(
-        #     filter=mongo_query,
-        #     sort=mongo_sort)))
         return success({
             "start": start,
             "battle_list": history_clear(db.battles.find(
