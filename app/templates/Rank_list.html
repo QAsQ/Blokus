@@ -1,0 +1,24 @@
+{% extends "Base.html" %}
+
+{% block head %}
+<script>
+$(document).ready(function() {
+    var rank_list = new Vue({
+        "el": "#rank_list",
+        "data":{
+            "users_data": {{ users|tojson|safe }}
+        }
+    });
+});
+</script>
+<div class="ui divider"></div>
+<div class='ui center aligned container'>
+    <h1 style="font-size: 4em;">用户排名</h1>
+	<div class="ui hidden divider"></div>
+	<rank-list id="rank_list" :users_data="users_data"></rank-list>
+</div>
+
+{% endblock %}
+
+{% block content %}
+{% endblock %}

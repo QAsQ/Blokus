@@ -1,0 +1,216 @@
+{% extends "Base.html" %}
+
+{% block head %}
+<script>
+$(document).ready(function() {
+    {% if updated %}
+        $("#updated_notify").modal("show")
+    {% endif %}
+
+    $('#username_update_form').form({
+        fields: {
+            old_password: {
+                identifier: 'old_password',
+                rules: [
+                    {type: 'empty', prompt: '当前密码不能为空'}
+                ]
+            },
+            username: {
+                identifier: 'username',
+                rules: [
+                    {type: 'empty', prompt: '用户名不能为空'},
+                    {type: 'minLength[3]', prompt: '用户名长度要长于3个字符'},
+                    {type: 'maxLength[15]', prompt: '用户名长度要短于15个字符'},
+                    {type: 'not_used[username]', prompt: '该用户名已被使用'}
+                ]
+           }
+        },
+        onSuccess: Callback(
+            "/api/users/" + user_item.user.user_id,
+            "PUT",
+            $("#username_update_form"),
+            $("#username_update_message"),
+            function(data){
+                user_item.user = Object.assign(user_item.user, data.result)
+                show_message("用户名更新成功")
+                $("#username_update_form").form("clear")
+            }
+        )
+    })
+
+    $('#password_update_form').form({
+        fields: {
+            old_password: {
+                identifier: 'old_password',
+                rules: [
+                    {type: 'empty', prompt: '当前密码不能为空'}
+                ]
+            },
+            new_password: {
+                identifier: 'new_password',
+                rules: [
+                    {type: 'empty', prompt: '密码不能为空'},
+                    {type: 'minLength[6]', prompt: '密码长度要长于6个字符'},
+                    {type: 'maxLength[32]', prompt: '密码长度要短于32个字符'}
+                ]
+            },
+            confirm_password: {
+                identifier: 'confirm_password',
+                rules: [
+                    {type: 'empty', prompt: '确认密码不能为空'},
+                    {type: 'match[new_password]', prompt: '两次输入的密码不一致'}
+                ]
+            }
+        },
+        onSuccess: Callback(
+            "/api/users/" + user_item.user.user_id,
+            "PUT",
+            $("#password_update_form"),
+            $("#password_update_message"),
+            function(data){
+                $("#password_update_form").form("clear")
+                show_message("密码更新成功")
+            }
+        )
+    })
+
+    $('#email_update_form').form("set value", "old_email", user_item.user.email)
+    $('#email_update_form').form({
+        fields: {
+            old_password: {
+                identifier: 'old_password',
+                rules: [
+                    {type: 'empty', prompt: '当前密码不能为空'}
+                ]
+            },
+            email: {
+                identifier: 'email',
+                rules: [
+                    {type: 'empty', prompt: '邮箱不能为空'},
+                    {type: 'email', prompt: '邮箱格式不正确'},
+                    {type: 'not_used[email]', prompt: '该邮箱已被使用'}
+                ]
+            }
+        },
+        onSuccess: Callback(
+            "/api/confirm",
+            "POST",
+            $("#email_update_form"),
+            $("#email_update_message"),
+            function(data){
+                $("#confirm_notify").modal("show")
+                $("#email_update_form").form("clear")
+                $('#email_update_form').form("set value", "old_email", user_item.user.email)
+            }
+        )
+    })
+
+
+})
+</script>
+<div class="ui divider"></div>
+<div class="ui center aligned basic segment grid">
+    <h1>用户设置</h1>
+</div>
+<div class="ui grid container">
+    <div class="ui three column row">
+        <div class="ui column">
+            <div class="ui teal segment">
+                <div class="ui header">修改个人信息</div>
+                <form class="ui form" id='username_update_form' action="javascript:void(0)">
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            <input type="password" name="old_password" placeholder="当前密码">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="user icon"></i>
+                            <input type="text" name="username" placeholder="用户名">
+                        </div>
+                    </div>
+                    <div class="ui teal fluid submit button">修改个人信息</div>
+                    <div class="ui error message" id='username_update_message'></div>
+                </form>
+            </div>
+        </div>
+        <div class="ui column">
+            <div class="ui black segment">
+                <div class="ui header">修改密码</div>
+                <form class="ui form" id='password_update_form' action="javascript:void(0)">
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            <input type="password" name="old_password" placeholder="当前密码">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            <input type="password" name="new_password" placeholder="新密码">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            <input type="password" name="confirm_password" placeholder="确认密码">
+                        </div>
+                    </div>
+                    <div class="ui black fluid submit button">修改密码</div>
+                    <div class="ui error message" id='password_update_message'></div>
+                </form>
+            </div>
+        </div>
+        <div class="ui column">
+            <div class="ui black segment">
+                <div class="ui header">修改邮箱</div>
+                <form class="ui form" id='email_update_form' action="javascript:void(0)">
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            <input type="password" name="old_password" placeholder="当前密码">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="mail icon"></i>
+                            <input type="text" name="old_email" readonly="" placeholder="旧邮箱">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="mail icon"></i>
+                            <input type="text" name="email" placeholder="新邮箱">
+                        </div>
+                    </div>
+                    <div class="ui black fluid submit button">修改邮箱</div>
+                    <div class="ui error message" id='email_update_message'></div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="ui mini modal" id="updated_notify">
+    <div class="ui header">
+        <i class="teal setting icon"></i>
+        <div class="content"> 邮箱已更新 </div>
+    </div>
+    <div class="ui content">
+        <div class="ui fluid teal button" onclick="$('#updated_notify').modal('hide')">确定</div>
+    </div>
+</div>
+<div class="ui mini modal" id="confirm_notify">
+    <div class="ui header">
+        <i class="teal mail icon"></i>
+        <div class="content">修改邮箱</div>
+    </div>
+    <div class="ui content">
+        <P>验证邮件已经发送到您的电子邮箱。若未能找到对应邮件，请检查是否被归类到垃圾邮件。</P>
+        <div class="ui fluid teal button" onclick="$('#confirm_notify').modal('hide')">确定</div>
+    </div>
+</div>
+{% endblock %}

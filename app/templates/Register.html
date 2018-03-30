@@ -1,0 +1,102 @@
+{% extends "Base.html" %}
+
+{% block head %}
+<script>
+    $(document).ready(function() {
+        token="{{token}}"
+        $('#register_form').form("set value", "email", "{{email}}")
+        $('#register_form').form({
+            fields: {
+                email: {
+                    identifier: 'email',
+                    rules: [
+                        {type: 'empty', prompt: '邮箱不能为空'},
+                        {type: 'email', prompt: '邮箱格式不正确'},
+                        {type: 'not_used[email]', prompt: '该邮箱已被使用'}
+                    ]
+                },
+                username: {
+                    identifier: 'username',
+                    rules: [
+                        {type: 'empty', prompt: '用户名不能为空'},
+                        {type: 'minLength[3]', prompt: '用户名长度要长于3个字符'},
+                        {type: 'maxLength[15]', prompt: '用户名长度要短于15个字符'},
+                        {type: 'not_used[username]', prompt: '该用户名已被使用'}
+                    ]
+                },
+                register_password: {
+                    identifier: 'register_password',
+                    rules: [
+                        {type: 'empty', prompt: '密码不能为空'},
+                        {type: 'minLength[6]', prompt: '密码长度要长于6个字符'},
+                        {type: 'maxLength[32]', prompt: '密码长度要短于32个字符'}
+                    ]
+                },
+                confirm_password: {
+                    identifier: 'confirm_password',
+                    rules: [
+                        {type: 'empty', prompt: '确认密码不能为空'},
+                        {type: 'match[register_password]', prompt: '两次输入的密码不一致'}
+                    ]
+                }
+            },
+            onSuccess: Callback(
+                "/api/users",
+                "POST",
+                $("#register_form"),
+                $("#register_message"),
+                function(data){
+                    window.location.href="/battles"
+                }
+            )
+        })
+    });
+</script>
+<style>
+.column { max-width: 450px; }
+</style>
+
+
+<div class="ui hidden divider"></div>
+<div class="ui middle aligned center aligned grid">
+    <h2 class="ui image header">
+        <img class="ui small image" src="static/favicon.ico">
+        注册
+    </h2>
+    <div class="row">
+        <div class="ui column segment">
+            <form class="ui large form" id='register_form' action="javascript:void(0)">
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="mail icon"></i>
+                        <input type="text" name="email" readonly="" placeholder="邮箱">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+                        <input type="text" name="username" placeholder="用户名">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="password" name="register_password" placeholder="密码">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="password" name="confirm_password" placeholder="确认密码">
+                    </div>
+                </div>
+                <div class="ui fluid large teal submit button">注册</div>
+                <div class="ui error message" id="register_message"></div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+{% endblock %}
