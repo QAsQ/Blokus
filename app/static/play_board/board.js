@@ -89,6 +89,7 @@ function ParticleFactory(direction, particleColor, mobile_version) {
 function PieceControllerFactory(colorTheme, controllerGroup){
     var bodySize = 6
     var half_a = bodySize * (Math.SQRT2 - 1)
+    var radius = (bodySize - 2) * gCellSize
 
     function generateGraphics(pointList, color, alpha){
         var graphics = new PIXI.Graphics();
@@ -110,16 +111,16 @@ function PieceControllerFactory(colorTheme, controllerGroup){
             [-bodySize, -half_a], 
             [-bodySize,  half_a], 
             [-half_a,  bodySize], 
-            [bodySize, bodySize]
+            [bodySize, bodySize],
+            [bodySize, -half_a]
         ]
         var graphics = generateGraphics(
             path,
             colorTheme.piece.controller.body.color, 
             colorTheme.piece.controller.body.alpha
         )
-        function toPoint(point){
-            return new PIXI.Point(point[0], point[1])
-        }
+        graphics.arc(0, 0, radius, 0, 2 * Math.PI);
+
 
         var body = new PIXI.Sprite(graphics.generateTexture())
         body.anchor.set(0.5)
@@ -173,7 +174,6 @@ function PieceControllerFactory(colorTheme, controllerGroup){
 
     function generateRotateCircle(){
         var graphics = new PIXI.Graphics()
-        var radius = (bodySize - 2) * gCellSize
         graphics.lineStyle(2, colorTheme.piece.controller.control_parts.color, 1)
         graphics.drawCircle(0, 0, radius)
 
