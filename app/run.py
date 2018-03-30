@@ -34,7 +34,7 @@ def load_user(user_id):
 
 @app.route("/")
 def index_page():
-    return render_template("index.html")
+    return render_template("Index.html")
 
 @app.route("/battles")
 def battles_page():
