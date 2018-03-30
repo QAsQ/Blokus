@@ -369,8 +369,7 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme, mobile_vers
 
     progressBarContainer.additional_extremity = ParticleFactory(
         progressBar.rotation,
-        colorTheme.board.progress_bar.particles.additional,
-        mobile_version
+        colorTheme.board.progress_bar.particles.additional
 	);
 	progressBarContainer.addChild(progressBarContainer.additional_extremity);
     progressBarContainer.additional_extremity.rotation = angle
@@ -612,8 +611,8 @@ function PieceFactory(pieceId,
 
     pieces.SetPosition = function(position){
         var piece = this.piece[this.state]
-        this.x = position.x * gCellSize + piece.offset.x
-        this.y = position.y * gCellSize + piece.offset.y
+        this.x = position.x * gCellSize + piece.offset.x + colorTheme.piece.dividing_line_width[mobile_version] / 2
+        this.y = position.y * gCellSize + piece.offset.y + colorTheme.piece.dividing_line_width[mobile_version] / 2
     }
 
     pieces.getCenter = function(){
@@ -863,7 +862,8 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, 
     current_piece_id = -1
     function DragStartCallBack(piece, position) {
         current_piece_id = piece.piece_id;
-        board.pieceController.attach(piece)
+        if (mobile_version)
+            board.pieceController.attach(piece)
     }
     function DragMoveCallBack(piece, position) {
         board.pieceController.follow()
