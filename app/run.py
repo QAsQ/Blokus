@@ -34,17 +34,17 @@ def load_user(user_id):
 
 @app.route("/")
 def index_page():
-    return render_template("Index.html")
+    return render_template("index.html")
 
 @app.route("/battles")
 def battles_page():
-    return render_template("Battles.html")
+    return render_template("battles.html")
 
 @app.route("/about")
 def about_page():
     user_number = db.users.find().count()
     battle_number = db.battles.find().count()
-    return render_template("About.html", user_number=user_number, battle_number=battle_number)
+    return render_template("about.html", user_number=user_number, battle_number=battle_number)
 
 @app.route("/rank-list")
 def userlist_page():
@@ -54,34 +54,34 @@ def userlist_page():
         filter={"user_info.number_of_battles": {"$ne": 0}},
         projection=projection,
         sort=sort))
-    return render_template("Rank_list.html", users=users)
+    return render_template("rank_list.html", users=users)
 
 @app.route("/users")
 def user_page():
     try:
         user_id = int(request.args.get("user_id"))
     except:
-        return render_template("Error.html", message="该用户不存在")
+        return render_template("error.html", message="该用户不存在")
 
     user = User.load_from_id(db, user_id)
     if user is None:
-        return render_template("Error.html", message="该用户不存在")
+        return render_template("error.html", message="该用户不存在")
 
-    return render_template("User.html", target_user=user)
+    return render_template("user.html", target_user=user)
 
 @app.route("/user_setting")
 def user_setting_page():
     try:
         user_id = int(request.args.get("user_id"))
     except:
-        return render_template("Error.html", message="该用户不存在")
+        return render_template("error.html", message="该用户不存在")
     user = User.load_from_id(db, user_id)
     if user is None:
-        return render_template("Error.html", message="该用户不存在")
+        return render_template("error.html", message="该用户不存在")
     if user.user_id != current_user.user_id:
-        return render_template("Error.html", message="没有权限")
+        return render_template("error.html", message="没有权限")
 
-    return render_template("User_setting.html", target_user=user, updated=False)
+    return render_template("user_setting.html", target_user=user, updated=False)
 
 @app.route("/register")
 def regiester_page():
@@ -89,13 +89,13 @@ def regiester_page():
         token = request.args.get("token")
         email = get_email_from_token(token)
         if email == False:
-            return render_template("Error.html", message="没有权限")
+            return render_template("error.html", message="没有权限")
         if not token_verify(db, token):
-            return render_template("Error.html", message="网址已过期")
+            return render_template("error.html", message="网址已过期")
     except Exception:
-        return render_template("Error.html", message="没有权限")
+        return render_template("error.html", message="没有权限")
     
-    return render_template("Register.html", email=email, token=token)
+    return render_template("register.html", email=email, token=token)
 
 @app.route("/confirm")
 def confirm_page():
@@ -103,15 +103,15 @@ def confirm_page():
         token = request.args.get("token")
         email = get_email_from_token(token)
         if email == False or current_user.user_id == -1:
-            return render_template("Error.html", message="没有权限")
+            return render_template("error.html", message="没有权限")
         if not token_verify(db, token):
-            return render_template("Error.html", message="网址已过期")
+            return render_template("error.html", message="网址已过期")
     except Exception:
-            return render_template("Error.html", message="没有权限")
+            return render_template("error.html", message="没有权限")
     
     current_user.update("email", email)
     
-    return render_template("User_setting.html", target_user=current_user, updated=True)
+    return render_template("user_setting.html", target_user=current_user, updated=True)
 
 @app.route("/password_resetter")
 def password_resetter_page():
@@ -120,13 +120,13 @@ def password_resetter_page():
         email = get_email_from_token(token)
         user = User.load_from_email(db, email)
         if email == False:
-            return render_template("Error.html", message="没有权限")
+            return render_template("error.html", message="没有权限")
         if not token_verify(db, token):
-            return render_template("Error.html", message="网址已过期")
+            return render_template("error.html", message="网址已过期")
     except Exception:
-        return render_template("Error.html", message="没有权限")
+        return render_template("error.html", message="没有权限")
     
-    return render_template("Password_resetter.html", token=token, user_id=user.user_id)
+    return render_template("password_resetter.html", token=token, user_id=user.user_id)
 
 
 @app.route("/battle")
@@ -134,14 +134,14 @@ def battle_page():
     try:
         battle_id = int(request.args.get('battle_id'))
     except Exception as e:
-        return render_template("Error.html", message=repr(e))
+        return render_template("error.html", message=repr(e))
     
     battle = BattleFactory.load_battle(battle_id, db)
 
     if isinstance(battle, str):
-        return render_template("Error.html", message=battle)
+        return render_template("error.html", message=battle)
 
-    return render_template("Battle.html", battle=battle.get_state(current_time(), current_user.user_id))
+    return render_template("battle.html", battle=battle.get_state(current_time(), current_user.user_id))
 
 @app.route("/api/register", methods=['POST'])
 def regiester():
