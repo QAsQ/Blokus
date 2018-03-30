@@ -488,10 +488,10 @@ Vue.component("chat-box", {
 });
 
 Vue.component("control-panel", {
-    props: ['battle_data', 'player_id', 'current_position'],
+    props: ['battle_data', 'player_id', 'current_position', 'mobile_version'],
     template: `
         <div class="ui four wide column">
-            <chat-box :chat_logs="battle_data.chat_logs" @focus_input="$emit('focus_input')"></chat-box>
+            <chat-box v-if="!mobile_version" :chat_logs="battle_data.chat_logs" @focus_input="$emit('focus_input')"></chat-box>
             <div v-if="!battle_data.battle_info.ended" class="ui teal fluid button" 
                 :class="{disabled: !can_hosting, loading: loading, active: hosting}"
                 @mousedown="update_hosting"
@@ -681,7 +681,11 @@ Vue.component("battle-interface", {
     props: ['board_data', 'battle_data', 'user_info'],
     template: `
         <div class="ui grid container stackable">
-            <div class="ui center aligned eleven wide column">
+            <div class="ui eleven wide column">
+                <chat-box v-if="mobile_version" 
+                    :chat_logs="battle_data.chat_logs" 
+                    @focus_input="board_detach_active_piece">
+                </chat-box>
                 <div class="ui segment" id="board_container">
                     <canvas id="board" :height="board_height" :width="board_width"></canvas>
                 </div>
@@ -694,6 +698,7 @@ Vue.component("battle-interface", {
                 :battle_data="battle_data" 
                 :player_id="player_id" 
                 :current_position="current_position"
+                :mobile_version="mobile_version"
                 @focus_input="board_detach_active_piece"
                 @move="move"> 
             </control-panel>
@@ -748,7 +753,7 @@ Vue.component("battle-interface", {
         board_width: function () {
             var width = document.body.clientWidth
             if (width > 767)
-                return 700
+                return 730
             else
                 return width - 50
         },
@@ -756,9 +761,9 @@ Vue.component("battle-interface", {
             var width = document.body.clientWidth
             if (width > 767)
                 return 646
-            else
-                return document.body.clientHeight - 150
-
+            else{
+                return document.body.clientHeight - 100
+            }
         },
         player_id: function () {
             if (this.user_info.user_id === -1)

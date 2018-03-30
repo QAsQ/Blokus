@@ -7,18 +7,31 @@ function Point(x, y) {
 }
 
 var gPiecesLocate = [
-    Point(19, -4), Point(13, -4), Point(-4, -4), Point(7, -4), Point(9, 23),
-    Point(18, 23), Point(0, -4), Point(-4, 6), Point(0, 23), Point(-4, 11),
-    Point(23, 22), Point(22, -4), Point(-4, 17), Point(23, 17), Point(-4, -1),
-    Point(4, 23), Point(-4, 22), Point(13, 23), Point(23, 7), Point(23, 12),
-    Point(23, 1)
-];
-
+    [
+        Point(19, -4), Point(13, -4), Point(-4, -4), Point(7, -4), Point(9, 23), 
+        Point(18, 23), Point(0, -4), Point(-4, -1), Point(0, 23), Point(-4, 9), 
+        Point(23, 22), Point(22, -4), Point(-4, 3), Point(23, 17), Point(-4, 15), 
+        Point(4, 23), Point(-4, 22), Point(13, 23), Point(23, 7), Point(23, 12), 
+        Point(23, 1)
+    ],
+    [
+        Point(9, 26), Point(10, 24), Point(0, 22), Point(8, 22), Point(12, 30), 
+        Point(2, 29), Point(3, 22), Point(8, 30), Point(15, 29), Point(4, 27), 
+        Point(13, 26), Point(17, 22), Point(5, 24), Point(17, 26), Point(0, 27), 
+        Point(18, 29), Point(9, 26), Point(15, 24), Point(5, 29), Point(1, 24), 
+        Point(12, 22)
+    ]
+]
 var gInitState = [
-    0, 0, 0, 0, 0, 2, 2, 2, 6, 2, 7, 6, 7, 7, 0, 7, 4, 4, 6, 0, 5
-];
+    [
+        0, 0, 0, 0, 0, 2, 2, 3, 6, 3, 7, 6, 6, 7, 0, 7, 4, 4, 6, 0, 5
+    ],
+    [
+        0, 0, 0, 0, 0, 0, 2, 4, 4, 0, 1, 6, 1, 1, 0, 4, 6, 0, 6, 1, 3
+    ]
+]
 
-gProgressBarEndPointList= [
+var gProgressBarEndPointList= [
     Point(0, -1), Point(20, -1), 
     Point(-1, 20), Point(-1, 0), 
     Point(20, 21), Point(0, 21), 

@@ -1,14 +1,14 @@
 Math.square = function(x){
     return x * x
 }
-function ParticleFactory(direction, particleColor) {
+function ParticleFactory(direction, particleColor, mobile_version) {
 	particle_config = {
 		"alpha": {
 			"start": 1,
 			"end": 0
 		},
 		"scale": {
-			"start": 0.2,
+			"start": mobile_version ? 0.05 : 0.2,
 			"end": 0.9,
 			"minimumScaleMultiplier": 1
 		},
@@ -27,7 +27,7 @@ function ParticleFactory(direction, particleColor) {
 		},
 		"maxSpeed": 0,
 		"startRotation": {
-			"min": -45,
+			"min": mobile_version ? -22.5 : -45,
 			"max": 0 
 		},
 		"noRotation": false,
@@ -37,12 +37,12 @@ function ParticleFactory(direction, particleColor) {
 		},
 		"lifetime": {
 			"min": 0.5,
-			"max": 2
+			"max": mobile_version ? 1.5 : 2
 		},
 		"blendMode": "normal",
 		"frequency": 0.01,
 		"emitterLifetime": -1,
-		"maxParticles": 500,
+		"maxParticles": 80,
 		"pos": {
 			"x": 0,
 			"y": 0
@@ -50,10 +50,10 @@ function ParticleFactory(direction, particleColor) {
 		"addAtBack": false,
 		"spawnType": "rect",
 		"spawnRect": {
-			"x": -1,
-			"y": -1,
-			"w": 7,
-			"h": 7
+			"x": 0,
+			"y": 0,
+			"w": mobile_version ? 1 : 7,
+			"h": mobile_version ? 1 : 7
 		}
 	}
     var emitter = null
@@ -103,22 +103,27 @@ function PieceControllerFactory(colorTheme, controllerGroup){
     }
 
     function generateConrtollerBody(){
+        var path = [
+            [bodySize, -half_a],
+            [half_a, -bodySize],
+            [-half_a, -bodySize], 
+            [-bodySize, -half_a], 
+            [-bodySize,  half_a], 
+            [-half_a,  bodySize], 
+            [bodySize, bodySize]
+        ]
         var graphics = generateGraphics(
-            [
-                [bodySize, -half_a],
-                [half_a, -bodySize],
-                [-half_a, -bodySize], 
-                [-bodySize, -half_a], 
-                [-bodySize,  half_a], 
-                [-half_a,  bodySize], 
-                [bodySize, bodySize]
-            ], 
+            path,
             colorTheme.piece.controller.body.color, 
             colorTheme.piece.controller.body.alpha
         )
+        function toPoint(point){
+            return new PIXI.Point(point[0], point[1])
+        }
 
         var body = new PIXI.Sprite(graphics.generateTexture())
         body.anchor.set(0.5)
+        body.interactive = true
         return body
     }
 
@@ -168,7 +173,7 @@ function PieceControllerFactory(colorTheme, controllerGroup){
 
     function generateRotateCircle(){
         var graphics = new PIXI.Graphics()
-        var radius = (bodySize - 1) * gCellSize
+        var radius = (bodySize - 2) * gCellSize
         graphics.lineStyle(2, colorTheme.piece.controller.control_parts.color, 1)
         graphics.drawCircle(0, 0, radius)
 
@@ -202,11 +207,13 @@ function PieceControllerFactory(colorTheme, controllerGroup){
             if(distance < radius - thickWidth || distance > radius){
                 return
             }
-            this.oldState = this.getState()
-            this.dragging = true;
-            this.alpha = colorTheme.piece.controller.control_parts.active_alpha
-            this.rotation = this.getAngel(position)
-            event.stopped = true
+            else{
+                this.oldState = this.getState()
+                this.dragging = true;
+                this.alpha = colorTheme.piece.controller.control_parts.active_alpha
+                this.rotation = this.getAngel(position)
+                event.stopped = true
+            }
         }
         function onDragMove() {
             if (this.dragging) {
@@ -260,6 +267,7 @@ function PieceControllerFactory(colorTheme, controllerGroup){
         this.attachPiece.Unselect()
     }
 
+
     var pieceController = new PIXI.Container()
     pieceController.visible = false
     pieceController.parentGroup = controllerGroup
@@ -270,6 +278,7 @@ function PieceControllerFactory(colorTheme, controllerGroup){
         .on('pointerup', onDragEnd)
         .on('pointerupoutside', onDragEnd)
         .on('pointermove', onDragMove);
+
 
     var conrtollerBody = generateConrtollerBody()
     pieceController.addChild(conrtollerBody)
@@ -299,10 +308,13 @@ function PieceControllerFactory(colorTheme, controllerGroup){
         this.follow()
     }
 
-    pieceController.detach = function(){
-        rotateCircle.Reset()
-        this.attachPiece = null
-        this.visible = false
+    pieceController.detach = function(piece){
+        if (piece === undefined || this.attachPiece == piece)
+        {
+            rotateCircle.Reset()
+            this.attachPiece = null
+            this.visible = false
+        }
     }
 
     return pieceController;
@@ -349,14 +361,16 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme, mobile_vers
 
     progressBarContainer.extremity = ParticleFactory(
         progressBar.rotation,
-        colorTheme.board.progress_bar.particles.accuracy[player_id]
+        colorTheme.board.progress_bar.particles.accuracy[player_id],
+        mobile_version
     );
 	progressBarContainer.addChild(progressBarContainer.extremity);
     progressBarContainer.extremity.rotation = angle
 
     progressBarContainer.additional_extremity = ParticleFactory(
         progressBar.rotation,
-        colorTheme.board.progress_bar.particles.additional
+        colorTheme.board.progress_bar.particles.additional,
+        mobile_version
 	);
 	progressBarContainer.addChild(progressBarContainer.additional_extremity);
     progressBarContainer.additional_extremity.rotation = angle
@@ -367,7 +381,7 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme, mobile_vers
 	var progressBarText = new PIXI.Text(
 		"",
 		new PIXI.TextStyle({
-            fontSize: mobile_version ? 5 : 20 
+            fontSize: mobile_version ? 9 : 20 
         })
 	);  
 	progressBarText.updText= function(text){
@@ -915,8 +929,8 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, 
                 DragMoveCallBack,
                 DragEndCallBack
             );
-            piece.SetState(gInitState[pieceId])
-            piece.SetPosition(gPiecesLocate[pieceId])
+            piece.SetState(gInitState[mobile_version][pieceId])
+            piece.SetPosition(gPiecesLocate[mobile_version][pieceId])
             if (playerId !== mPlayerId) 
                 piece.SetOwnership(false)
             pieceList.push(piece);
@@ -959,6 +973,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, 
             var isCurrentPlayer = piece.player_id == mPlayerId;
             var currentPiece = _pieceLists[piece.player_id][piece.piece_id];
 
+            board.pieceController.detach(currentPiece)
             currentPiece.DropDown();
             currentPiece.SetState(piece.position.state);
             currentPiece.SetPosition(piece.position)
@@ -1022,7 +1037,7 @@ function generateBoard(canvas, mPlayerId, boardData, colorTheme, mobile_version)
     if (mobile_version)
         gCellSize = Math.floor(Math.min(gWidth, gHeight) / 24)
     else
-        gCellSize = Math.floor(Math.min(gWidth, gHeight) / 28)
+        gCellSize = Math.floor(Math.min(gWidth, gHeight) / 29)
     gBoardSize = gCellSize * 20;
 
     function TryDropPiece(data){
