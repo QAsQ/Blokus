@@ -251,7 +251,7 @@ Vue.component("battle-info", {
             let minute = Math.ceil(second / 60);
             if (minute < 60)
                 return minute + "分钟";
-            let hour = Math.ceil(second / 60);
+            let hour = Math.ceil(minute / 60);
             if (hour < 24)
                 return hour + "小时";
             let day = Math.ceil(hour / 24);
