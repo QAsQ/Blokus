@@ -417,10 +417,10 @@ Vue.component("chat-item", {
 })
 
 Vue.component("chat-box", {
-    props: ['chat_logs'],
+    props: ['chat_logs', 'mobile_version'],
     template: `
         <div class="ui segment">
-            <div class="ui horizontal chat-box" id="chat_box" @scroll="update_bottom">
+            <div class="ui horizontal chat-box" :style="{height: height}" id="chat_box" @scroll="update_bottom">
                 <div class="ui comments">
                     <chat-item v-for="(chat_log, index) in chat_logs" :chat_log="chat_log" :key="index"></chat-item>
                 </div>
@@ -443,6 +443,14 @@ Vue.component("chat-box", {
         var chat_box = $("#chat_box")
         if (this.bottom)
             this.roll_to_bottom()
+    },
+    computed: {
+        height: function(){
+            if (this.mobile_version)
+                return "100px"
+            else
+                return "379px"
+        }
     },
     methods: {
         update_bottom: function () {
@@ -491,7 +499,12 @@ Vue.component("control-panel", {
     props: ['battle_data', 'player_id', 'current_position', 'mobile_version'],
     template: `
         <div class="ui four wide column">
-            <chat-box v-if="!mobile_version" :chat_logs="battle_data.chat_logs" @focus_input="$emit('focus_input')"></chat-box>
+            <chat-box 
+                v-if="!mobile_version" 
+                :chat_logs="battle_data.chat_logs" 
+                :mobile_version="mobile_version"
+                @focus_input="$emit('focus_input')">
+            </chat-box>
             <div v-if="!battle_data.battle_info.ended" class="ui teal fluid button" 
                 :class="{disabled: !can_hosting, loading: loading, active: hosting}"
                 @mousedown="update_hosting"
@@ -684,6 +697,7 @@ Vue.component("battle-interface", {
             <div class="ui eleven wide column">
                 <chat-box v-if="mobile_version" 
                     :chat_logs="battle_data.chat_logs" 
+                    :mobile_version="mobile_version"
                     @focus_input="board_detach_active_piece">
                 </chat-box>
                 <div class="ui segment" id="board_container">
