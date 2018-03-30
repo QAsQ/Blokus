@@ -12,6 +12,11 @@
         </div>
     </div>
 </div>
+<script>
+$(document).ready(function() {
+    $('.menu .item').tab();
+})
+</script>
 {% endblock %}
 
 {% block content %}
@@ -107,62 +112,115 @@
 <div class="ui vertical stripe quote segment">
     <div class="ui equal width stackable internally celled grid container">
         <div class="row">
-            <div class="seven wide column">
+            <div class="eleven wide column">
                 <h3>操作</h3>
-                <p>鼠标点击选中某一个棋子后，使用按键旋转/翻转棋子</p>
-                <div class="ui compact segment">
-                    <div class="ui horizontal list">
-                        <div class="item"> <div class="content"> 
-                            <p>使用按键 S/W 将</p>
-                        </div> </div>
-                        <div class="item">
-                            <img class="ui bordered middle aligned image" src="static/common/images/intro/s.jpg">
-                            <div class="content">
-                                <p>上下翻转为</p> 
+                <div class="ui top attached tabular menu">
+                    <a class="item" data-tab="pc">PC端</a>
+                    <a class="item active" data-tab="mobile">移动端</a>
+                </div>
+                <div class="ui bottom attached tab segment" data-tab="pc">
+                    <p>鼠标点击选中某一个棋子后，使用按键旋转/翻转棋子</p>
+                    <div class="ui compact segment">
+                        <div class="ui horizontal list">
+                            <div class="item"> <div class="content"> 
+                                <p>使用按键 S/W 将</p>
+                            </div> </div>
+                            <div class="item">
+                                <img class="ui bordered middle aligned image" src="static/common/images/intro/s.jpg">
+                                <div class="content">
+                                    <p>上下翻转为</p> 
+                                </div>
+                            </div>
+                            <div class="item">
+                                <img class="ui bordered middle aligned image" src="static/common/images/intro/w.jpg">
                             </div>
                         </div>
-                        <div class="item">
-                            <img class="ui bordered middle aligned image" src="static/common/images/intro/w.jpg">
+                    </div>
+                    <div class="row">
+                        <div class="ui compact segment">
+                            <div class="ui horizontal list">
+                                <div class="item"> <div class="content"> 
+                                    <p>使用按键 A 将</p>
+                                </div> </div>
+                                <div class="item">
+                                    <img class="ui bordered middle aligned image" src="static/common/images/intro/s.jpg">
+                                    <div class="content">
+                                        <p>逆时针旋转为</p>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <img class="ui bordered middle aligned image" src="static/common/images/intro/a.jpg">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui compact segment">
+                            <div class="ui horizontal list">
+                                <div class="item"> <div class="content"> 
+                                    <p>使用按键 D 将</p>
+                                </div> </div>
+                                <div class="item">
+                                    <img class="ui bordered middle aligned image" src="static/common/images/intro/s.jpg">
+                                    <div class="content">
+                                        <p>顺时针旋转为</p>
+                                    </div>
+                                </div>
+                                <div class="item">
+                                    <img class="ui bordered middle aligned image" src="static/common/images/intro/d.jpg">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="ui compact segment">
+                <div class="ui bottom attached tab segment active" data-tab="mobile">
+                    <div class="ui basic segment">
                         <div class="ui horizontal list">
-                            <div class="item"> <div class="content"> 
-                                <p>使用按键 A 将</p>
-                            </div> </div>
                             <div class="item">
-                                <img class="ui bordered middle aligned image" src="static/common/images/intro/s.jpg">
+                                <img class="ui bordered middle aligned small image" 
+                                    src="static/common/images/intro/controller.png">
                                 <div class="content">
-                                    <p>逆时针旋转为</p>
+                                    <p>触摸棋子会显示该棋子的控制盘</p>
+                                    <p>点击棋子本体放下棋子</p>
+                                    <p>拖动浅灰色区域可以同时拖动棋子</p>
                                 </div>
-                            </div>
-                            <div class="item">
-                                <img class="ui bordered middle aligned image" src="static/common/images/intro/a.jpg">
                             </div>
                         </div>
                     </div>
-                    <div class="ui compact segment">
-                        <div class="ui horizontal list">
-                            <div class="item"> <div class="content"> 
-                                <p>使用按键 D 将</p>
-                            </div> </div>
-                            <div class="item">
-                                <img class="ui bordered middle aligned image" src="static/common/images/intro/s.jpg">
+                    <div class="ui stackable basic grid three column" 
+                    style="padding-top:0em; padding-bottom:0em;">
+                        <div class="ui column" style="padding-top:1em; padding-bottom:1em;">
+                            <div class="ui fluid card">
+                                <div class="image">
+                                    <img src="static/common/images/intro/controller_rotate.png">
+                                </div>
                                 <div class="content">
-                                    <p>顺时针旋转为</p>
+                                    <p>拖动该区域旋转棋子</p>
                                 </div>
                             </div>
-                            <div class="item">
-                                <img class="ui bordered middle aligned image" src="static/common/images/intro/d.jpg">
+                        </div>
+                        <div class="ui column" style="padding-top:1em; padding-bottom:1em;">
+                            <div class="ui fluid card">
+                                <div class="image">
+                                    <img src="static/common/images/intro/controller_horizontal.png">
+                                </div>
+                                <div class="content">
+                                    <p>点击该区域上下翻转棋子</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui column" style="padding-top:1em; padding-bottom:1em;">
+                            <div class="ui fluid card">
+                                <div class="image">
+                                    <img src="static/common/images/intro/controller_vertical.png">
+                                </div>
+                                <div class="content">
+                                    <p>点击该区域左右翻转棋子</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="nine wide column">
+            <div class="five wide column">
                 <h3>计时规则 </h3>
                 <p> 对每一局游戏，每个玩家有总用时和额外用时，其中额外计时每回合重置。 </p>
                 <p> 当轮到某个玩家的回合时，会首先消耗这一步的用时，当这一步的用时消耗完后，会消耗这一局的总用时。总用时也消耗完后会由系统随机放下一个棋子并强制进入下一个玩家的回合。 </p>
