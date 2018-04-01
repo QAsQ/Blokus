@@ -1,5 +1,4 @@
 from .board import BoardFactory
-from .board.square_board.piece import Position
 from .db_utility import id_generate
 from .user import User
 from .rating import calculate_rating
@@ -31,7 +30,7 @@ class Battle:
         self.default_player_info = {"user_id": -1}
 
         if players_info is None:
-            self.players_info = [self.default_player_info for _ in range(4)]
+            self.players_info = [self.default_player_info for _ in range(self.board.player_num)]
         else:
             self.players_info = players_info
 
@@ -176,7 +175,7 @@ class Battle:
 
         if self.board.try_drop_piece(player_id, piece_id, dict_position):
             self.players_info[self.current_player]['additional_time_left'] = self.additional_time
-            self.current_player = (self.current_player + 1) % 4
+            self.current_player = (self.current_player + 1) % self.board.player_num
             self._update_ended(self.board.is_ended())
 
             self._update("board_info", self.board.get_info())
@@ -240,7 +239,7 @@ class Battle:
     def _get_left_position(self):
         left_position = 0
         for player_info in self.players_info:
-            left_position += player_info['user_id'] == -1
+            left_position += (player_info['user_id'] == -1)
         return left_position
 
     def _update(self, key, value):
@@ -282,7 +281,7 @@ class Battle:
             self._update_ended(self.board.is_ended())
             current_player()['additional_time_left'] = self.additional_time
             self.current_player += 1
-            self.current_player %= 4
+            self.current_player %= self.board.player_num
 
         if player_id != -1:
             self.players_info[player_id]["last_active_time"] = timestamp

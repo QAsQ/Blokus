@@ -79,7 +79,8 @@ class Piece:
         self.is_drop = True
         return True
 
-    def is_possible_position(self, position):
+    def is_possible_position(self, dict_position):
+        position = Position.from_dict(dict_position)
         if 0 > position.state or position.state > 8:
             return False
         if 0 > position.x or self.board_size < position.x:
@@ -100,7 +101,9 @@ class Piece:
     def get_cell_list(self, state):
         return self.shape_set[state]
 
-    def update_possible_position(self, piece_shape, position, is_same_player):
+    def update_possible_position(self, piece_shape, dict_position, is_same_player):
+        position = Position.from_dict(dict_position)
+
         for state in range(8):
             for one_cell in piece_shape:
                 for act in self.action[state]:

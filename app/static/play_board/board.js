@@ -798,7 +798,7 @@ function HighlightLayerFactory(colorTheme, mobile_version, piecesCellList){
     return highlightLayer;
 }
 
-function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, mobile_version) {
+function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobile_version) {
     var backgroundGroup = new PIXI.display.Group(-3, false); 
     var placedGroup = new PIXI.display.Group(-2, false); 
     var highlightGroup = new PIXI.display.Group(-1, false);
@@ -843,9 +843,8 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, 
             gCellSize / 2, gCellSize / 2
         )
     }
-    var initial_position = [[0, 0], [0, 19], [19, 19], [19, 0]]
     for (var player_id = 0 ; player_id < 4; player_id ++){
-        draw_initial_posiiton(initial_position[player_id], colorTheme.piece.initial[player_id])
+        draw_initial_posiiton(boardData.start_point[player_id], colorTheme.piece.initial[player_id])
     }
 
     var boardShape = new PIXI.Sprite(graphics.generateTexture());
@@ -917,7 +916,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, 
         for (var pieceId = 0; pieceId <= 20; pieceId++) {
             var piece = PieceFactory(
                 pieceId,
-                piecesCellList[pieceId],
+                boardData.piece_shape[pieceId],
                 new PIXI.Point(board.x, board.y),
                 playerId,
                 colorTheme,
@@ -941,7 +940,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, piecesCellList, 
     board.pieceLists = pieceLists;
     //Create piece Done
 
-    board.highlightLayer = HighlightLayerFactory(colorTheme, mobile_version, piecesCellList)
+    board.highlightLayer = HighlightLayerFactory(colorTheme, mobile_version, boardData.piece_shape)
     board.highlightLayer.parentGroup = highlightGroup
     board.addChild(board.highlightLayer)
 

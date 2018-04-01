@@ -108,9 +108,9 @@ class BoardFactory:
         }
         if board_type in args:
             Piece, piece_shape, start_point, board_size, initialize_position = args[board_type]
-            pieces = [[] for _ in len(start_point)]
-            for player_id in len(initialize_position):
-                for piece_id in len(piece_shape):
+            pieces = [[] for _ in range(len(start_point))]
+            for player_id in range(len(initialize_position)):
+                for piece_id in range(len(piece_shape)):
                     piece = Piece(
                         piece_shape[piece_id], 
                         start_point[player_id], 
@@ -136,11 +136,12 @@ class BoardFactory:
         datas = {
             "square_standard": {
                 "start_point": [(0, 0), (0, 19), (19, 19), (19, 0)], 
-                "piece_shape": square_piece_shape_generate()
+                "piece_shape": square_piece_shape_generate(),
+                "board_size": 20
             }
         }
         if board_type not in datas:
             return "board type {} is not defined!".format(board_type)
         
-        return datas['board_type']
+        return datas[board_type]
     
