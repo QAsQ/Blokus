@@ -36,7 +36,7 @@
                 else {
                     if (flush) {
                         battle_list.battles_data = data.result.battle_list
-                        if (limit != data.result.length)
+                        if (limit != battle_list.battles_data.length)
                             battle_list.ended = true
                     }
                     else {
@@ -75,7 +75,7 @@
                     condition: user_item.user.user_info.perference.condition
                 }
             })
-            load_battles()
+            // load_battles()
 
             var battle_creater = new Vue({
                 el: "#battle_creater",
