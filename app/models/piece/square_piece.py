@@ -19,9 +19,6 @@ class Position:
             "y": self.y
         }
 
-def same_point(point1, point2):
-    return point1[0] == point2[0] and point1[1] == point2[1]
-
 # 0-lack of corner
 # 1-can be placed
 # 2-occupied or share edge with same color or illegal or out of board
@@ -38,9 +35,10 @@ occupy = 2
 
 # 维护单个棋子(包括八个状态）在棋盘的各个位置上的状态
 class Piece:
-    def __init__(self, piece_shape_set, player_id, initialize_position=None):
-        self.shape_set = piece_shape_set
-        self.cell_num = 0 if len(piece_shape_set) == 0 else len(piece_shape_set[0])
+    def __init__(self, shape_set, start_point, board_size, initialize_position=None):
+        self.shape_set = shape_set
+        self.cell_num = 0 if len(shape_set) == 0 else len(shape_set[0])
+        self.board_size = board_size
 
         self.possible_position = []
         if initialize_position is None:
@@ -48,7 +46,7 @@ class Piece:
                 self.possible_position.append(
                     self._generate_piece_initialize_legal_position(
                         self.shape_set[state],
-                        player_id
+                        start_point
                     )
                 )
         else:
@@ -84,9 +82,9 @@ class Piece:
     def is_possible_position(self, position):
         if 0 > position.state or position.state > 8:
             return False
-        if 0 > position.x or 20 < position.x:
+        if 0 > position.x or self.board_size < position.x:
             return False
-        if 0 > position.y or 20 < position.y:
+        if 0 > position.y or self.board_size < position.y:
             return False
         return self.possible_position[position.state][position.x][position.y] == can_be_placed
 
@@ -94,11 +92,13 @@ class Piece:
         if self.is_drop:
             return Position()
         for state in range(8):
-            for x in range(20):
-                for y in range(20):
-                    if self.possible_position[state][x][y] == 1:
-                        return Position(state, x, y)
+            for x, y in [(x, y) for x in range(self.board_size) for y in range(self.board_size)]:
+                if self.possible_position[state][x][y] == 1:
+                    return Position(state, x, y)
         return Position()
+    
+    def get_cell_list(self, state):
+        return self.shape_set[state]
 
     def update_possible_position(self, piece_shape, position, is_same_player):
         for state in range(8):
@@ -113,9 +113,9 @@ class Piece:
                     )
     
     def _update_one_position(self, state, x, y, action, is_same_player):
-        if x < 0 or x >= 20:
+        if x < 0 or x >= self.board_size:
             return
-        if y < 0 or y >= 20:
+        if y < 0 or y >= self.board_size:
             return
         self.possible_position[state][x][y] = self.state_update_table[is_same_player][action][self.possible_position[state][x][y]]
 
@@ -146,12 +146,6 @@ class Piece:
                 res_action.append((x, y, action))
         return res_action
 
-    def get_state(self):
-        return {
-            "is_drop": self.is_drop,
-        }
-
-
     def _generate_piece_initialize_legal_position(self, piece_shape, player_id):
 
         def can_place(piece_set, coordinate_x, coordinate_y):
@@ -160,35 +154,6 @@ class Piece:
                     return False
             return True
         
-        def occupied(act_pos, ano_pos):
-            for actp in act_pos:
-                for anop in ano_pos:
-                    if same_point(actp, anop):
-                        return True
-            return False
-
-        def share_edge(act_pos, ano_pos):
-            if same_point((act_pos[0] + 1, act_pos[1]), ano_pos):
-                return True
-            if same_point((act_pos[0] - 1, act_pos[1]), ano_pos):
-                return True
-            if same_point((act_pos[0], act_pos[1] + 1), ano_pos):
-                return True
-            if same_point((act_pos[0], act_pos[1] - 1), ano_pos):
-                return True
-            return False
-
-        def share_corner(act_pos, ano_pos):
-            if same_point((act_pos[0] + 1, act_pos[1] + 1), ano_pos):
-                return True
-            if same_point((act_pos[0] - 1, act_pos[1] - 1), ano_pos):
-                return True
-            if same_point((act_pos[0] - 1, act_pos[1] + 1), ano_pos):
-                return True
-            if same_point((act_pos[0] + 1, act_pos[1] - 1), ano_pos):
-                return True
-            return False
-
         begin_point = [(-1, -1), (-1, 20), (20, 20), (20, -1)]
         dir_point = [(-1, -1), (-1, 1), (1, 1), (1, -1)]
         begin_position = [[0 for j in range(20)] for i in range(20)]
@@ -202,8 +167,76 @@ class Piece:
                     continue
                 can_be_placed = 0
                 for point in piece_shape:
-                    if same_point((i + point[0] + dir_point[player_id][0], j + point[1] + dir_point[player_id][1]), begin_point[player_id]):
+                    if (i + point[0] + dir_point[player_id][0], 
+                        j + point[1] + dir_point[player_id][1]) == begin_point[player_id]:
                         can_be_placed = 1
                         break
                 begin_position[i][j] = can_be_placed
         return begin_position
+
+PieceShape = [
+    [(0, 0)],
+    [(0, 0), (1, 0)],
+    [(0, 0), (0, 1), (1, 0)],
+    [(0, 0), (1, 0), (2, 0)],
+    [(0, 0), (0, 1), (1, 0), (1, 1)],
+    [(0, 0), (0, 1), (0, 2), (1, 1)],
+    [(0, 0), (0, 1), (0, 2), (0, 3)],
+    [(0, 0), (1, 0), (2, 0), (0, 1)],
+    [(0, 0), (0, 1), (1, 1), (1, 2)],
+    [(0, 0), (0, 1), (1, 0), (2, 0), (3, 0)],
+    [(0, 0), (0, 1), (0, 2), (1, 1), (2, 1)],
+    [(0, 0), (0, 1), (0, 2), (1, 0), (2, 0)],
+    [(0, 0), (1, 0), (1, 1), (2, 1), (3, 1)],
+    [(0, 0), (0, 1), (1, 1), (2, 1), (2, 2)],
+    [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4)],
+    [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1)],
+    [(0, 0), (1, 0), (1, 1), (2, 1), (2, 2)],
+    [(0, 0), (1, 0), (2, 0), (0, 1), (2, 1)],
+    [(0, 0), (0, 1), (1, 1), (1, 2), (2, 1)],
+    [(1, 0), (1, 1), (1, 2), (0, 1), (2, 1)],
+    [(0, 0), (0, 1), (0, 2), (0, 3), (1, 1)]
+]
+
+def piece_shape_set_generate():
+    def clockwise90(old_state, clock):
+        temp_state = []
+        new_state = []
+        for point in old_state:
+            if clock:
+                temp_state.append((4 - point[1], point[0]))
+            else:
+                temp_state.append((point[1], 4 - point[0]))
+        x, y = 5, 5
+        for point in temp_state:
+            x = min(x, point[0])
+            y = min(y, point[1])
+        for point in temp_state:
+            new_state.append((point[0]-x, point[1]-y))
+        return new_state
+
+    def flip(old_state):
+        temp_state = []
+        new_state = []
+        for point in old_state:
+            temp_state.append((point[0], 4 - point[1]))
+        x, y = 5, 5
+        for point in temp_state:
+            x = min(x, point[0])
+            y = min(y, point[1])
+        for point in temp_state:
+            new_state.append((point[0]-x, point[1]-y))
+        return new_state
+
+    piece_shape_set = []
+    for piece_id in range(21):
+        piece_shape = []
+        for i in range(8):
+            if i == 0:
+                piece_shape.append(PieceShape[piece_id])
+            elif i % 2:
+                piece_shape.append(flip(piece_shape[i-1]))
+            else:
+                piece_shape.append(clockwise90(piece_shape[i-2], False))
+        piece_shape_set.append(piece_shape)
+    return piece_shape_set
