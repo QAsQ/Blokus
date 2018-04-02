@@ -1,7 +1,7 @@
 # 维护一个棋盘的状态，不维护游戏进程
 class Board:
-    def __init__(self,  pieces):
-        # player_id, piece_id, state, x, y
+    def __init__(self,  pieces, board_type):
+        self.board_type = board_type
         self.drop_history = []
         self.amount_cells = 0
         self.dropped_cells = 0
@@ -17,13 +17,13 @@ class Board:
     def get_info(self, start=-1):
         if start < 0:
             return {
-                "board_type": "square_standard",
+                "board_type": self.board_type,
                 "history": self.drop_history,
                 "board_progress": self.dropped_cells * 1.0 /  self.amount_cells
             }
         else:
             return {
-                "board_type": "square_standard",
+                "board_type": self.board_type,
                 "history": {
                     "start": start,
                     "result": self.drop_history[start:]
@@ -92,7 +92,8 @@ class Board:
 import copy
 from .piece.square_piece import Piece as Square_piece
 from .piece.square_piece import piece_shape_set_generate as square_piece_shape_generate
-from .piece.square_standard_initial_pos import piece_initial_pos as square_standard_initial_pos
+from .piece.square_standard_initial_state import square_standard_initial_possible_position  
+from .piece.square_standard_initial_pos import square_standard_init_locate, square_standard_init_state, square_standard_progress_bar_end_point
 
 class BoardFactory:
     @staticmethod
@@ -103,19 +104,26 @@ class BoardFactory:
                 square_piece_shape_generate(),
                 [(0, 0), (0, 19), (19, 19), (19, 0)], 
                 20, 
-                square_standard_initial_pos
-            ) 
+                square_standard_initial_possible_position
+            ), 
+            "square_duo": (
+                Square_piece, 
+                square_piece_shape_generate(),
+                [(4, 4), (9, 9)], 
+                14,
+                None
+            )
         }
         if board_type in args:
             Piece, piece_shape, start_point, board_size, initialize_position = args[board_type]
             pieces = [[] for _ in range(len(start_point))]
-            for player_id in range(len(initialize_position)):
+            for player_id in range(len(start_point)):
                 for piece_id in range(len(piece_shape)):
                     piece = Piece(
                         piece_shape[piece_id], 
                         start_point[player_id], 
                         board_size,
-                        copy.deepcopy(initialize_position[player_id][piece_id])
+                        copy.deepcopy(initialize_position[player_id][piece_id]) if initialize_position is not None else None
                     )
                     pieces[player_id].append(piece)
             return pieces
@@ -129,7 +137,7 @@ class BoardFactory:
         if isinstance(pieces, str):
             return pieces
 
-        return Board(pieces)
+        return Board(pieces, board_type)
     
     @staticmethod
     def getBoardData(board_type):
@@ -137,8 +145,21 @@ class BoardFactory:
             "square_standard": {
                 "start_point": [(0, 0), (0, 19), (19, 19), (19, 0)], 
                 "piece_shape": square_piece_shape_generate(),
-                "board_size": 20
-            }
+                "player_num": 4,
+                "board_size": 20,
+                "init_locate": square_standard_init_locate, 
+                "init_state": square_standard_init_state, 
+                "progress_bar_end_point": square_standard_progress_bar_end_point
+            },
+            "square_duo": {
+                "start_point": [(4, 4), (9, 9)], 
+                "piece_shape": square_piece_shape_generate(),
+                "player_num": 2,
+                "board_size": 14,
+                "init_locate": [], 
+                "init_state": [], 
+                "progress_bar_end_point": [] 
+            },
         }
         if board_type not in datas:
             return "board type {} is not defined!".format(board_type)

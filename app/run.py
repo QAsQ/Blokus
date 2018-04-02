@@ -6,9 +6,10 @@ from pymongo import MongoClient
 from flask import Flask, render_template, g, request, redirect, url_for, jsonify, flash
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 
-from models.battle import Battle, BattleFactory
-from models.board import BoardFactory
 from models.user import User
+from models.board import BoardFactory
+from models.battle import Battle, BattleFactory
+from models.theme  import ThemeFactory
 from models.db_utility import init_generate, id_clear, history_clear, id_generate, auth_db, filter_condition_generate, sort_condition_generate, username_checker
 from models.app_utility import success, failure, field_checker, current_time, require_format, generate_register_token, get_email_from_token, token_verify
 from models.mail_utility import send_register_mail, send_reset_mail, send_confirm_email
@@ -303,10 +304,20 @@ def login():
         logout_user()
 
         return success(current_user.dump())
+
+@app.route("/api/themes/<string:themeType>/<string:boardType>", methods=['GET'])
+def themes(themeType, boardType):
+    theme = ThemeFactory(themeType, boardType)
+    if isinstance(theme, str):
+        return failure(theme)
+    return success(theme)
         
 @app.route("/api/boards/<string:boardType>", methods=['GET'])
 def boards(boardType):
-    return success(BoardFactory.getBoardData(boardType))
+    board_data = BoardFactory.getBoardData(boardType)
+    if isinstance(board_data, str):
+        return failure(board_data)
+    return success(board_data)
 
 @app.route("/api/battles", methods=['GET', 'POST'])
 def battles():

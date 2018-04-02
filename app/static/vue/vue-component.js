@@ -130,7 +130,7 @@ function try_leave(player_id, call_back) {
 }
 
 Vue.component("playerinfo-item", {
-    props: ['player_info', 'item_id', 'player_id', 'ended', 'description_type'],
+    props: ['player_info', 'item_id', 'player_id', 'ended', 'board_type', 'description_type'],
     template: `
         <div class="item" 
             :class="{link: !occupied}" 
@@ -187,7 +187,7 @@ Vue.component("playerinfo-item", {
             return this.player_info.user_data.username
         },
         image_path: function () {
-            return "static/common/images/player/" + (1 << this.item_id) + '.jpg'
+            return "static/common/images/" + this.board_type + "/player/" + (1 << this.item_id) + '.jpg'
         },
         description: function () {
             if (this.player_info.user_id == -1)
@@ -210,13 +210,14 @@ Vue.component("playerinfo-item", {
 });
 
 Vue.component("playerinfo-list", {
-    props: ['players_info', 'ended'],
+    props: ['players_info', 'ended', 'board_type'],
     template: `
         <div class='ui big list'>
             <playerinfo-item v-for="(player_info, index) in players_info" :key="index"
                 :item_id="index"
                 :player_id="-1"
                 :player_info="player_info"
+                :board_type="board_type"
                 :ended="ended"
                 description_type="winning_rate">
             </playerinfo-item>
@@ -302,7 +303,8 @@ Vue.component("battle-item", {
                 <div class='header'>用户信息</div>
                 <playerinfo-list 
                     :players_info="battle_data.players_info" 
-                    :ended="battle_data.battle_info.ended">
+                    :ended="battle_data.battle_info.ended"
+                    :board_type="battle_data.board_info.board_type">
                 </playerinfo-list>
             </div>
         </div>`,
@@ -314,12 +316,12 @@ Vue.component("battle-item", {
     computed: {
         image_path: function () {
             if (this.battle_data.battle_info.ended)
-                return "static/common/images/battle/ended.jpg"
+                return "static/common/images/" + this.battle_data.board_info.board_type + "/battle/ended.jpg"
             state = 0
-            for (var id = 0; id < 4; id++)
+            for (var id = 0; id < this.battle_data.players_info.length; id++)
                 if (this.battle_data.players_info[id].user_id !== -1)
                     state |= 1 << id
-            return "static/common/images/battle/" + state + ".jpg"
+            return "static/common/images/" + this.battle_data.board_info.board_type + "/battle/" + state + ".jpg"
         }
     }
 });
@@ -350,38 +352,16 @@ Vue.component("battle-list", {
 });
 
 Vue.component("playerinfo-table", {
-    props: ['players_info', 'ended', 'player_id'],
+    props: ['players_info', 'board_type', 'ended', 'player_id'],
     template: `
     <div class="ui vertical segment" @click="show_result">
-        <div class="left aligned attached ui two item menu">
-            <playerinfo-item 
-                :player_info="players_info[0]" 
-                :item_id="0" 
+        <div v-for="player_list in table_typesetting" class="left aligned attached ui two item menu">
+            <playerinfo-item v-for="item_id in player_list"
+                :player_info="players_info[item_id]" 
+                :item_id="item_id" 
                 :player_id="player_id" 
                 :ended="ended"
-                description_type="battle_state">
-            </playerinfo-item>
-            <playerinfo-item 
-                :player_info="players_info[3]" 
-                :item_id="3" 
-                :player_id="player_id" 
-                :ended="ended"
-                description_type="battle_state">
-            </playerinfo-item>
-        </div>
-        <div class="left aligned attached ui two item menu">
-            <playerinfo-item 
-                :player_info="players_info[1]" 
-                :item_id="1" 
-                :player_id="player_id" 
-                :ended="ended"
-                description_type="battle_state">
-            </playerinfo-item>
-            <playerinfo-item 
-                :player_info="players_info[2]" 
-                :item_id="2" 
-                :player_id="player_id" 
-                :ended="ended"
+                :board_type="board_type"
                 description_type="battle_state">
             </playerinfo-item>
         </div>
@@ -391,8 +371,19 @@ Vue.component("playerinfo-table", {
             if (this.ended)
                 $("#result_modal").modal("show")
         }
+    },
+    computed: {
+        table_typesetting: function(){
+            var typesetting = []
+            typesetting[2] = [[0, 1]]
+            typesetting[4] = [[0, 3], [1, 2]]
+            var player_num = {
+                "square_duo": 2,
+                "square_standard": 4
+            }
+            return typesetting[player_num[this.board_type]]
+        }
     }
-
 });
 
 Vue.component("chat-item", {
@@ -532,7 +523,7 @@ Vue.component("control-panel", {
                                 <td> {{result.rank}} </td>
                                 <td>
                                     <h4 class="ui image header">
-                                        <img :src="'static/common/images/player/' + (1 << result.player_id) + '.jpg'" class="ui mini rounded image">
+                                        <img :src="head_image(result.player_id)" class="ui mini rounded image">
                                         <div class="content">
                                             {{result.username}}
                                         </div>
@@ -555,7 +546,8 @@ Vue.component("control-panel", {
             <playerinfo-table 
                 :player_id="player_id"
                 :ended="battle_data.battle_info.ended"
-                :players_info="battle_data.players_info">
+                :players_info="battle_data.players_info"
+                :board_type="battle_data.board_info.board_type">
             </playerinfo-table>
             <div class="ui fluid negative button" @click="leave">离开</div>
         </div> `,
@@ -570,8 +562,8 @@ Vue.component("control-panel", {
         }
     },
     methods: {
-        detach: function () {
-            this.b
+        head_image: function(player_id){
+            return 'static/common/images/' + this.battle_data.board_info.board_type + '/player/' + (1 << player_id) + '.jpg'
         },
         update_hosting: function () {
             this.loading = true
@@ -691,7 +683,7 @@ Vue.component("battle-progress", {
 })
 
 Vue.component("battle-interface", {
-    props: ['board_data', 'battle_data', 'user_info'],
+    props: ['board_data', 'battle_data', 'color_theme', 'user_info'],
     template: `
         <div class="ui grid container stackable">
             <div class="ui eleven wide column">
@@ -723,7 +715,7 @@ Vue.component("battle-interface", {
         }
     },
     mounted: function () {
-        this.board = generateBoard($("#board")[0], this.player_id, this.board_data, ColorThemeFactory("default"),this.mobile_version);
+        this.board = generateBoard($("#board")[0], this.player_id, this.board_data, this.color_theme, this.mobile_version);
         this.board.loadState(this.battle_data, this.current_position)
     },
     methods: {
@@ -854,7 +846,8 @@ Vue.component("battle-condition", {
             <label>按对局类型</label>
             <select id="board_type" class="ui fluid selection dropdown" v-model="condition.query.board_type">
                 <option value="">对局类型</option>
-                <option class="item" value="square_standard">标准(四人)</option>
+                <option value="square_standard">标准(四人)</option>
+                <option value="square_duo">双人</option>
             </select>
         </div>
         <h1><i class="sort icon"></i>排序</h1>
@@ -920,7 +913,8 @@ Vue.component("battle-condition", {
                 var res = load_battles()
                 if (res === "user not exist") {
                     $("#username_condition").addClass("error")
-                } else if (res !== "success") {
+                } 
+                else if (res !== "success") {
                     show_message(res)
                 }
             },
@@ -950,6 +944,7 @@ Vue.component("battle-creater", {
 
                                 <option value="">对局类型</option>
                                 <option class="item" value="square_standard">标准(四人)</option>
+                                <option class="item" value="square_duo">双人</option>
                             </select>
                         </div>
                     </div>

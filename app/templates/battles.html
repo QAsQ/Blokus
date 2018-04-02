@@ -32,6 +32,7 @@
             success: function(data){
                 res = data.message
                 if (data.message != 'success'){
+                    show_message(data.message)
                 }
                 else {
                     if (flush) {
@@ -75,7 +76,7 @@
                     condition: user_item.user.user_info.perference.condition
                 }
             })
-            // load_battles()
+            load_battles()
 
             var battle_creater = new Vue({
                 el: "#battle_creater",

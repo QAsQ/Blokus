@@ -1,6 +1,12 @@
 Math.square = function(x){
     return x * x
 }
+Point = function(x, y){
+    return new PIXI.Point(x, y)
+}
+function toPoint(point){
+    return Point(point[0], point[1])
+}
 function ParticleFactory(direction, particleColor, mobile_version) {
 	particle_config = {
 		"alpha": {
@@ -329,8 +335,8 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme, mobile_vers
 	graphics.drawRect(0, 0, 1, 1)
 	var additionalBar = new PIXI.Sprite(graphics.generateTexture());
 
-	var startPoint = Point(stPoint.x * gCellSize, stPoint.y * gCellSize);
-	var endPoint = Point(edPoint.x * gCellSize, edPoint.y * gCellSize);
+	var startPoint = Point(stPoint[0] * gCellSize, stPoint[1] * gCellSize);
+	var endPoint = Point(edPoint[0] * gCellSize, edPoint[1] * gCellSize);
 
     function distance(pointA, pointB){
         return Math.sqrt(Math.square(pointA.x - pointB.x) + Math.square(pointA.y - pointB.y))
@@ -697,7 +703,7 @@ function CheckerFactory(piece_shape_set, player_id){
 }
 */
 
-function HighlightLayerFactory(colorTheme, mobile_version, piecesCellList){
+function HighlightLayerFactory(colorTheme, player_num, mobile_version, piecesCellList){
     
     var highlightLayer = new PIXI.Container();
     function highlightCellGenerate(color, player_id){
@@ -757,8 +763,7 @@ function HighlightLayerFactory(colorTheme, mobile_version, piecesCellList){
         })
     })
     highlightLayer.highlightCells = []
-    for (var player_id = 0; player_id < 4; player_id++)
-    {
+    for (var player_id = 0; player_id < player_num; player_id++) {
         cells = []
         for (var i = 0; i < max_size; i ++){
             var highlightCell = highlightCellGenerate(
@@ -782,7 +787,7 @@ function HighlightLayerFactory(colorTheme, mobile_version, piecesCellList){
             drop = history[index]
             last_drop[drop.player_id] = drop
         }
-        for (var player_id = 0; player_id < 4; player_id ++){
+        for (var player_id = 0; player_id < player_num; player_id ++){
             if (last_drop[player_id] === -1)
                 continue
             var drop = last_drop[player_id]
@@ -826,11 +831,11 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
     graphics.lineColor = colorTheme.board.dividing_line
     graphics.lineWidth = colorTheme.board.dividing_line_width[mobile_version]
     //Draw board line
-    for (var i = 0; i <= 20; i++) {
+    for (var i = 0; i <= boardData.board_size; i++) {
         graphics.moveTo(i * gCellSize, 0);
-        graphics.lineTo(i * gCellSize, 20 * gCellSize);
+        graphics.lineTo(i * gCellSize, boardData.board_size * gCellSize);
         graphics.moveTo(0, i * gCellSize);
-        graphics.lineTo(gCellSize * 20, i * gCellSize);
+        graphics.lineTo(gCellSize * boardData.board_size, i * gCellSize);
     }
 
     //Draw initial place
@@ -843,7 +848,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
             gCellSize / 2, gCellSize / 2
         )
     }
-    for (var player_id = 0 ; player_id < 4; player_id ++){
+    for (var player_id = 0 ; player_id < boardData.player_num; player_id ++){
         draw_initial_posiiton(boardData.start_point[player_id], colorTheme.piece.initial[player_id])
     }
 
@@ -875,11 +880,12 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
         }
         TryDropPiece(data)
     }
+
     board.progressBars = []
-    for (var player_id = 0; player_id < 4; player_id++) {
+    for (var player_id = 0; player_id < boardData.player_num; player_id++) {
         progressBar = ProgressBarFactory(
-            gProgressBarEndPointList[player_id * 2],
-            gProgressBarEndPointList[player_id * 2 + 1],
+            boardData.progress_bar_end_point[player_id * 2],
+            boardData.progress_bar_end_point[player_id * 2 + 1],
             player_id,
             colorTheme,
             mobile_version
@@ -911,7 +917,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
 
     //Create piece
     var pieceLists = [];
-    for(var playerId = 0; playerId < 4; playerId ++) {
+    for(var playerId = 0; playerId < boardData.player_num; playerId ++) {
         var pieceList = [];
         for (var pieceId = 0; pieceId <= 20; pieceId++) {
             var piece = PieceFactory(
@@ -928,8 +934,8 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
                 DragMoveCallBack,
                 DragEndCallBack
             );
-            piece.SetState(gInitState[mobile_version][pieceId])
-            piece.SetPosition(gPiecesLocate[mobile_version][pieceId])
+            piece.SetState(boardData.init_state[mobile_version][pieceId])
+            piece.SetPosition(toPoint(boardData.init_locate[mobile_version][pieceId]))
             if (playerId !== mPlayerId) 
                 piece.SetOwnership(false)
             pieceList.push(piece);
@@ -940,13 +946,13 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
     board.pieceLists = pieceLists;
     //Create piece Done
 
-    board.highlightLayer = HighlightLayerFactory(colorTheme, mobile_version, boardData.piece_shape)
+    board.highlightLayer = HighlightLayerFactory(colorTheme, boardData.player_num, mobile_version, boardData.piece_shape)
     board.highlightLayer.parentGroup = highlightGroup
     board.addChild(board.highlightLayer)
 
     board.loadState = function(state, position) {
         //update progressBar
-        for (var playerId = 0; playerId < 4; playerId ++) {
+        for (var playerId = 0; playerId < boardData.player_num; playerId ++) {
             var currentProgressBar = this.progressBars[playerId];
             currentProgressBar.setProgressRate(
                 state.players_info[playerId].accuracy_time_left, 
@@ -958,7 +964,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
         }
         
         var _pieceLists = this.pieceLists;
-        for (var playerId = 0; playerId < 4; playerId ++){
+        for (var playerId = 0; playerId < boardData.player_num; playerId ++){
             for (var pieceId = 0; pieceId < 21; pieceId ++){
                 _pieceLists[playerId][pieceId].PickUp(playerId === mPlayerId)
             }
@@ -984,7 +990,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
     };
     board.update_player = function(playerId){
         mPlayerId = playerId
-        for(var player_id = 0; player_id < 4; player_id++) {
+        for(var player_id = 0; player_id < boardData.player_num; player_id++) {
             board.pieceLists[player_id].forEach(piece => {
                 piece.SetOwnership(player_id === mPlayerId)
             })
@@ -1034,10 +1040,10 @@ function generateBoard(canvas, mPlayerId, boardData, colorTheme, mobile_version)
     app.stage = new PIXI.display.Stage();
 
     if (mobile_version)
-        gCellSize = Math.floor(Math.min(gWidth, gHeight) / 24)
+        gCellSize = Math.floor(Math.min(gWidth, gHeight) / (boardData.board_size + 4))
     else
-        gCellSize = Math.floor(Math.min(gWidth, gHeight) / 29)
-    gBoardSize = gCellSize * 20;
+        gCellSize = Math.floor(Math.min(gWidth, gHeight) / (boardData.board_size + 9))
+    gBoardSize = gCellSize * boardData.board_size;
 
     function TryDropPiece(data){
 

@@ -4,19 +4,22 @@
 <script src="static/pixi/pixi-particles.min.js"></script>
 <script src="static/pixi/pixi-layers.js"></script>
 <script src="static/play_board/board.js?v=2.1"></script>
-<script src="static/play_board/data.js?v=2.1"></script>
 <script>
 
 $(document).ready(function() {
-    $.get("/api/boards/square_standard")
-    .then(function(board_data){
+    battle_data = {{ battle|tojson|safe }};
+    $.when(
+        $.get("/api/boards/" + battle_data.board_info.board_type),
+        $.get("/api/themes/default/" + battle_data.board_info.board_type)
+    ).then(function(board_data, color_theme){
 
-        board_data = board_data.result
-        battle_data = {{ battle|tojson|safe }};
+        board_data = board_data[0].result
+        color_theme = color_theme[0].result
 
         battle_interface = new Vue({
             el: "#battle_interface",
             data: {
+                color_theme: color_theme,
                 board_data: board_data,
                 battle_data: battle_data,
                 user_info: user_item.user,
@@ -97,6 +100,7 @@ $(document).ready(function() {
         id="battle_interface"
         :battle_data="battle_data"
         :board_data="board_data"
+        :color_theme="color_theme"
         :user_info="user_info">
 </battle-interface>
 {% endblock %}
