@@ -39,6 +39,7 @@ class Piece:
         self.shape_set = shape_set
         self.cell_num = 0 if len(shape_set) == 0 else len(shape_set[0])
         self.board_size = board_size
+        self.start_point = start_point
 
         self.possible_position = []
         if initialize_position is None:
@@ -70,6 +71,9 @@ class Piece:
              [2, 2, 2],
              [2, 2, 2]]
         ]
+    
+    def _in_board(self, x, y):
+        return 0 <= x and x < self.board_size and 0 <= y and y < self.board_size
 
     def try_drop(self, position):
         if self.is_drop:
@@ -83,10 +87,9 @@ class Piece:
         position = Position.from_dict(dict_position)
         if 0 > position.state or position.state > 8:
             return False
-        if 0 > position.x or self.board_size <= position.x:
+        if not self._in_board(position.x, position.y):
             return False
-        if 0 > position.y or self.board_size <= position.y:
-            return False
+
         return self.possible_position[position.state][position.x][position.y] == can_be_placed
 
     def get_one_possible_position(self):
@@ -116,11 +119,11 @@ class Piece:
                     )
     
     def _update_one_position(self, state, x, y, action, is_same_player):
-        if x < 0 or x >= self.board_size:
+        if not self._in_board(x, y):
             return
-        if y < 0 or y >= self.board_size:
-            return
-        self.possible_position[state][x][y] = self.state_update_table[is_same_player][action][self.possible_position[state][x][y]]
+
+        new_state = self.state_update_table[is_same_player][action][self.possible_position[state][x][y]]
+        self.possible_position[state][x][y] = new_state
 
     def _action_generate(self, piece_shape):
         irrelevant = -1
@@ -149,32 +152,26 @@ class Piece:
                 res_action.append((x, y, action))
         return res_action
 
-    def _generate_piece_initialize_legal_position(self, piece_shape, player_id):
+    def _generate_piece_initialize_legal_position(self, piece_shape, start_point):
 
-        def can_place(piece_set, coordinate_x, coordinate_y):
-            for piece_point in piece_set:
-                if piece_point[0] + coordinate_x >= 20 or piece_point[1] + coordinate_y >= 20:
+        def can_place(x, y):
+            for piece_point in piece_shape:
+                if not self._in_board(piece_point[0] + x, piece_point[1] + y):
                     return False
             return True
         
-        begin_point = [(-1, -1), (-1, 20), (20, 20), (20, -1)]
-        dir_point = [(-1, -1), (-1, 1), (1, 1), (1, -1)]
-        begin_position = [[0 for j in range(20)] for i in range(20)]
-        for i in range(20):
-            for j in range(20):
-                legal_place = can_place(piece_shape, i, j)
-                if legal_place == 0:
-                    begin_position[i][j] = 2
-                    continue
-                if begin_position[i][j] == 2:
-                    continue
-                can_be_placed = 0
-                for point in piece_shape:
-                    if (i + point[0] + dir_point[player_id][0], 
-                        j + point[1] + dir_point[player_id][1]) == begin_point[player_id]:
-                        can_be_placed = 1
-                        break
-                begin_position[i][j] = can_be_placed
+        begin_position = [[0 for y in range(self.board_size)] for x in range(self.board_size)]
+
+        for x, y in [(x, y) for x in range(self.board_size) for y in range(self.board_size)]:
+            if not can_place(x, y):
+                begin_position[x][y] = illegal
+                continue
+            state = lack_of_corner
+            for point in piece_shape:
+                if (x + point[0], y + point[1]) == start_point:
+                    state = can_be_placed
+                    break
+            begin_position[x][y] = state 
         return begin_position
 
 PieceShape = [
