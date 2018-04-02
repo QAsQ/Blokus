@@ -83,20 +83,20 @@ class Piece:
         position = Position.from_dict(dict_position)
         if 0 > position.state or position.state > 8:
             return False
-        if 0 > position.x or self.board_size < position.x:
+        if 0 > position.x or self.board_size <= position.x:
             return False
-        if 0 > position.y or self.board_size < position.y:
+        if 0 > position.y or self.board_size <= position.y:
             return False
         return self.possible_position[position.state][position.x][position.y] == can_be_placed
 
     def get_one_possible_position(self):
         if self.is_drop:
-            return Position()
+            return Position().to_dict()
         for state in range(8):
             for x, y in [(x, y) for x in range(self.board_size) for y in range(self.board_size)]:
                 if self.possible_position[state][x][y] == 1:
-                    return Position(state, x, y)
-        return Position()
+                    return Position(state, x, y).to_dict()
+        return Position().to_dict()
     
     def get_cell_list(self, state):
         return self.shape_set[state]
