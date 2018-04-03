@@ -107,16 +107,29 @@ def filter_condition_generate(conditions):
             "$or": user_condition
         }
     
+    def board_type_filter(board_type):
+        if len(board_type) == 1:
+            return {"board_info.board_type": board_type[0]}
+
+        board_type_condition = []
+        for one_type in board_type:
+            board_type_condition.append({
+                "board_info.board_type": one_type
+            })
+        return {
+            "$or": board_type_condition
+        }
+
+    
     field_translate = {
         "battle_name": "battle_info.battle_name",
-        "board_type": "board_info.board_type"
     }
     def is_empty(key, value):
         checker  = {
             "username": "",
             "battle_state": [],
             "battle_name": "",
-            "board_type": "" 
+            "board_type": []
         }
         return key in checker and checker[key] == value
 
@@ -128,6 +141,8 @@ def filter_condition_generate(conditions):
             mongo_condition.append(state_filter(conditions['battle_state']))
         elif key == "username":
             mongo_condition.append(user_filter(conditions['username']))
+        elif key == "board_type":
+            mongo_condition.append(board_type_filter(conditions['board_type']))
         else:
             if key not in field_translate:
                 return "filter condition not support! condition: {}".format(key)

@@ -61,6 +61,11 @@
         if (check_login())
             $('#create_modal').modal('show')
     }
+    function adhoc_update_condition(condition){
+        if (typeof(condition.query.board_type) == "string")
+            condition.query.board_type = [condition.query.board_type]
+        return condition
+    }
     $(document)
         .ready(function() {
             battle_list = new Vue({
@@ -73,7 +78,7 @@
             battle_condition = new Vue({
                 el: "#battle_condition",
                 data:{
-                    condition: user_item.user.user_info.perference.condition
+                    condition: adhoc_update_condition(user_item.user.user_info.perference.condition)
                 }
             })
             load_battles()

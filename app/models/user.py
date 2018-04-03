@@ -15,7 +15,7 @@ default_info = {
                 "username": "",
                 "battle_state": [],
                 "battle_name": "",
-                "board_type": "" 
+                "board_type": []
             }
         },
         "create": {

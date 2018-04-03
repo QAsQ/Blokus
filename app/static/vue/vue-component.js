@@ -845,7 +845,7 @@ Vue.component("battle-condition", {
         </div>
         <div class="field">
             <label>按对局类型</label>
-            <select id="board_type" class="ui fluid selection dropdown" v-model="condition.query.board_type">
+            <select id="board_type" class="ui fluid dropdown multiple" v-model="condition.query.board_type">
                 <option value="">对局类型</option>
                 <option value="square_standard">标准(四人)</option>
                 <option value="square_duo">双人</option>
@@ -888,7 +888,8 @@ Vue.component("battle-condition", {
     mounted: function () {
         if (this.condition.sort !== [])
             $("#sort_condition").dropdown("set selected", this.condition.sort)
-        $('#board_type').dropdown();
+        if (this.condition.query.board_type !== [])
+            $('#board_type').dropdown("set selected", this.condition.query.board_type);
     },
     methods: {
         reset_condition: function () {
@@ -898,7 +899,7 @@ Vue.component("battle-condition", {
                     username: "",
                     battle_state: [],
                     battle_name: "",
-                    board_type: ""
+                    board_type: []
                 }
             })
             $("#sort_condition").dropdown("clear")
