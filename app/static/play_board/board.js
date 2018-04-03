@@ -664,6 +664,7 @@ function PieceFactory(pieceId,
         pieces.dropped = false
         pieces.alpha =  pieces.dragging ? colorTheme.piece.onselect_alpha : colorTheme.piece.initial_alpha
         pieces.SetOwnership(rights)
+        pieces.parentGroup = pieceGroup
     }
 
     pieces.Flip = function(){
