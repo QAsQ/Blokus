@@ -35,7 +35,8 @@ def ThemeFactory(theme, board_type):
                 "spectator": 0xb7b7b7,
                 "dividing_line": 0xffffff,
                 "dividing_line_width": [3, 1],
-                "cell": [0xf2542d, 0x80ba04, 0x1da6f0, 0xfeb923],
+                #"cell": [0xf2542d,0x80ba04, 0x1da6f0, 0xfeb923],
+                "cell": [0xf2542d, 0x36a850, 0x1da6f0, 0xfeb923],
                 "initial":[0xcf1b24, 0x239546, 0x006BA3, 0xD69723],
                 "last_drop": [0xcf1b24, 0x239546, 0x006BA3, 0xD69723]
             }
