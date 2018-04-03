@@ -769,7 +769,7 @@ Vue.component("battle-interface", {
             if (width > 767)
                 return 646
             else{
-                return document.body.clientHeight - 100
+                return document.body.clientHeight * 0.8
             }
         },
         player_id: function () {

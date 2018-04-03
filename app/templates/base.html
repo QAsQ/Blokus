@@ -11,9 +11,20 @@
     <script src="static/semantic-ui/semantic.min.js"></script>
     <script src="static/jquery/js.cookie.js"></script>
     <script src='static/vue/vue.js'></script>
-    <script src="static/vue/vue-component.js?v=2.1"></script>
-    <link rel="stylesheet" type="text/css" href="static/base/base.css?v=2.1">
+    <script src="static/vue/vue-component.js?v=2.2"></script>
+    <link rel="stylesheet" type="text/css" href="static/base/base.css?v=2.2">
     <link rel="shortcut icon" href="static/favicon.ico">
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116734412-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-116734412-1');
+    </script>
+
     <script>
         function Callback(url, method, form, message, on_success) {
             return function () {
