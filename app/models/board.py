@@ -144,6 +144,7 @@ class BoardFactory:
     def getBoardData(board_type):
         datas = {
             "square_standard": {
+                "board_type": "square_standard",
                 "start_point": [(0, 0), (0, 19), (19, 19), (19, 0)], 
                 "piece_shape": square_piece_shape_generate(),
                 "player_num": 4,
@@ -153,6 +154,7 @@ class BoardFactory:
                 "progress_bar_end_point": square_standard_progress_bar_end_point
             },
             "square_duo": {
+                "board_type": "square_duo",
                 "start_point": [(4, 4), (9, 9)], 
                 "piece_shape": square_piece_shape_generate(),
                 "player_num": 2,

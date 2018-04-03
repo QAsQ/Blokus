@@ -467,10 +467,13 @@ function PieceFactory(pieceId,
                       pieceGroup,
                       shadowGroup,
                       draggedGroup,
+                      TouchStartCallBack,
                       DragStartCallBack,
                       DragMoveCallBack,
                       DragEndCallBack) {
     function onDragStart(event) {
+        if (event.data.pointerType === "touch")
+            TouchStartCallBack(this)
         this.data = event.data;
         this.anchorPoint = this.data.getLocalPosition(this);
         this.dragging = true;
@@ -864,10 +867,11 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
         board.x = board.y = 4  * gCellSize;
 
     current_piece_id = -1
+    function TouchStartCallBack(piece) {
+        board.pieceController.attach(piece)
+    }
     function DragStartCallBack(piece, position) {
         current_piece_id = piece.piece_id;
-        if (mobile_version)
-            board.pieceController.attach(piece)
     }
     function DragMoveCallBack(piece, position) {
         board.pieceController.follow()
@@ -930,6 +934,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
                 pieceGroup,
                 shadowGroup,
                 draggedGroup,
+                TouchStartCallBack,
                 DragStartCallBack,
                 DragMoveCallBack,
                 DragEndCallBack
@@ -1039,10 +1044,13 @@ function generateBoard(canvas, mPlayerId, boardData, colorTheme, mobile_version)
     );
     app.stage = new PIXI.display.Stage();
 
-    if (mobile_version)
-        gCellSize = Math.floor(Math.min(gWidth, gHeight) / (boardData.board_size + 4))
-    else
-        gCellSize = Math.floor(Math.min(gWidth, gHeight) / (boardData.board_size + 9))
+    var bound = {
+        "square_standard": [[30, 29], [24, 33]],
+        "square_duo": [[23, 23], [18, 29]]
+    }
+
+    var current_bound = bound[boardData.board_type][mobile_version ? 1 : 0]
+    gCellSize = Math.floor(Math.min(gWidth / current_bound[0], gHeight / current_bound[1]))
     gBoardSize = gCellSize * boardData.board_size;
 
     function TryDropPiece(data){
