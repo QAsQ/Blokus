@@ -63,7 +63,7 @@ class Board:
             return False
     
     def get_result(self):
-        res = [ {"left": int(self.amount_cells / 4), "score": 0} for _ in range(4)]
+        res = [ {"left": int(self.amount_cells / self.player_num), "score": 0} for _ in range(self.player_num)]
 
         for drop in self.drop_history:
             res[drop['player_id']]["left"] -= self.pieces[drop['player_id']][drop['piece_id']].cell_num
@@ -73,7 +73,7 @@ class Board:
     
     def is_ended(self, check_player_id = -1):
         if check_player_id == -1:
-            for player_id in range(4):
+            for player_id in range(self.player_num):
                 piece_id, _ = self._get_one_possible_position(player_id)
                 if piece_id != -1:
                     return False
@@ -94,6 +94,7 @@ from .piece.square_piece import Piece as Square_piece
 from .piece.square_piece import piece_shape_set_generate as square_piece_shape_generate
 from .piece.square_standard_initial_state import square_standard_initial_possible_position  
 from .piece.square_standard_initial_pos import square_standard_init_locate, square_standard_init_state, square_standard_progress_bar_end_point
+from .piece.square_duo_initial_pos import square_duo_init_locate, square_duo_init_state, square_duo_progress_bar_end_point
 
 class BoardFactory:
     @staticmethod
@@ -156,9 +157,9 @@ class BoardFactory:
                 "piece_shape": square_piece_shape_generate(),
                 "player_num": 2,
                 "board_size": 14,
-                "init_locate": [], 
-                "init_state": [], 
-                "progress_bar_end_point": [] 
+                "init_locate": square_duo_init_locate, 
+                "init_state": square_duo_init_state, 
+                "progress_bar_end_point": square_duo_progress_bar_end_point
             },
         }
         if board_type not in datas:

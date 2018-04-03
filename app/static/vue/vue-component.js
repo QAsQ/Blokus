@@ -614,9 +614,10 @@ Vue.component("control-panel", {
             return this.battle_data.players_info[this.player_id]['is_hosting']
         },
         battle_result: function () {
+            var player_num = this.battle_data.players_info.length
             if (!this.battle_data.battle_info.ended) {
                 var result = []
-                for (var player_id = 0; player_id < 4; player_id++) {
+                for (var player_id = 0; player_id < player_num; player_id++) {
                     result.push({
                         player_id: player_id,
                         username: "null",
@@ -636,7 +637,7 @@ Vue.component("control-panel", {
                 return rating + "(" + head_char + delta + ")"
             }
             var result = []
-            for (var player_id = 0; player_id < 4; player_id++) {
+            for (var player_id = 0; player_id < player_num; player_id++) {
                 var current_player = this.battle_data.players_info[player_id]
                 result.push({
                     player_id: player_id,
@@ -653,7 +654,7 @@ Vue.component("control-panel", {
             result = result.sort(function (a, b) {
                 return b.score - a.score
             })
-            for (var player_id = 0; player_id < 4; player_id++) {
+            for (var player_id = 0; player_id < player_num; player_id++) {
                 if (player_id === 0)
                     result[player_id].rank = 1
                 else {
