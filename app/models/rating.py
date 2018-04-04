@@ -15,7 +15,7 @@ class RatingCalculator(object):
             self.user_list.append(User(user['rank'], user['rating'], user['left'], user['index']))
 
     def cal_p(self, user_a, user_b):
-        return 1.0 / pow(10, (user_b.old_rating - user_a.old_rating) / 400.0)
+        return 1.0 / pow(10, (user_b.old_rating - user_a.old_rating) / 1000.0)
 
     def get_ex_seed(self, user_list, rating, own_user):
         ex_user = User(0.0, rating)
@@ -37,24 +37,37 @@ class RatingCalculator(object):
         return left
 
     def calculate(self):
-        # Calculate multi
+        # Initialization
+        number_of_people = len(self.user_list)
+        if number_of_people < 2:
+            return failure("The number of people mustn't less than 2.")
+        for i in range(number_of_people):
+            self.user_list[i].delta = 0
+            
+        # Calculate sum_dis and ave_dis
         self.user_list = sorted(self.user_list, key=lambda x: x.left)
         sum_dis = 0
-        for i in range(len(self.user_list)):
-            for j in range(i+1,len(self.user_list)):
+        for i in range(number_of_people):
+            for j in range(i+1,number_of_people):
                 sum_dis += self.user_list[j].left - self.user_list[i].left
-        ave_dis = sum_dis / (len(self.user_list) * (len(self.user_list) - 1) / 2)
-        multi = 16 / ave_dis
+        ave_dis = sum_dis / (number_of_people * (number_of_people - 1) / 2)
+        if ave_dis == 0:
+            ave_dis = 1
+            
+        # Calculate multi
+        multi = 20 / ave_dis * pow(2, 4 - number_of_people)
+
         # Calculate rating changes between every two people
-        for i in range(len(self.user_list)):
-            for j in range(i+1,len(self.user_list)):
+        for i in range(number_of_people):
+            for j in range(i+1,number_of_people):
                 inc = int(multi * (self.user_list[j].left - self.user_list[i].left) * self.cal_p(self.user_list[j], self.user_list[i]))
-                inc = min(max(inc, 10), 100)
+                min_rating_change = 0 if self.user_list[i].left == self.user_list[j].left else 15
+                inc = min(max(inc, min_rating_change), 100)
                 self.user_list[i].delta += inc
                 self.user_list[j].delta -= inc
+                
         # Calculate new rating
         for user in self.user_list:
-            user.delta += inc
             user.new_rating = user.old_rating + user.delta
         self.user_list = sorted(self.user_list, key=lambda x: x.index)
 
