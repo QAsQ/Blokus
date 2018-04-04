@@ -44,7 +44,7 @@ class RatingCalculator(object):
             for j in range(i+1,len(self.user_list)):
                 sum_dis += self.user_list[j].left - self.user_list[i].left
         ave_dis = sum_dis / (len(self.user_list) * (len(self.user_list) - 1) / 2)
-        multi = 4 / ave_dis * len(self.user_list)
+        multi = 16 / ave_dis
         # Calculate rating changes between every two people
         for i in range(len(self.user_list)):
             for j in range(i+1,len(self.user_list)):
