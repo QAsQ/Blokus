@@ -37,7 +37,7 @@ share_edge = 1
 occupy = 2
 
 class Piece:
-    def __init__(self, shape_set, start_point, board_size, initialize_position=None): # todo
+    def __init__(self, shape_set, start_point, board_size, initialize_position=None):
         self.shape_set = shape_set
         self.cell_num = 0 if len(shape_set) == 0 else len(shape_set[0])
         self.board_size = board_size
@@ -45,7 +45,7 @@ class Piece:
 
         self.possible_position = []
         if initialize_position is None:
-            for state in range(8):
+            for state in range(12):
                 self.possible_position.append(
                     self._generate_piece_initialize_legal_position(
                         self.shape_set[state],
@@ -56,7 +56,7 @@ class Piece:
             self.possible_position = initialize_position
 
         self.action = []
-        for state in range(8):
+        for state in range(12):
             self.action.append(
                 self._action_generate(
                     self.shape_set[state]
@@ -97,7 +97,7 @@ class Piece:
 
     def is_possible_position(self, dict_position):
         position = Position.from_dict(dict_position)
-        if 0 > position.state or position.state > 8:
+        if 0 > position.state or position.state > 11:
             return False
         if not self._in_board(position.x, position.y, position.z):
             return False
@@ -107,31 +107,32 @@ class Piece:
     def get_one_possible_position(self):
         if self.is_drop:
             return Position().to_dict()
-        for state in range(8):
+        for state in range(12):
             for x, y, z in [(x, y, z) for x in range(2 * self.board_size) for y in range(2 * self.board_size) for z in range(2)]:
                 if self.possible_position[state][x][y][z] == 1:
-                    return Position(state, x, y).to_dict()
+                    return Position(state, x, y, z).to_dict()
         return Position().to_dict()
 
     def get_cell_list(self, state):
         return self.shape_set[state]
 
-    def update_possible_position(self, piece_shape, dict_position, is_same_player): # todo
+    def update_possible_position(self, piece_shape, dict_position, is_same_player):
         position = Position.from_dict(dict_position)
 
-        for state in range(8): # todo
+        for state in range(12):
             for one_cell in piece_shape:
                 for act in self.action[state]:
                     self._update_one_position(
                         state, 
                         one_cell[0] + position.x + act[0],
                         one_cell[1] + position.y + act[1],
+                        one_cell[2]
                         act[2],
                         is_same_player
                     )
     
     def _update_one_position(self, state, x, y, z, action, is_same_player):
-        if not self._in_board(x, y):
+        if not self._in_board(x, y, z):
             return
 
         new_state = self.state_update_table[is_same_player][action][self.possible_position[state][x][y][z]]
@@ -139,51 +140,46 @@ class Piece:
 
     def _action_generate(self, piece_shape): # todo
         irrelevant = -1
-        def get_act(x, y, ano_pos):
-            dx = abs(x + ano_pos[0])
-            dy = abs(y + ano_pos[1])
-            if dx + dy == 0:
+        def get_act(x, y, z, ano_pos):
+            if (x == ano_pos[0]) and (y == ano_pos[1]) and (z == ano_pos[2]):
                 return occupy
-            if dx <= 1 and dy <= 1:
-                if dx + dy == 2:
-                    return share_corner
-                else:
-                    return share_edge
-            return irrelevant
+            # 调用corner2corner和edge2edge
+            # 判断ano_pos是否在对应的list
 
         res_action = []
-        for x in range(-5, 6):
-            for y in range(-5, 6):
-                action = irrelevant
-                for ano_pos in piece_shape:
-                    action = max(action, get_act(x, y, ano_pos))
-                    if action == occupy:
-                        break
-                if action == irrelevant:
-                    continue
-                res_action.append((x, y, action))
-        return res_action
+        for x in range(-10, 10):
+            for y in range(-10, 10):
+                for z in range(2):
+                    action = irrelevant
+                    for ano_pos in piece_shape:
+                        action = max(action, get_act(x, y, z, ano_pos))
+                        if action == occupy:
+                            break
+                    if action == irrelevant:
+                        continue
+                    res_action.append((x, y, action))
+            return res_action
 
-    def _generate_piece_initialize_legal_position(self, piece_shape, start_point): # todo
+    def _generate_piece_initialize_legal_position(self, piece_shape, start_point):
 
         def can_place(x, y):
             for piece_point in piece_shape:
-                if not self._in_board(piece_point[0] + x, piece_point[1] + y):
+                if not self._in_board(piece_point[0] + x, piece_point[1] + y, piece_point[2]):
                     return False
             return True
         
-        begin_position = [[0 for y in range(self.board_size)] for x in range(self.board_size)]
+        begin_position = [[[0 for z in range(2)] for y in range(2 * self.board_size)] for x in range(2 * self.board_size)]
 
-        for x, y in [(x, y) for x in range(self.board_size) for y in range(self.board_size)]:
-            if not can_place(x, y):
-                begin_position[x][y] = illegal
+        for x, y, z in [(x, y, z) for x in range(2 * self.board_size) for y in range(2 * self.board_size) for z in range(2)]:
+            if not can_place(x, y, z):
+                begin_position[x][y][z] = illegal
                 continue
             state = lack_of_corner
             for point in piece_shape:
-                if (x + point[0], y + point[1]) == start_point:
+                if (x + point[0], y + point[1], point[2]) == start_point:
                     state = can_be_placed
                     break
-            begin_position[x][y] = state 
+            begin_position[x][y][z] = state 
         return begin_position
 
 # 输入不合法返回空list
