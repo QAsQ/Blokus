@@ -62,7 +62,7 @@ def corner2corner(pos):
         if bound_judge(tup):
             ret.append(tup)
     else:
-        tup = (pos[0] + 1, pos[1] + 1, 1)
+        tup = (pos[0] - 1, pos[1] - 1, 1)
         if bound_judge(tup):
             ret.append(tup)
         tup = (pos[0] - 1, pos[1] + 1, 1)
