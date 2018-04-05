@@ -187,7 +187,7 @@ Vue.component("playerinfo-item", {
             return this.player_info.user_data.username
         },
         image_path: function () {
-            return "static/common/images/" + this.board_type + "/player/" + (1 << this.item_id) + '.jpg'
+            return "static/images/" + this.board_type + "/player/" + (1 << this.item_id) + '.jpg'
         },
         description: function () {
             if (this.player_info.user_id == -1)
@@ -229,7 +229,7 @@ Vue.component("battle-info", {
     template: `
         <div class="ui fluid card">
             <div class="ui image">
-                <img src="static/common/images/standard.png">
+                <img src="static/images/standard.png">
             </div>
             <div class="content">
                 <div class="header">{{battle_type}}</div>
@@ -316,12 +316,12 @@ Vue.component("battle-item", {
     computed: {
         image_path: function () {
             if (this.battle_data.battle_info.ended)
-                return "static/common/images/" + this.battle_data.board_info.board_type + "/battle/ended.jpg"
+                return "static/images/" + this.battle_data.board_info.board_type + "/battle/ended.jpg"
             state = 0
             for (var id = 0; id < this.battle_data.players_info.length; id++)
                 if (this.battle_data.players_info[id].user_id !== -1)
                     state |= 1 << id
-            return "static/common/images/" + this.battle_data.board_info.board_type + "/battle/" + state + ".jpg"
+            return "static/images/" + this.battle_data.board_info.board_type + "/battle/" + state + ".jpg"
         }
     }
 });
@@ -563,7 +563,7 @@ Vue.component("control-panel", {
     },
     methods: {
         head_image: function(player_id){
-            return 'static/common/images/' + this.battle_data.board_info.board_type + '/player/' + (1 << player_id) + '.jpg'
+            return 'static/images/' + this.battle_data.board_info.board_type + '/player/' + (1 << player_id) + '.jpg'
         },
         update_hosting: function () {
             this.loading = true
@@ -985,7 +985,7 @@ Vue.component("battle-creater", {
                 </form>
             </div>
             <div class="ui column">
-                <img class="ui middle image" src="static/common/images/standard.png">
+                <img class="ui middle image" src="static/images/standard.png">
             </div>
         </div>`,
     data: function () {

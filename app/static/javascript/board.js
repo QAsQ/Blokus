@@ -84,7 +84,7 @@ function ParticleFactory(direction, particleColor, mobile_version) {
 
     var emitter = new PIXI.particles.Emitter(
         emitterContainer, 
-        [PIXI.Texture.fromImage("/static/pixi/images/image.png")],
+        [PIXI.Texture.fromImage("/static/images/pixi/image.png")],
         particle_config
     );
     emitter.particleConstructor = PIXI.particles.PathParticle;
