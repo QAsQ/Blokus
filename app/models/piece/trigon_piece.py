@@ -1,3 +1,4 @@
+#this code need to be fix
 class Position:
     def __init__(self, state=-1, x=-1, y=-1, z=-1):
         self.state = state
@@ -109,7 +110,7 @@ class Piece:
             return Position().to_dict()
         for state in range(12):
             for x, y, z in [(x, y, z) for x in range(2 * self.board_size) for y in range(2 * self.board_size) for z in range(2)]:
-                if self.possible_position[state][x][y][z] == 1:
+                if self.possible_position[state][x][y][z] == can_be_placed:
                     return Position(state, x, y, z).to_dict()
         return Position().to_dict()
 
@@ -126,8 +127,8 @@ class Piece:
                         state, 
                         one_cell[0] + position.x + act[0],
                         one_cell[1] + position.y + act[1],
-                        one_cell[2]
-                        act[2],
+                        one_cell[2] + act[2],
+                        act[3],
                         is_same_player
                     )
     
@@ -141,24 +142,32 @@ class Piece:
     def _action_generate(self, piece_shape): # todo
         irrelevant = -1
         def get_act(x, y, z, ano_pos):
-            if (x == ano_pos[0]) and (y == ano_pos[1]) and (z == ano_pos[2]):
-                return occupy
-            # 调用corner2corner和edge2edge
-            # 判断ano_pos是否在对应的list
+            dist = abs(x - ano_pos[0]) + abs(y - ano_pos[1])
+            same_direction = ano_pos[2] == z
+            if dist == 0:
+                return occupy if same_direction else share_edge
+            if dist == 1 and same_direction:
+                return share_corner
+            if (x + 1, y - 1) ==  ano_pos[:2] or (x - 1, y + 1) == ano_pos[:2]:
+                return share_corner
+            step = -1 if z == 0 else 1
+            if (x + step, y) == ano_pos[:2] or (x, y + step) == ano_pos[:2]:
+                return share_edge
+            if (x + step, y + step, 1 - z) == ano_pos:
+                return share_corner
+            return irrelevant
 
         res_action = []
-        for x in range(-10, 10):
-            for y in range(-10, 10):
-                for z in range(2):
-                    action = irrelevant
-                    for ano_pos in piece_shape:
-                        action = max(action, get_act(x, y, z, ano_pos))
-                        if action == occupy:
-                            break
-                    if action == irrelevant:
-                        continue
-                    res_action.append((x, y, action))
-            return res_action
+        for x, y, z in [(x, y, z) for x in range(-4, 4) for y in range(-4, 4) for z in range(2)]:
+            action = irrelevant
+            for ano_pos in piece_shape:
+                action = max(action, get_act(x, y, z, ano_pos))
+                if action == occupy:
+                    break
+            if action == irrelevant:
+                continue
+            res_action.append((x, y, action))
+        return res_action
 
     def _generate_piece_initialize_legal_position(self, piece_shape, start_point):
 
@@ -182,141 +191,10 @@ class Piece:
             begin_position[x][y][z] = state 
         return begin_position
 
-# 输入不合法返回空list
-# 输入合法返回合法的相邻三角的list
-
-def edge2edge(pos):
-    ret = []
-    if not _in_board(pos):
-        return ret
-    if z == 1:
-        tup = (x, y, 0)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x, y + 1, 0)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x + 1, y, 0)
-        if _in_board(tup):
-            ret.append(tup)
-    else:
-        tup = (x, y, 1)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x - 1, y, 1)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x, y - 1, 1)
-        if _in_board(tup):
-            ret.append(tup)
-    return ret
-
-def corner2corner(pos):
-    ret = []
-    if not _in_board(pos):
-        return ret
-    if z == 1:
-        tup = (x + 1, y + 1, 0)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x + 1, y, 1)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x, y + 1, 1)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x - 1, y, 1)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x - 1, y + 1, 0)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x - 1, y + 1, 1)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x + 1, y - 1, 0)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x + 1, y - 1, 1)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x, y - 1, 1)
-        if _in_board(tup):
-            ret.append(tup)
-    else:
-        tup = (x - 1, y - 1, 1)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x - 1, y, 0)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x, y - 1, 0)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x , y + 1, 0)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x - 1, y + 1, 0)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x - 1, y + 1, 1)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x + 1, y - 1, 0)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x + 1, y - 1, 1)
-        if _in_board(tup):
-            ret.append(tup)
-        tup = (x + 1, y, 0)
-        if _in_board(tup):
-            ret.append(tup)
-    return ret
-
-# 不合法返回(-1, -1, -1)
-# 不存在返回(0, 0, 0)
-# 合法返回对应位置的tuple
-
-def edge_direct(pos, dir):
-    if not _in_board(pos):
-        return (-1, -1, -1)
-    if z == 1:
-        if dir == 0:
-            tup = (x, y + 1, 0)
-            if _in_board(tup):
-                return tup
-            else:
-                return (0, 0, 0) 
-        if dir == 1:
-            tup = (x + 1, y, 0)
-            if _in_board(tup):
-                return tup
-            else:
-                return (0, 0, 0)
-        if dir == 2:
-            tup = (x, y, 0)
-            if _in_board(tup):
-                return tup
-            else:
-                return (0, 0, 0)
-    else:
-        if dir == 0:
-            tup = (x, y - 1, 0)
-            if _in_board(tup):
-                return tup
-            else:
-                return (0, 0, 0) 
-        if dir == 1:
-            tup = (x - 1, y, 0)
-            if _in_board(tup):
-                return tup
-            else:
-                return (0, 0, 0)
-        if dir == 2:
-            tup = (x, y, 1)
-            if _in_board(tup):
-                return tup
-            else:
-                return (0, 0, 0)
-        
-    
+def edge_direct(pos, direct):
+    direction = [
+        [(0, 1), (1, 0), (0, 0)],
+        [(0, -1), (0, -1), (0, 0)]
+    ]
+    dx, dy = direction[pos[0]][direct]
+    return (pos[0] + dx, pos[1] + dy, 1 - pos[2])
