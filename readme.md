@@ -8,57 +8,24 @@ Blokus 是四个玩家参与的抽象策略类桌游，由法国数学家 Bernar
 
 标准的 Blokus 游戏由 21 种形状的棋子，每个形状四个颜色（红，绿，蓝，黄）各一份共 84 个棋子和 20 * 20 的正方形棋盘构成。每个颜色有对应的起始点。![full.png](https://i.loli.net/2018/03/22/5ab3905782df0.png)
 
+详情参见官网
 
+# 安装
 
-## 开始
+1、安装 mongodb
 
-每个玩家选择一个颜色后，游戏开始
+* 通过系统包管理器安装  
+如 brew (mac), apt-get (ubuntu)  
+[Install MongoDB Community Edition](https://docs.mongodb.com/manual/administration/install-community/)  
+* 通过 docker 安装  
+`$ docker pull mongo`  
+`$ docker create --name blokus -p 27017:27017 mongo`  
+`$ docker start blokus`  
 
-## 进行
+2、安装 python 的依赖
 
-玩家按照按照红，绿，蓝，黄的顺序依次在棋盘上按规则放下棋子，当某一个玩家无法在棋盘上放下棋子时，该玩家的回合会被跳过。当所有玩家无法在棋盘上放下棋子时，该对局游戏结束。
+`pip install -r requirements.txt`
 
-### 计时规则
+3、启动
 
-对每一局游戏，每个玩家有总用时和额外用时，其中额外计时每回合重置。
-
-当轮到某个玩家的回合时，会首先消耗这一步的用时，当这一步的用时消耗完后，会消耗这一局的总用时。总用时也消耗完后会由系统随机放下一个棋子并强制进入下一个玩家的回合。
-
-### 落子规则
-
-1. 第一个棋子必须有一个格子和对应颜色起始点的格子重合 ![first.jpg](https://i.loli.net/2018/03/22/5ab389ea16fb6.jpg)
-2. 除第一个棋子之外，每个放下的棋子至少有一个角和之前的同色棋子相邻  ![dropped.jpg](https://i.loli.net/2018/03/22/5ab376bac852e.jpg)
-3. 每个放下的棋子不得和之前放下的同色棋子有边相邻 ![not.jpg](https://i.loli.net/2018/03/22/5ab376baa7116.jpg)
-4. 每个放下的棋子不得越过棋盘的边界 ![out.jpg](https://i.loli.net/2018/03/22/5ab37bba6cd01.jpg)
-5. 每个放下的棋子不得和之前任何棋子有格子重叠 ![occupied.jpg](https://i.loli.net/2018/03/22/5ab3815c38f52.jpg)
-
-   ​
-
-### 计分规则
-
-对局结束后，按照玩家未能放在棋盘上棋子的格子个数排名。格子越少排名越靠前
-
-# 操作
-
-鼠标点击或者按住不放选择某一个棋子后，使用按键 wasd 旋转/翻转棋子
-假设棋子原来的状态为 ![s.jpg](https://i.loli.net/2018/03/22/5ab376baa87a0.jpg)
-
-1. 用按键 w/s 上下翻转为 ![w.jpg](https://i.loli.net/2018/03/22/5ab376bab5d13.jpg)
-2. 用按键 a 逆时针旋转为 ![a.jpg](https://i.loli.net/2018/03/22/5ab376bac4183.jpg)
-3. 用按键 d 顺时针旋转为 ![d.jpg](https://i.loli.net/2018/03/22/5ab376bac9cfe.jpg)
-
-
-在自己的回合拖动棋子到合法位置放下即可将棋子放置在棋盘上
-
-点击托管按钮后进入托管管状态，托管状态下每一回合会由系统随机放下一个棋子
-
-
-# 显示
-
-每个玩家有对应的进度条，总用时用该玩家对应的颜色表示，额外用时用灰色表示。![progress_bar.jpg](https://i.loli.net/2018/03/22/5ab376d270f0e.jpg)
-
-当轮到某个玩家的回合时，该玩家的进度条会有一个燃烧效果。 ![additional_.jpg](https://i.loli.net/2018/03/22/5ab376bacb218.jpg) ![accuracy.jpg](https://i.loli.net/2018/03/22/5ab376bac5803.jpg)
-
-棋子在落下前是半透明状态，当移动一个棋子时，该棋子会以阴影效果显示落下后在棋盘所占据的位置 ![shadow.jpg](https://i.loli.net/2018/03/22/5ab376bab458b.jpg)
-
-每个玩家最后一个落下的棋子会有纹理效果的提示 ![last.jpg](https://i.loli.net/2018/03/22/5ab376bac6db3.jpg)
+`python app/run.py`
