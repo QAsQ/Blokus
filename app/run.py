@@ -3,7 +3,7 @@ import json
 import pymongo
 from pymongo import MongoClient
 
-from flask import Flask, render_template, g, request, redirect, url_for, jsonify, flash
+from flask import Flask, render_template, g, request, redirect, url_for, jsonify
 from flask_login import LoginManager, current_user, login_user, login_required, logout_user
 
 from models.user import User
@@ -16,7 +16,6 @@ from models.mail_utility import send_register_mail, send_reset_mail, send_confir
 
 from config import db_config, app_config, email_config, url_head
 
-
 db = MongoClient(host=db_config['host'], port=db_config['port'])[db_config['db_name']]
 auth_db(db, db_config)
 init_generate(db, ["battles", "users"])
@@ -27,6 +26,8 @@ app.config['SECRET_KEY'] = app_config['secret_key']
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.anonymous_user = User.anonymous_user(db)
+
+next_battle_cache = dict()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -408,6 +409,20 @@ def battle(battle_id):
             request_json['position']
         )
         return success(battle.get_state(current_time(), request_json['player_id']))
+
+@app.route("/api/battles/<int:battle_id>/next_battle", methods=['GET'])
+def next_battle(battle_id):
+    battle = BattleFactory.load_battle(battle_id, db)
+
+    if isinstance(battle, str):
+        return failure(battle)
+    
+    if battle_id not in next_battle_cache:
+        battle_data = battle.get_state()
+        next_battle = BattleFactory.clone_battle(current_time(), battle_data, db)
+        next_battle_cache[battle_id] = next_battle.id
+
+    return success({"next_battle": next_battle_cache[battle_id]})
 
 @app.route("/api/battles/<int:battle_id>/chat_logs", methods=['POST'])
 def chat_logs(battle_id):

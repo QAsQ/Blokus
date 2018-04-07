@@ -310,7 +310,7 @@ Vue.component("battle-item", {
         </div>`,
     methods: {
         goto_battle: function () {
-            window.open("/battle?battle_id=" + this.battle_data.battle_id)
+            window.location.href="/battle?battle_id=" + this.battle_data.battle_id
         }
     },
     computed: {
@@ -536,9 +536,13 @@ Vue.component("control-panel", {
                     </table>
                 </div>
                 <div class="actions">
-                    <div class="ui ok teal button">
+                    <div class="ui ok button">
                         <i class="checkmark icon"></i>
                         确定
+                    </div>
+                    <div v-if="show_next" class="ui teal button" @click="go_next">
+                        <i class="plus icon"></i>
+                        再来一局
                     </div>
                 </div>
             </div>
@@ -553,15 +557,25 @@ Vue.component("control-panel", {
         </div> `,
     data: function () {
         return {
-            loading: false
+            loading: false,
+            show_next: false
         }
     },
     watch: {
         "battle_data.battle_info.ended": function () {
-            $("#result_modal").modal("show")
+            $("#result_modal").modal("show"),
+            this.show_next = true
         }
     },
     methods: {
+        go_next: function(){
+            $.get("/api/battles/" + this.battle_data.battle_id + "/next_battle", {}, function(data){
+                if (data.message != "success")
+                    show_message(data.message)
+                else
+                    window.location.href="/battle?battle_id=" + data.result.next_battle
+            });
+        },
         head_image: function(player_id){
             return 'static/images/' + this.battle_data.board_info.board_type + '/player/' + (1 << player_id) + '.jpg'
         },
@@ -587,10 +601,13 @@ Vue.component("control-panel", {
             })
         },
         leave: function () {
+            var back = function(){
+                window.location.href="/battles"
+            }
             if (this.player_id !== -1)
-                try_leave(this.player_id, window.close)
+                try_leave(this.player_id, back)
             else
-                window.close()
+                back()
         }
     },
     computed: {
@@ -1062,8 +1079,9 @@ Vue.component("battle-creater", {
                         if (data.message == "success") {
                             form.removeClass("loading")
                             $("#create_modal").modal("hide");
-                            window.open("/battle?battle_id=" + data.result.id);
-                        } else {
+                            window.location.href="/battle?battle_id=" + data.result.id
+                        } 
+                        else {
                             form
                                 .removeClass("success")
                                 .addClass("error")
