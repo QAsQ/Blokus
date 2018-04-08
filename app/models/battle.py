@@ -336,6 +336,20 @@ class BattleFactory():
         if additional_time <= 0 or additional_time > 3600:
             return "额外用时必须大于1秒小于3600秒"
         return Battle(start_timestamp, battle_info, board, db=db)
+
+    @staticmethod
+    def clone_battle(start_timestamp, battle_data, db):
+        battle = BattleFactory.create_battle(
+            start_timestamp,
+            {
+                'battle_name': battle_data['battle_info']['battle_name'],
+                'accuracy_time': battle_data['battle_info']['accuracy_time'],
+                'additional_time': battle_data['battle_info']['additional_time']
+            },
+            battle_data['board_info']['board_type'],
+            db
+        )
+        return battle
     
     @staticmethod
     def load_battle(battle_id, db):

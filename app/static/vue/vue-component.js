@@ -187,7 +187,7 @@ Vue.component("playerinfo-item", {
             return this.player_info.user_data.username
         },
         image_path: function () {
-            return "static/common/images/" + this.board_type + "/player/" + (1 << this.item_id) + '.jpg'
+            return "static/images/" + this.board_type + "/player/" + (1 << this.item_id) + '.jpg'
         },
         description: function () {
             if (this.player_info.user_id == -1)
@@ -229,7 +229,7 @@ Vue.component("battle-info", {
     template: `
         <div class="ui fluid card">
             <div class="ui image">
-                <img src="static/common/images/standard.png">
+                <img src="static/images/standard.png">
             </div>
             <div class="content">
                 <div class="header">{{battle_type}}</div>
@@ -310,18 +310,18 @@ Vue.component("battle-item", {
         </div>`,
     methods: {
         goto_battle: function () {
-            window.open("/battle?battle_id=" + this.battle_data.battle_id)
+            window.location.href="/battle?battle_id=" + this.battle_data.battle_id
         }
     },
     computed: {
         image_path: function () {
             if (this.battle_data.battle_info.ended)
-                return "static/common/images/" + this.battle_data.board_info.board_type + "/battle/ended.jpg"
+                return "static/images/" + this.battle_data.board_info.board_type + "/battle/ended.jpg"
             state = 0
             for (var id = 0; id < this.battle_data.players_info.length; id++)
                 if (this.battle_data.players_info[id].user_id !== -1)
                     state |= 1 << id
-            return "static/common/images/" + this.battle_data.board_info.board_type + "/battle/" + state + ".jpg"
+            return "static/images/" + this.battle_data.board_info.board_type + "/battle/" + state + ".jpg"
         }
     }
 });
@@ -536,9 +536,13 @@ Vue.component("control-panel", {
                     </table>
                 </div>
                 <div class="actions">
-                    <div class="ui ok teal button">
+                    <div class="ui ok button">
                         <i class="checkmark icon"></i>
                         确定
+                    </div>
+                    <div v-if="show_next" class="ui teal button" @click="go_next">
+                        <i class="plus icon"></i>
+                        再来一局
                     </div>
                 </div>
             </div>
@@ -553,17 +557,27 @@ Vue.component("control-panel", {
         </div> `,
     data: function () {
         return {
-            loading: false
+            loading: false,
+            show_next: false
         }
     },
     watch: {
         "battle_data.battle_info.ended": function () {
-            $("#result_modal").modal("show")
+            $("#result_modal").modal("show"),
+            this.show_next = true
         }
     },
     methods: {
+        go_next: function(){
+            $.get("/api/battles/" + this.battle_data.battle_id + "/next_battle", {}, function(data){
+                if (data.message != "success")
+                    show_message(data.message)
+                else
+                    window.location.href="/battle?battle_id=" + data.result.next_battle
+            });
+        },
         head_image: function(player_id){
-            return 'static/common/images/' + this.battle_data.board_info.board_type + '/player/' + (1 << player_id) + '.jpg'
+            return 'static/images/' + this.battle_data.board_info.board_type + '/player/' + (1 << player_id) + '.jpg'
         },
         update_hosting: function () {
             this.loading = true
@@ -587,10 +601,13 @@ Vue.component("control-panel", {
             })
         },
         leave: function () {
+            var back = function(){
+                window.location.href="/battles"
+            }
             if (this.player_id !== -1)
-                try_leave(this.player_id, window.close)
+                try_leave(this.player_id, back)
             else
-                window.close()
+                back()
         }
     },
     computed: {
@@ -985,7 +1002,7 @@ Vue.component("battle-creater", {
                 </form>
             </div>
             <div class="ui column">
-                <img class="ui middle image" src="static/common/images/standard.png">
+                <img class="ui middle image" src="static/images/standard.png">
             </div>
         </div>`,
     data: function () {
@@ -1062,8 +1079,9 @@ Vue.component("battle-creater", {
                         if (data.message == "success") {
                             form.removeClass("loading")
                             $("#create_modal").modal("hide");
-                            window.open("/battle?battle_id=" + data.result.id);
-                        } else {
+                            window.location.href="/battle?battle_id=" + data.result.id
+                        } 
+                        else {
                             form
                                 .removeClass("success")
                                 .addClass("error")
