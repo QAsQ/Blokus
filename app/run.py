@@ -369,6 +369,7 @@ def battles():
         if current_user.user_id == -1:
             return failure("need login first!")
 
+        request_json = request.get_json(force=True)
         battle = BattleFactory.create_battle(
             current_time(),
             request_json,
