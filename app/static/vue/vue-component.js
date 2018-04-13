@@ -376,10 +376,12 @@ Vue.component("playerinfo-table", {
         table_typesetting: function(){
             var typesetting = []
             typesetting[2] = [[0, 1]]
+            typesetting[3] = [[0], [1, 2]]
             typesetting[4] = [[0, 3], [1, 2]]
             var player_num = {
                 "square_duo": 2,
-                "square_standard": 4
+                "square_standard": 4,
+                "trigon_trio": 3
             }
             return typesetting[player_num[this.board_type]]
         }
@@ -864,8 +866,10 @@ Vue.component("battle-condition", {
             <label>按对局类型</label>
             <select id="board_type" class="ui fluid dropdown multiple" v-model="condition.query.board_type">
                 <option value="">对局类型</option>
-                <option value="square_standard">标准(四人)</option>
-                <option value="square_duo">双人</option>
+                <option value="square_standard">正方形(四人)</option>
+                <option value="square_duo">正方形(双人)</option>
+                <option value="trigon_standard">三角形(四人)</option>
+                <option value="trigon_trio">三角形(三人)</option>
             </select>
         </div>
         <h1><i class="sort icon"></i>排序</h1>
@@ -962,8 +966,10 @@ Vue.component("battle-creater", {
                                 id="board_type_selector">
 
                                 <option value="">对局类型</option>
-                                <option class="item" value="square_standard">标准(四人)</option>
-                                <option class="item" value="square_duo">双人</option>
+                                <option value="square_standard">正方形(四人)</option>
+                                <option value="square_duo">正方形(双人)</option>
+                                <option value="trigon_standard">三角形(四人)</option>
+                                <option value="trigon_trio">三角形(三人)</option>
                             </select>
                         </div>
                     </div>

@@ -95,6 +95,9 @@ from .piece.square_piece import piece_shape_set_generate as square_piece_shape_g
 from .piece.square_standard_initial_state import square_standard_initial_possible_position  
 from .piece.square_standard_initial_pos import square_standard_init_locate, square_standard_init_state, square_standard_progress_bar_end_point
 from .piece.square_duo_initial_pos import square_duo_init_locate, square_duo_init_state, square_duo_progress_bar_end_point
+from .piece.trigon_piece import Piece as Trigon_piece
+from .piece.trigon_piece import piece_shape_set_generate as trigon_piece_shape_generate
+from .piece.trigon_trio_initial_pos import trigon_trio_init_locate, trigon_trio_init_state, trigon_trio_progress_bar_end_point
 
 class BoardFactory:
     @staticmethod
@@ -112,6 +115,13 @@ class BoardFactory:
                 square_piece_shape_generate(),
                 [(4, 4), (9, 9)], 
                 14,
+                None
+            ),
+            "trigon_trio": (
+                Trigon_piece, 
+                trigon_piece_shape_generate(),
+                [(0, 0), (1, 1), (2, 2)], 
+                8,
                 None
             )
         }
@@ -137,7 +147,6 @@ class BoardFactory:
         
         if isinstance(pieces, str):
             return pieces
-
         return Board(pieces, board_type)
     
     @staticmethod
@@ -162,6 +171,16 @@ class BoardFactory:
                 "init_locate": square_duo_init_locate, 
                 "init_state": square_duo_init_state, 
                 "progress_bar_end_point": square_duo_progress_bar_end_point
+            },
+            "trigon_trio": {
+                "board_type": "trigon_trio",
+                "start_point": [(10, 2, 1), (2, 10, 1), (10, 10, 1)], 
+                "piece_shape": trigon_piece_shape_generate(),
+                "player_num": 3,
+                "board_size": 8,
+                "init_locate": trigon_trio_init_locate, 
+                "init_state": trigon_trio_init_state, 
+                "progress_bar_end_point": trigon_trio_progress_bar_end_point
             },
         }
         if board_type not in datas:

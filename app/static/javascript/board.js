@@ -2,8 +2,19 @@ function square(x) {
     return x * x
 }
 
+var gOffsetX;
 var Point = function (x, y) {
     return new PIXI.Point(x, y)
+}
+function liftPoint(x, y){
+    return Point(x * gCellSize + y * gCellSize / 2 - gOffsetX, y * gCellSize / 2 * Math.sqrt(3));
+}
+function lowerPoint(x, y){
+    //return Point(x / gCellSize, y / gCellSize);
+    x += gOffsetX;
+    var ly = y * 2 / (gCellSize * Math.sqrt(3));
+    var lx = (x - ly * gCellSize / 2) / gCellSize; 
+    return Point(lx, ly);
 }
 Point.from = function (point) {
     return Point(point[0], point[1])
@@ -331,7 +342,7 @@ function PieceControllerFactory(colorTheme, controllerGroup) {
     return pieceController;
 }
 
-function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme, mobile_version) {
+function ProgressBarFactory(startPoint, endPoint, player_id, colorTheme, mobile_version) {
     var graphics = new PIXI.Graphics();
     graphics.beginFill(colorTheme.board.progress_bar.accuracy[player_id], 1);
     graphics.drawRect(0, 0, 1, 1)
@@ -339,9 +350,6 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme, mobile_vers
     graphics.beginFill(colorTheme.board.progress_bar.additional, 1);
     graphics.drawRect(0, 0, 1, 1)
     var additionalBar = new PIXI.Sprite(graphics.generateTexture());
-
-    var startPoint = Point(stPoint[0] * gCellSize, stPoint[1] * gCellSize);
-    var endPoint = Point(edPoint[0] * gCellSize, edPoint[1] * gCellSize);
 
     function distance(pointA, pointB) {
         return Math.sqrt(square(pointA.x - pointB.x) + square(pointA.y - pointB.y))
@@ -459,12 +467,14 @@ function ProgressBarFactory(stPoint, edPoint, player_id, colorTheme, mobile_vers
     return progressBarContainer;
 }
 
-function PieceFactory(pieceId,
+function PieceFactory(
+    pieceId,
     shape,
     offset,
     player_id,
     colorTheme,
     mobile_version,
+    pieceType,
     pieceGroup,
     shadowGroup,
     draggedGroup,
@@ -503,50 +513,32 @@ function PieceFactory(pieceId,
             DragEndCallBack(this, this.State());
     }
 
-    function CellList_2_Polygon(cell_list, offset) {
-        var vertex_list = [new PIXI.Point(0, 0)];
-        cell_list.forEach(function (cell) {
-            [
-                [0, 0],
-                [0, 1],
-                [1, 1],
-                [1, 0],
-                [0, 0]
-            ].forEach(function (point) {
-                vertex_list.push(
-                    new PIXI.Point(
-                        (cell[0] + point[0]) * gCellSize + offset.x,
-                        (cell[1] + point[1]) * gCellSize + offset.y
-                    )
-                )
-            })
-            vertex_list.push(new PIXI.Point(0, 0));
-        });
-
-        return new PIXI.Polygon(vertex_list);
-    }
-
     var pieces = new PIXI.Container();
-    pieces.piece_id = pieceId
-    pieces.piece = []
 
-    function generateTexture(cellList, color) {
+    function generateSquareTexture(cellList, color) {
+        function CellList_2_Polygon(cell_list) {
+            var vertex_list = [new PIXI.Point(0, 0)];
+            cell_list.forEach(function (cell) {
+                [[0, 0], [0, 1], [1, 1], [1, 0], [0, 0]].forEach(function (point) {
+                    vertex_list.push(
+                        new PIXI.Point(
+                            (cell[0] + point[0]) * gCellSize,
+                            (cell[1] + point[1]) * gCellSize,
+                ))})
+                vertex_list.push(new PIXI.Point(0, 0));
+            });
+            return new PIXI.Polygon(vertex_list);
+        }
         var graphics = new PIXI.Graphics();
         graphics.beginFill(color, 1);
-
-        var polygon = CellList_2_Polygon(cellList, new PIXI.Point());
+        var polygon = CellList_2_Polygon(cellList);
         graphics.drawPolygon(polygon);
 
         graphics.lineColor = colorTheme.piece.dividing_line;
         graphics.lineWidth = colorTheme.piece.dividing_line_width[mobile_version];
         cellList.forEach(function (cell) {
             last = [0, 0]
-            lis = [
-                [1, 0],
-                [1, 1],
-                [0, 1],
-                [0, 0]
-            ]
+            lis = [[1, 0], [1, 1], [0, 1], [0, 0]]
             lis.forEach(function (bias) {
                 graphics.moveTo((cell[0] + bias[0]) * gCellSize, (cell[1] + bias[1]) * gCellSize);
                 graphics.lineTo((cell[0] + last[0]) * gCellSize, (cell[1] + last[1]) * gCellSize);
@@ -555,10 +547,8 @@ function PieceFactory(pieceId,
         });
         return graphics.generateTexture()
     }
-
-    function getOffset(cellList) {
-        var x = 0,
-            y = 0
+    function getSquareOffset(cellList) {
+        var x = 0, y = 0;
         cellList.forEach(function (point) {
             x = Math.max(x, point[0] + 1)
             y = Math.max(y, point[1] + 1)
@@ -566,10 +556,64 @@ function PieceFactory(pieceId,
         return new PIXI.Point(x * gCellSize / 2, y * gCellSize / 2)
     }
 
+    function generateTrigonTexture(cellList, color) {
+        function CellList_2_Polygon(cell_list) {
+            var vertex_list = [new PIXI.Point(0, 0)];
+            cell_list.forEach(function (cell) {
+                var tip = liftPoint(cell[0] + cell[2], cell[1] + cell[2])
+                vertex_list = vertex_list.concat([
+                    tip,
+                    liftPoint(cell[0] + 1, cell[1]),
+                    liftPoint(cell[0], cell[1] + 1),
+                    tip,
+                    Point(0, 0),
+                ])
+            });
+            return new PIXI.Polygon(vertex_list);
+        }
+        var graphics = new PIXI.Graphics();
+        graphics.beginFill(color, 1);
+        var polygon = CellList_2_Polygon(cellList);
+        graphics.drawPolygon(polygon);
+
+        graphics.lineColor = colorTheme.piece.dividing_line;
+        graphics.lineWidth = colorTheme.piece.dividing_line_width[mobile_version];
+        cellList.forEach(function (cell) {
+            var tip = liftPoint(cell[0] + cell[2], cell[1] + cell[2])
+            var pointL = liftPoint(cell[0] + 1, cell[1]);
+            var pointR = liftPoint(cell[0], cell[1] + 1);
+            graphics.moveTo(tip.x, tip.y);
+            graphics.lineTo(pointL.x, pointL.y);
+            graphics.lineTo(pointR.x, pointR.y);
+            graphics.lineTo(tip);
+        });
+        return graphics.generateTexture()
+    }
+    function getTrigonOffset(cellList) {
+        var x = 0, y = 0;
+        cellList.forEach(function (point) {
+            x = Math.max(x, point[0] + 1)
+            y = Math.max(y, point[1] + 1)
+        })
+        return new PIXI.Point(x * gCellSize / 2, y * gCellSize / 2)
+    }
+
+    if (pieceType === 'square'){
+        var generateTexture = generateSquareTexture
+        var getOffset = getSquareOffset
+    }
+    else if (pieceType === 'trigon'){
+        var generateTexture = generateTrigonTexture
+        var getOffset = getTrigonOffset
+    }
+
+    pieces.piece_id = pieceId
+    pieces.piece = []
+    //generate piece shape
     shape.forEach(function (cellList, state) {
         var piece = new PIXI.Sprite(generateTexture(cellList, colorTheme.piece.cell[player_id]));
         piece.cellList = cellList
-        piece.offset = getOffset(cellList)
+        piece.offset = Point(piece.width / 2, piece.height / 2) 
         piece.visible = false
         piece.anchor.set(0.5)
 
@@ -581,6 +625,18 @@ function PieceFactory(pieceId,
         pieces.piece.push(piece)
         pieces.addChild(piece)
     })
+    
+    //adhoc for trigon
+    for (var i = 0; i < shape.length; i ++){
+        var exOffset = gCellSize / 2;
+        if (pieceType === 'square')
+            exOffset = 0;
+        shape[i].forEach(function(cell){
+            if (cell[0] === 0 && cell[1] === 0 && cell[2] === 0)
+                exOffset = 0
+        })
+        pieces.piece[i].exOffset = exOffset;
+    }
 
     pieces.alpha = colorTheme.piece.initial_alpha
     pieces.interactive = true
@@ -623,19 +679,44 @@ function PieceFactory(pieceId,
         this.deactiveShadow()
     }
 
-    pieces.State = function () {
-        var piece = this.piece[this.state]
-        return {
-            state: this.state,
-            x: Math.floor((this.x - piece.offset.x) / gCellSize + 0.5),
-            y: Math.floor((this.y - piece.offset.y) / gCellSize + 0.5)
+    if (pieceType === 'square'){
+        pieces.State = function () {
+            var piece = this.piece[this.state]
+            return {
+                state: this.state,
+                x: Math.floor((this.x - piece.offset.x) / gCellSize + 0.5),
+                y: Math.floor((this.y - piece.offset.y) / gCellSize + 0.5)
+            }
+        }
+    }
+    else{
+        pieces.State = function () {
+            var piece = this.piece[this.state]
+            var x = this.x - piece.offset.x - piece.exOffset
+            var y = this.y - piece.offset.y
+            var lower = lowerPoint(x, y)
+            return {
+                state: this.state,
+                x: Math.floor(lower.x + 0.5),
+                y: Math.floor(lower.y + 0.5)
+            }
         }
     }
 
-    pieces.SetPosition = function (position) {
-        var piece = this.piece[this.state]
-        this.x = position.x * gCellSize + piece.offset.x + colorTheme.piece.dividing_line_width[mobile_version] / 2
-        this.y = position.y * gCellSize + piece.offset.y + colorTheme.piece.dividing_line_width[mobile_version] / 2
+    if (pieceType === 'square'){
+        pieces.SetPosition = function (position) {
+            var piece = this.piece[this.state];
+            this.x = position.x * gCellSize + piece.offset.x;
+            this.y = position.y * gCellSize + piece.offset.y;
+        }
+    }
+    else{
+        pieces.SetPosition = function (position) {
+            position = liftPoint(position.x, position.y);
+            var piece = this.piece[this.state];
+            this.x = position.x + piece.offset.x + piece.exOffset;
+            this.y = position.y + piece.offset.y;
+        }
     }
 
     pieces.getCenter = function () {
@@ -650,8 +731,15 @@ function PieceFactory(pieceId,
         var position = this.State()
         var piece = this.piece[this.state]
         piece.shadow.visible = true
-        piece.shadow.x = position.x * gCellSize - this.x,
+        if (pieceType === 'square'){
+            piece.shadow.x = position.x * gCellSize - this.x,
             piece.shadow.y = position.y * gCellSize - this.y
+        }
+        else{
+            var lposition = liftPoint(position.x, position.y)
+            piece.shadow.x = lposition.x - this.x + piece.exOffset,
+            piece.shadow.y = lposition.y - this.y
+        }
     }
 
     pieces.deactiveShadow = function () {
@@ -839,6 +927,92 @@ function HighlightLayerFactory(colorTheme, player_num, mobile_version, piecesCel
     return highlightLayer;
 }
 
+function SquareBoardShapeFactory(colorTheme, boardData, mobile_version){
+    var graphics = new PIXI.Graphics();
+
+    graphics.lineColor = colorTheme.board.dividing_line
+    graphics.lineWidth = colorTheme.board.dividing_line_width[mobile_version]
+    //Draw board line
+    for (var i = 0; i <= boardData.board_size; i++) {
+        graphics.moveTo(i * gCellSize, 0);
+        graphics.lineTo(i * gCellSize, boardData.board_size * gCellSize);
+        graphics.moveTo(0, i * gCellSize);
+        graphics.lineTo(gCellSize * boardData.board_size, i * gCellSize);
+    }
+
+    function draw_initial_posiiton(position, color) {
+        graphics.beginFill(color, 1)
+        graphics.lineWidth = 0
+        graphics.drawRect(
+            position[0] * gCellSize + gCellSize / 4,
+            position[1] * gCellSize + gCellSize / 4,
+            gCellSize / 2, gCellSize / 2
+        )
+    }
+    //Draw initial place
+    for (var player_id = 0; player_id < boardData.player_num; player_id++) {
+        draw_initial_posiiton(boardData.start_point[player_id], colorTheme.piece.initial[player_id])
+    }
+
+    var boardShape = new PIXI.Sprite(graphics.generateTexture());
+    return boardShape;
+}
+
+function TrigonBoardShapeFactory(colorTheme, boardData, mobile_version){
+    var graphics = new PIXI.Graphics();
+
+    graphics.lineColor = colorTheme.board.dividing_line
+    graphics.lineWidth = colorTheme.board.dividing_line_width[mobile_version]
+    //Draw board line
+    var unitX = Point(gCellSize, gCellSize / 2);
+    var unitY = Point(0, gCellSize / 2 * Math.sqrt(3));
+    function drawLine(start, end){
+        var lstart = liftPoint(start.x, start.y), lend = liftPoint(end.x, end.y)
+        graphics.moveTo(lstart.x, lstart.y);
+        graphics.lineTo(lend.x, lend.y);
+    }
+
+    var length = boardData.board_size;
+    for (var i = 0; i < length; i ++){
+        drawLine(Point(i, length * 2), Point(length * 2, i))
+        drawLine(Point(length - i, i), Point(length * 2, i))
+        drawLine(Point(i, length * 2), Point(i , length - i))
+    }
+    for (var i = 0; i < length; i ++){
+        drawLine(Point(i + length, 0), Point(0, i + length));
+        drawLine(Point(i + length, 0), Point(i + length, length * 2 - i));
+        drawLine(Point(length * 2 - i, i + length), Point(0, i + length));
+    }
+    drawLine(Point(0, length  * 2), Point(length, length * 2));
+    drawLine(Point(length  * 2, 0), Point(length * 2, length));
+    drawLine(Point(length, length * 2), Point(length * 2, length));
+
+    //Draw initial place
+    function draw_initial_posiiton(position, color) {
+        graphics.beginFill(color, 1)
+        graphics.lineWidth = 0
+        var tip = liftPoint(position[0] + position[2], position[1] + position[2])
+        var pointL = liftPoint(position[0] + 1, position[1]);
+        var pointR = liftPoint(position[0], position[1] + 1);
+        var center = Point((tip.x + pointL.x + pointR.x) / 3, (tip.y + pointL.y + pointR.y) / 3);
+        function middle(a, b){
+            return Point((a.x + b.x) / 2, (a.y + b.y) / 2);
+        }
+        graphics.drawPolygon(new PIXI.Polygon([
+            middle(tip, center),
+            middle(pointL, center),
+            middle(pointR, center)
+        ]))
+    }
+    for (var player_id = 0; player_id < boardData.player_num; player_id++) {
+        draw_initial_posiiton(boardData.start_point[player_id], colorTheme.piece.initial[player_id])
+    }
+
+    var boardShape = new PIXI.Sprite(graphics.generateTexture());
+    return boardShape;
+}
+
+
 function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobile_version) {
     var backgroundGroup = new PIXI.display.Group(-3, false);
     var placedGroup = new PIXI.display.Group(-2, false);
@@ -862,57 +1036,37 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
         app.stage.addChild(new PIXI.display.Layer(value));
     });
 
-    var graphics = new PIXI.Graphics();
-
-    graphics.lineColor = colorTheme.board.dividing_line
-    graphics.lineWidth = colorTheme.board.dividing_line_width[mobile_version]
-    //Draw board line
-    for (var i = 0; i <= boardData.board_size; i++) {
-        graphics.moveTo(i * gCellSize, 0);
-        graphics.lineTo(i * gCellSize, boardData.board_size * gCellSize);
-        graphics.moveTo(0, i * gCellSize);
-        graphics.lineTo(gCellSize * boardData.board_size, i * gCellSize);
+    var boardShapeFactory = {
+        "square_standard": SquareBoardShapeFactory,
+        "square_duo": SquareBoardShapeFactory,
+        "trigon_trio": TrigonBoardShapeFactory
     }
-
-    //Draw initial place
-    function draw_initial_posiiton(position, color) {
-        graphics.beginFill(color, 1)
-        graphics.lineWidth = 0
-        graphics.drawRect(
-            position[0] * gCellSize + gCellSize / 4,
-            position[1] * gCellSize + gCellSize / 4,
-            gCellSize / 2, gCellSize / 2
-        )
-    }
-    for (var player_id = 0; player_id < boardData.player_num; player_id++) {
-        draw_initial_posiiton(boardData.start_point[player_id], colorTheme.piece.initial[player_id])
-    }
-
-    var boardShape = new PIXI.Sprite(graphics.generateTexture());
+    var boardShape = boardShapeFactory[boardData.board_type](colorTheme, boardData, mobile_version);
     boardShape.parentGroup = boardGroup;
 
     var board = new PIXI.Container();
-    board.addChild(boardShape);
+    if (boardData.board_type.split("_")[0] === 'square'){
+        if (mobile_version) board.x = board.y = 2 * gCellSize;
+        else board.x = board.y = 3 * gCellSize;
+    }
+    else {
+        board.x = gCellSize * 2
+        board.y = gCellSize * Math.sqrt(3);
+    }
 
-    if (mobile_version)
-        board.x = board.y = 2 * gCellSize;
-    else
-        board.x = board.y = 4 * gCellSize;
+    board.addChild(boardShape);
 
     current_piece_id = -1
 
     function TouchStartCallBack(piece) {
         board.pieceController.attach(piece)
     }
-
     function DragStartCallBack(piece, position) {
         current_piece_id = piece.piece_id;
     }
-
     function DragMoveCallBack(piece, position) {
         board.pieceController.follow()
     }
-
     function DragEndCallBack(piece, position) {
         data = {
             player_id: mPlayerId,
@@ -924,9 +1078,19 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
 
     board.progressBars = []
     for (var player_id = 0; player_id < boardData.player_num; player_id++) {
+        if (boardData.board_type.split("_") == "square"){
+            var update = function(point){
+                return Point(point[0] * gCellSize, point[1] * gCellSize);
+            }
+        }
+        else{
+            var update = function(point){
+                return liftPoint(point[0], point[1]);
+            }
+        }
         progressBar = ProgressBarFactory(
-            boardData.progress_bar_end_point[player_id * 2],
-            boardData.progress_bar_end_point[player_id * 2 + 1],
+            update(boardData.progress_bar_end_point[player_id * 2]),
+            update(boardData.progress_bar_end_point[player_id * 2 + 1]),
             player_id,
             colorTheme,
             mobile_version
@@ -958,9 +1122,10 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
 
     //Create piece
     var pieceLists = [];
+    var pieceType = boardData.board_type.split("_")[0];
     for (var playerId = 0; playerId < boardData.player_num; playerId++) {
         var pieceList = [];
-        for (var pieceId = 0; pieceId <= 20; pieceId++) {
+        for (var pieceId = 0; pieceId < boardData.piece_shape.length; pieceId++) {
             var piece = PieceFactory(
                 pieceId,
                 boardData.piece_shape[pieceId],
@@ -968,6 +1133,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
                 playerId,
                 colorTheme,
                 mobile_version,
+                pieceType,
                 pieceGroup,
                 shadowGroup,
                 draggedGroup,
@@ -1007,7 +1173,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
 
         var _pieceLists = this.pieceLists;
         for (var playerId = 0; playerId < boardData.player_num; playerId++) {
-            for (var pieceId = 0; pieceId < 21; pieceId++) {
+            for (var pieceId = 0; pieceId < boardData.piece_shape.length; pieceId++) {
                 _pieceLists[playerId][pieceId].PickUp(playerId === mPlayerId)
             }
         }
@@ -1043,8 +1209,6 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
         if (pieceId > 20 || pieceId < 0)
             return false;
         var positionState = this.position;
-        //if (this.cellList[mPlayerId][pieceId].)
-
     };
 
     board.detach = function () {
@@ -1080,6 +1244,7 @@ function generateBoard(canvas, mPlayerId, boardData, colorTheme, mobile_version)
     );
     app.stage = new PIXI.display.Stage();
 
+    var trigon_height = Math.sqrt(3) / 2;
     var bound = {
         "square_standard": [
             [30, 29],
@@ -1088,12 +1253,16 @@ function generateBoard(canvas, mPlayerId, boardData, colorTheme, mobile_version)
         "square_duo": [
             [23, 23],
             [18, 29]
+        ],
+        "trigon_trio": [
+            [15, 15 / trigon_height],
+            [15, 15 / trigon_height]
         ]
     }
 
-    var current_bound = bound[boardData.board_type][mobile_version ? 1 : 0]
-    gCellSize = Math.floor(Math.min(gWidth / current_bound[0], gHeight / current_bound[1]))
-    gBoardSize = gCellSize * boardData.board_size;
+    var current_bound = bound[boardData.board_type][mobile_version ? 1 : 0];
+    gCellSize = Math.floor(Math.min(gWidth / current_bound[0], gHeight / current_bound[1]));
+    gOffsetX = boardData.board_size * gCellSize / 2;
 
     function TryDropPiece(data) {
 
@@ -1118,5 +1287,7 @@ function generateBoard(canvas, mPlayerId, boardData, colorTheme, mobile_version)
     var board = BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobile_version ? 1 : 0)
     app.stage.addChild(board);
 
+    //test only
+    //board.update_player(0)
     return board;
 }
