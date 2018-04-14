@@ -16,6 +16,9 @@ function lowerPoint(x, y){
     var lx = (x - ly * gCellSize / 2) / gCellSize; 
     return Point(lx, ly);
 }
+function middle(a, b){
+    return Point((a.x + b.x) / 2, (a.y + b.y) / 2);
+}
 Point.from = function (point) {
     return Point(point[0], point[1])
 }
@@ -809,7 +812,7 @@ function CheckerFactory(piece_shape_set, player_id){
 }
 */
 
-function HighlightLayerFactory(colorTheme, player_num, mobile_version, piecesCellList) {
+function SquareHighlightLayerFactory(colorTheme, player_num, mobile_version, piecesCellList) {
 
     var highlightLayer = new PIXI.Container();
 
@@ -817,38 +820,10 @@ function HighlightLayerFactory(colorTheme, player_num, mobile_version, piecesCel
         var graphics = new PIXI.Graphics();
 
         var player_shape = [
-            [
-                [0, 1],
-                [0, 2],
-                [1, 0],
-                [1, 1],
-                [2, 0],
-                [2, 2]
-            ],
-            [
-                [0, 0],
-                [0, 1],
-                [1, 1],
-                [1, 2],
-                [2, 0],
-                [2, 2]
-            ],
-            [
-                [0, 0],
-                [0, 2],
-                [1, 1],
-                [1, 2],
-                [2, 0],
-                [2, 1]
-            ],
-            [
-                [0, 0],
-                [0, 2],
-                [1, 0],
-                [1, 1],
-                [2, 1],
-                [2, 2]
-            ]
+            [[0, 1], [0, 2], [1, 0], [1, 1], [2, 0], [2, 2]],
+            [[0, 0], [0, 1], [1, 1], [1, 2], [2, 0], [2, 2]],
+            [[0, 0], [0, 2], [1, 1], [1, 2], [2, 0], [2, 1]],
+            [[0, 0], [0, 2], [1, 0], [1, 1], [2, 1], [2, 2]]
         ]
 
         graphics.beginFill(color, 1);
@@ -927,6 +902,101 @@ function HighlightLayerFactory(colorTheme, player_num, mobile_version, piecesCel
     return highlightLayer;
 }
 
+function TrigonHighlightLayerFactory(colorTheme, player_num, mobile_version, piecesCellList) {
+
+    var highlightLayer = new PIXI.Container();
+
+    function highlightCellGenerate(color, index) {
+        var graphics = new PIXI.Graphics();
+
+        var smallCellSize = gCellSize - colorTheme.piece.dividing_line_width[mobile_version] * 1;
+        var lp = Point(smallCellSize / 2, smallCellSize / 2 * Math.sqrt(3))
+        var rp = Point(smallCellSize, 0);
+        if (index == 0) var tip = Point(0, 0);
+        else tip = Point(smallCellSize * 3 / 2, smallCellSize / 2 * Math.sqrt(3))
+
+        function fillSubTrigon(st, a, b){
+            var ma = middle(st, a);
+            var mb = middle(st, b);
+            graphics.drawPolygon(new PIXI.Polygon([ma, mb, st]));
+            graphics.moveTo(ma.x, ma.y);
+            graphics.lineTo(mb.x, mb.y);
+        }
+
+        graphics.beginFill(color, 1);
+        fillSubTrigon(tip, lp, rp);
+        fillSubTrigon(lp, rp, tip);
+        fillSubTrigon(rp, tip, lp);
+        graphics.endFill();
+
+        /*
+        graphics.lineColor = colorTheme.piece.dividing_line;
+        graphics.lineWidth = colorTheme.piece.dividing_line_width[mobile_version];
+        graphics.moveTo(tip.x, tip.y);
+        graphics.lineTo(lp.x, lp.y);
+        graphics.lineTo(rp.x, rp.y);
+        graphics.lineTo(tip.x, tip.y);
+        */
+
+        var highlightCell = new PIXI.Sprite(graphics.generateTexture());
+        highlightCell.visible = false
+        return highlightCell
+    }
+
+    var max_size = 0
+    piecesCellList.forEach(function (cellLists) {
+        cellLists.forEach(function (cellList) {
+            max_size = Math.max(max_size, cellList.length)
+        })
+    })
+    highlightLayer.highlightCells = []
+    for (var player_id = 0; player_id < player_num; player_id++) {
+        cells = [[], []]
+        for (var index = 0; index < 2; index ++){
+            for (var i = 0; i < max_size; i++) {
+                var highlightCell = highlightCellGenerate(
+                    colorTheme.piece.last_drop[player_id],
+                    index
+                )
+                cells[index].push(highlightCell)
+                highlightLayer.addChild(highlightCell)
+            }
+        }
+        highlightLayer.highlightCells.push(cells)
+    }
+
+    highlightLayer.updateHighlight = function (history, length) {
+        this.highlightCells.forEach(function (highlightCell) {
+            highlightCell.forEach(function (cellList) {
+                cellList.forEach(function(cell){
+                    cell.visible = false;
+                })
+            })
+        })
+        last_drop = [-1, -1, -1, -1];
+        for (var index = 0; index < length; index++) {
+            drop = history[index]
+            last_drop[drop.player_id] = drop
+        }
+        for (var player_id = 0; player_id < player_num; player_id++) {
+            if (last_drop[player_id] === -1)
+                continue
+            var drop = last_drop[player_id]
+            shape = piecesCellList[drop.piece_id][drop.position.state]
+            for (var index = 0; index < shape.length; index++) {
+                var curShape = shape[index]
+                var cell = highlightLayer.highlightCells[player_id][curShape[2]][index];
+
+                var lPos = liftPoint(curShape[0] + drop.position.x, curShape[1] + drop.position.y);
+                cell.x = lPos.x + curShape[2] * gCellSize / 2 + colorTheme.piece.dividing_line_width[mobile_version];
+                cell.y = lPos.y + colorTheme.piece.dividing_line_width[mobile_version];
+                cell.visible = true;
+            }
+        }
+    }
+    return highlightLayer;
+}
+
 function SquareBoardShapeFactory(colorTheme, boardData, mobile_version){
     var graphics = new PIXI.Graphics();
 
@@ -995,9 +1065,6 @@ function TrigonBoardShapeFactory(colorTheme, boardData, mobile_version){
         var pointL = liftPoint(position[0] + 1, position[1]);
         var pointR = liftPoint(position[0], position[1] + 1);
         var center = Point((tip.x + pointL.x + pointR.x) / 3, (tip.y + pointL.y + pointR.y) / 3);
-        function middle(a, b){
-            return Point((a.x + b.x) / 2, (a.y + b.y) / 2);
-        }
         graphics.drawPolygon(new PIXI.Polygon([
             middle(tip, center),
             middle(pointL, center),
@@ -1154,7 +1221,8 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
     board.pieceLists = pieceLists;
     //Create piece Done
 
-    board.highlightLayer = HighlightLayerFactory(colorTheme, boardData.player_num, mobile_version, boardData.piece_shape)
+    var HighlightLayerFactory = pieceType === 'square' ? SquareHighlightLayerFactory : TrigonHighlightLayerFactory;
+    board.highlightLayer = HighlightLayerFactory(colorTheme, boardData.player_num, mobile_version, boardData.piece_shape);
     board.highlightLayer.parentGroup = highlightGroup
     board.addChild(board.highlightLayer)
 

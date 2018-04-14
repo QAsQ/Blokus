@@ -83,7 +83,7 @@ class Board:
         return piece_id == -1
 
     def _get_one_possible_position(self, player_id):
-        for piece_id in range(20, -1, -1):
+        for piece_id in range(len(self.pieces[player_id]) - 1, -1, -1):
             position = self.pieces[player_id][piece_id].get_one_possible_position()
             if position['state'] != -1:
                 return piece_id, position
@@ -120,7 +120,7 @@ class BoardFactory:
             "trigon_trio": (
                 Trigon_piece, 
                 trigon_piece_shape_generate(),
-                [(0, 0), (1, 1), (2, 2)], 
+                [(10, 2, 1), (2, 10, 1), (10, 10, 1)],
                 8,
                 None
             )

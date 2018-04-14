@@ -54,13 +54,13 @@ class Piece:
         ]
 
     def _in_board(self, x, y, z=None): # 判断三角形是否在棋盘内
-        if (z > 1) or (z < 0):
-            return False
         if (x > 2 * self.board_size - 1) or (y > 2 * self.board_size - 1):
             return False
         if z is None:
             return True
 
+        if (z > 1) or (z < 0):
+            return False
         if z == 1:
             if (x + y < self.board_size - 1) or (x + y > 3 * self.board_size - 2):
                 return False
@@ -103,27 +103,28 @@ class Piece:
 
         for state in range(12):
             for one_cell in piece_shape:
-                for act in self.action[state]:
+                for act in self.action[state][one_cell[2]]:
                     self._update_one_position(
                         state, 
                         one_cell[0] + position.x + act[0],
                         one_cell[1] + position.y + act[1],
-                        one_cell[2],
                         act[2],
                         is_same_player
                     )
     
-    def _update_one_position(self, state, x, y, z, action, is_same_player):
-        if not self._in_board(x, y, z):
+    def _update_one_position(self, state, x, y, action, is_same_player):
+        if not self._in_board(x, y):
             return
 
         new_state = self.state_update_table[is_same_player][action][self.possible_position[state][x][y]]
         self.possible_position[state][x][y] = new_state
 
-    def _action_generate(self, piece_shape): # todo
+    def _action_generate(self, piece_shape):
         irrelevant = -1
         def get_act(x, y, z, ano_pos):
-            dist = abs(x - ano_pos[0]) + abs(y - ano_pos[1])
+            ano_pos = (ano_pos[0] + x, ano_pos[1] + y, ano_pos[2])
+            x = y = 0
+            dist = abs(ano_pos[0]) + abs(ano_pos[1])
             same_direction = ano_pos[2] == z
             if dist == 0:
                 return occupy if same_direction else share_edge
@@ -195,7 +196,6 @@ def piece_shape_set_generate():
         return cell_list[1:]
     
     def shift(cell_list):
-        print(cell_list)
         x = 0
         y = 0
         for cell in cell_list:
