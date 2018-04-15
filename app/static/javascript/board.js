@@ -781,7 +781,7 @@ function PieceFactory(
     };
     pieces.HorizontalFlip = function () {
         if (pieces.dropped == false) {
-            if (pieceType == square)
+            if (pieceType == "square")
                 var new_state = (this.state + ((this.state % 2) ? 3 : 5)) % 8
             else
                 var new_state = (this.state + ((this.state % 2) ? 7 : 5)) % 12
@@ -790,7 +790,7 @@ function PieceFactory(
     }
     pieces.Rotate = function (clock) {
         if (pieces.dropped == false) {
-            if (pieceType == square)
+            if (pieceType == "square")
                 var new_state = (this.state + ((this.state % 2) ^ clock ? 2 : 6)) % 8
             else
                 var new_state = (this.state + ((this.state % 2) ^ clock ? 2 : 10)) % 12
@@ -1152,7 +1152,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
 
     board.progressBars = []
     for (var player_id = 0; player_id < boardData.player_num; player_id++) {
-        if (boardData.board_type.split("_") == "square"){
+        if (boardData.board_type.split("_")[0] === "square"){
             var update = function(point){
                 return Point(point[0] * gCellSize, point[1] * gCellSize);
             }
