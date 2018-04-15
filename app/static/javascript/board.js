@@ -561,15 +561,17 @@ function PieceFactory(
 
     function generateTrigonTexture(cellList, color) {
         function CellList_2_Polygon(cell_list) {
-            var vertex_list = [new PIXI.Point(0, 0)];
+            var fst = null;
+            var vertex_list = [];
             cell_list.forEach(function (cell) {
                 var tip = liftPoint(cell[0] + cell[2], cell[1] + cell[2])
+                if (fst === null) fst = tip
                 vertex_list = vertex_list.concat([
                     tip,
                     liftPoint(cell[0] + 1, cell[1]),
                     liftPoint(cell[0], cell[1] + 1),
                     tip,
-                    Point(0, 0),
+                    fst
                 ])
             });
             return new PIXI.Polygon(vertex_list);
@@ -578,6 +580,7 @@ function PieceFactory(
         graphics.beginFill(color, 1);
         var polygon = CellList_2_Polygon(cellList);
         graphics.drawPolygon(polygon);
+        graphics.endFill();
 
         graphics.lineColor = colorTheme.piece.dividing_line;
         graphics.lineWidth = colorTheme.piece.dividing_line_width[mobile_version];
@@ -593,12 +596,15 @@ function PieceFactory(
         return graphics.generateTexture()
     }
     function getTrigonOffset(cellList) {
-        var x = 0, y = 0;
+        var lBound = 10, rBound = 0;
+        var uBound = 10, dBound = 0;
         cellList.forEach(function (point) {
-            x = Math.max(x, point[0] + 1)
-            y = Math.max(y, point[1] + 1)
+            lBound = Math.min(lBound, point[0] * 2 + point[1] + point[2]);
+            rBound = Math.max(rBound, point[0] * 2 + point[1] + point[2]);
+            uBound = Math.min(uBound, point[1]);
+            dBound = Math.max(dBound, point[1]);
         })
-        return new PIXI.Point(x * gCellSize / 2, y * gCellSize / 2)
+        return new PIXI.Point((rBound - lBound + 2) * gCellSize / 4, (dBound - uBound + 1) * gCellSize * Math.sqrt(3) / 4);
     }
 
     if (pieceType === 'square'){
@@ -616,7 +622,7 @@ function PieceFactory(
     shape.forEach(function (cellList, state) {
         var piece = new PIXI.Sprite(generateTexture(cellList, colorTheme.piece.cell[player_id]));
         piece.cellList = cellList
-        piece.offset = Point(piece.width / 2, piece.height / 2) 
+        piece.offset = getOffset(cellList) 
         piece.visible = false
         piece.anchor.set(0.5)
 
@@ -662,8 +668,7 @@ function PieceFactory(
 
     pieces.insideBound = function () {
         var pieceOffset = this.piece[this.state].offset
-        var oldX = this.x,
-            oldY = this.y
+        var oldX = this.x, oldY = this.y
         this.x = Math.max(this.x, -offset.x + pieceOffset.x)
         this.y = Math.max(this.y, -offset.y + pieceOffset.y)
         this.x = Math.min(this.x, gWidth - offset.x - pieceOffset.x)
@@ -793,7 +798,7 @@ function PieceFactory(
             if (pieceType == "square")
                 var new_state = (this.state + ((this.state % 2) ^ clock ? 2 : 6)) % 8
             else
-                var new_state = (this.state + ((this.state % 2) ^ clock ? 2 : 10)) % 12
+                var new_state = (this.state + ((this.state % 2) ^ clock ? 10 : 2)) % 12
             this.SetState(new_state);
         }
     };
