@@ -632,13 +632,14 @@ function PieceFactory(
     //adhoc for trigon
     for (var i = 0; i < shape.length; i ++){
         var exOffset = gCellSize / 2;
-        if (pieceType === 'square')
-            exOffset = 0;
+        var lbound = 10;
         shape[i].forEach(function(cell){
-            if (cell[0] === 0 && cell[1] === 0 && cell[2] === 0)
-                exOffset = 0
+            lbound = Math.min(lbound, cell[0] * 2 + cell[1] + cell[2])
         })
-        pieces.piece[i].exOffset = exOffset;
+        if (pieceType === 'square')
+            pieces.piece[i].exOffset = 0;
+        else
+            pieces.piece[i].exOffset = lbound * gCellSize / 2;
     }
 
     pieces.alpha = colorTheme.piece.initial_alpha
