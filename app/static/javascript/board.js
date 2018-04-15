@@ -780,13 +780,19 @@ function PieceFactory(
     };
     pieces.HorizontalFlip = function () {
         if (pieces.dropped == false) {
-            var new_state = (this.state + ((this.state % 2) ? 3 : 5)) % 8
+            if (pieceType == square)
+                var new_state = (this.state + ((this.state % 2) ? 3 : 5)) % 8
+            else
+                var new_state = (this.state + ((this.state % 2) ? 7 : 5)) % 12
             this.SetState(new_state);
         }
     }
     pieces.Rotate = function (clock) {
         if (pieces.dropped == false) {
-            var new_state = (this.state + ((this.state % 2) ^ clock ? 2 : 6)) % 8
+            if (pieceType == square)
+                var new_state = (this.state + ((this.state % 2) ^ clock ? 2 : 6)) % 8
+            else
+                var new_state = (this.state + ((this.state % 2) ^ clock ? 2 : 10)) % 12
             this.SetState(new_state);
         }
     };

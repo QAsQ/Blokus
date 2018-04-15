@@ -175,47 +175,73 @@ class Piece:
         return begin_position
 
 PieceShape = [
-    [0],
-    [0, [2, 1, 0]],
-    [0, [2, 1, 2, 0, 2]],
+    [],
+    [[2, 1, 0]],
+    [[0, 2], [1], [2, 1]],
+    [[2, 1, 2, 0, 2]]
 ]
 
 def piece_shape_set_generate():
-    def next_cell(pos, direct):
-        direction = [
-            [(0, -1), (0, -1), (0, 0)],
-            [(0, 1), (1, 0), (0, 0)]
-        ]
-        dx, dy = direction[pos[2]][direct]
-        return [pos[0] + dx, pos[1] + dy, 1 - pos[2]]
-    
-    def generate_cell_list(start, path):
-        cell_list = [start]
-        for direct in path:
-            cell_list.append(next_cell(cell_list[-1], direct))
-        return cell_list[1:]
-    
-    def shift(cell_list):
-        x = 0
-        y = 0
-        for cell in cell_list:
-            x = min(x, cell[0])
-            y = min(y, cell[1])
-        new_cell = []
-        for cell in cell_list:
-            new_cell.append((cell[0] - x, cell[1] - y, cell[2]))
-        return new_cell
 
-    piece_shape_set = []
+    def generate_shape(raw_data):
+        def next_cell(pos, direct):
+            direction = [
+                [(0, -1), (-1, 0), (0, 0)],
+                [(0, 1), (1, 0), (0, 0)]
+            ]
+            dx, dy = direction[pos[2]][direct]
+            return [pos[0] + dx, pos[1] + dy, 1 - pos[2]]
+        
+        def generate_cell_list(start, path):
+            cell_list = [start]
+            for direct in path:
+                cell_list.append(next_cell(cell_list[-1], direct))
+            return cell_list[1:]
+        
+        def shift(cell_list):
+            x = 0
+            y = 0
+            for cell in cell_list:
+                x = min(x, cell[0])
+                y = min(y, cell[1])
+            new_cell = []
+            for cell in cell_list:
+                new_cell.append((cell[0] - x, cell[1] - y, cell[2]))
+            return new_cell
 
-    for raw_data in PieceShape:
         start = [0, 0, raw_data[0]]
         initial_shape = [start]
         for path_list in raw_data[1:]:
             initial_shape = initial_shape + generate_cell_list(start, path_list)
-        initial_shape = shift(initial_shape)
-        
-        #todo
-        piece_shape_set.append([initial_shape for _ in range(12)])
+        return shift(initial_shape)
+    
+    def update_path(raw_data, state):
+        full_mapping = [
+            ((0, 1, 2), 0),#0
+            ((0, 2, 1), 1),#1
+            ((1, 2, 0), 1),#2
+            ((2, 1, 0), 0),#3
+            ((2, 0, 1), 0),#4
+            ((1, 0, 2), 1),#5
+            ((0, 1, 2), 1),#6
+            ((0, 2, 1), 0),#7
+            ((1, 2, 0), 0),#8
+            ((2, 1, 0), 1),#9
+            ((2, 0, 1), 1),#10
+            ((1, 0, 2), 0) #11
+        ]
+        mapping, start = full_mapping[state]
+        path = [start]
+        for raw_path in raw_data:
+            path.append(list(map(lambda dir: mapping[dir], raw_path)))
+        return path
+
+    piece_shape_set = []
+    for raw_data in PieceShape:
+        piece_shape = []
+        for state in range(12):
+            piece_shape.append(generate_shape(update_path(raw_data, state)))
+
+        piece_shape_set.append(piece_shape)
 
     return piece_shape_set
