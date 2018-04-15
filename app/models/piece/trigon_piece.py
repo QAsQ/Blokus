@@ -54,7 +54,7 @@ class Piece:
         ]
 
     def _in_board(self, x, y, z=None): # 判断三角形是否在棋盘内
-        if (x > 2 * self.board_size - 1) or (y > 2 * self.board_size - 1):
+        if x < 0 or x > 2 * self.board_size - 1 or y < 0 or y > 2 * self.board_size - 1:
             return False
         if z is None:
             return True
@@ -175,14 +175,35 @@ class Piece:
         return begin_position
 
 PieceShape = [
-    [],
-    [[2, 1, 0]],
-    [[0, 2], [1], [2, 1]],
-    [[2, 1, 2, 0, 2]]
+    [],#1
+    [[1]],#2
+    [[1, 2]],#3
+
+    [[1, 2, 1]],#4
+    [[0], [1], [2]],#5
+    [[2, 1, 0]],#6
+
+    [[1, 2, 1, 2]],#7
+    [[0], [1], [2, 1]],#8
+    [[0, 2, 1, 0]],#9
+    [[1, 2, 1, 0]],#10
+
+    [[1, 2, 1, 2, 1]],#11
+    [[0], [1], [2, 1, 2]],#12
+    [[0, 2, 1, 0, 2]],#13
+    [[2, 1, 2, 1, 0]],#14
+    [[0], [2, 1], [1, 2]],#15
+    [[0, 2], [1], [2, 1]],#16
+    [[1, 2, 1, 0, 2]],#17
+    [[1, 2], [0, 2], [2]],#18
+    #TODO need fix: 19 with one same cell
+    [[0], [1], [2, 1], [2, 0]],#19
+    [[1, 2, 0, 2, 1]],#20
+    [[1, 2], [2, 0, 2]],#21
+    [[0, 2, 1], [1], [2]]#22
 ]
 
 def piece_shape_set_generate():
-
     def generate_shape(raw_data):
         def next_cell(pos, direct):
             direction = [
