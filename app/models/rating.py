@@ -63,7 +63,6 @@ class RatingCalculator(object):
                 inc = int(multi * (self.user_list[j].left - self.user_list[i].left) * self.cal_p(self.user_list[j], self.user_list[i]))
                 min_rating_change = 0 if self.user_list[i].left == self.user_list[j].left else 15
                 inc = min(max(inc, min_rating_change), 100)
-            #    print(min_rating_change,'i=',i,'j=',j,'p=',self.cal_p(self.user_list[j], self.user_list[i]),inc)
                 self.user_list[i].delta += inc
                 self.user_list[j].delta -= inc
                 
