@@ -108,7 +108,7 @@ function ParticleFactory(direction, particleColor, mobile_version) {
     return emitterContainer
 }
 
-function PieceControllerFactory(colorTheme, controllerGroup) {
+function PieceControllerFactory(colorTheme, controllerGroup, pieceType) {
     var bodySize = 6
     var half_a = bodySize * (Math.SQRT2 - 1)
     var radius = (bodySize - 2) * gCellSize
@@ -202,20 +202,24 @@ function PieceControllerFactory(colorTheme, controllerGroup) {
 
         var thickWidth = gCellSize * Math.SQRT2
         graphics.lineWidth = thickWidth
-        graphics.arc(0, 0, radius - thickWidth / 2, -Math.PI / 8 * 8, -Math.PI / 8 * 4)
+        if (pieceType === 'square') graphics.arc(0, 0, radius - thickWidth / 2, -Math.PI, -Math.PI / 2)
+        else                        graphics.arc(0, 0, radius - thickWidth / 2, -Math.PI, -Math.PI / 3 * 2)
+        if (pieceType === 'square') var stateSize = 4
+        else                        var stateSize = 6
+
         var rotateCircle = new PIXI.Sprite(graphics.generateTexture())
         rotateCircle.alpha = colorTheme.piece.controller.control_parts.initial_alpha
         rotateCircle.anchor.set(0.5)
         rotateCircle.interactive = true
 
         rotateCircle.getAngel = function (position) {
-            return -(Math.atan2(position.x, position.y) + Math.PI / 4 * 3)
+            return -(Math.atan2(position.x, position.y) + Math.PI / stateSize * (stateSize / 2 + 1))
         }
         rotateCircle.getState = function () {
             var res = this.rotation
             if (res < 0)
                 res += Math.PI * 2
-            return Math.floor(res / Math.PI * 2 + 0.5) % 4
+            return Math.floor(res / (Math.PI * 2) * stateSize + 0.5) % stateSize
         }
         rotateCircle.Reset = function () {
             this.rotation = 0
@@ -229,11 +233,13 @@ function PieceControllerFactory(colorTheme, controllerGroup) {
             var distance = Math.sqrt(square(position.x) + square(position.y))
             if (distance < radius - thickWidth || distance > radius) {
                 return
-            } else {
+            } 
+            else {
                 this.oldState = this.getState()
                 this.dragging = true;
                 this.alpha = colorTheme.piece.controller.control_parts.active_alpha
                 this.rotation = this.getAngel(position)
+                this.parent.attachPiece.rotation = this.rotation - this.oldState * Math.PI * 2 / stateSize
                 event.stopped = true
             }
         }
@@ -242,7 +248,8 @@ function PieceControllerFactory(colorTheme, controllerGroup) {
             if (this.dragging) {
                 var position = this.data.getLocalPosition(this.parent);
                 this.rotation = this.getAngel(position)
-                this.parent.attachPiece.rotation = this.rotation - this.oldState * Math.PI / 2
+                this.getState()
+                this.parent.attachPiece.rotation = this.rotation - this.oldState * Math.PI * 2 / stateSize
             }
         }
 
@@ -254,9 +261,9 @@ function PieceControllerFactory(colorTheme, controllerGroup) {
                 piece = this.parent.attachPiece
                 piece.rotation = 0
                 var newState = this.getState()
-                for (var i = 0; i < newState - this.oldState + 4; i++)
+                for (var i = 0; i < newState - this.oldState + stateSize; i++)
                     piece.Rotate(false)
-                this.rotation = newState * Math.PI / 2
+                this.rotation = newState * Math.PI * 2 / stateSize
             }
         }
         rotateCircle
@@ -789,7 +796,7 @@ function PieceFactory(
             if (pieceType == "square")
                 var new_state = (this.state + ((this.state % 2) ? 3 : 5)) % 8
             else
-                var new_state = (this.state + ((this.state % 2) ? 7 : 5)) % 12
+                var new_state = (this.state + ((this.state % 2) ? 5 : 7)) % 12
             this.SetState(new_state);
         }
     }
@@ -1203,7 +1210,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
         board.pieceController.detach()
     })
 
-    board.pieceController = PieceControllerFactory(colorTheme, controllerGroup)
+    board.pieceController = PieceControllerFactory(colorTheme, controllerGroup, boardData.board_type.split("_")[0])
     board.addChild(board.pieceController)
 
     //Create piece
