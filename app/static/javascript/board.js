@@ -723,8 +723,8 @@ function PieceFactory(
         pieces.SetPosition = function (position) {
             position = liftPoint(position.x, position.y);
             var piece = this.piece[this.state];
-            this.x = position.x + piece.offset.x + piece.exOffset;
-            this.y = position.y + piece.offset.y;
+            this.x = position.x + piece.offset.x + piece.exOffset + colorTheme.piece.dividing_line_width[mobile_version] * Math.sqrt(3) / 2;
+            this.y = position.y + piece.offset.y + colorTheme.piece.dividing_line_width[mobile_version] / 2;
         }
     }
 
@@ -921,7 +921,7 @@ function TrigonHighlightLayerFactory(colorTheme, player_num, mobile_version, pie
     function highlightCellGenerate(color, index) {
         var graphics = new PIXI.Graphics();
 
-        var smallCellSize = gCellSize - colorTheme.piece.dividing_line_width[mobile_version] * 1;
+        var smallCellSize = gCellSize - colorTheme.piece.dividing_line_width[mobile_version] * Math.sqrt(3) * 2;
         var lp = Point(smallCellSize / 2, smallCellSize / 2 * Math.sqrt(3))
         var rp = Point(smallCellSize, 0);
         if (index == 0) var tip = Point(0, 0);
@@ -1000,8 +1000,8 @@ function TrigonHighlightLayerFactory(colorTheme, player_num, mobile_version, pie
                 var cell = highlightLayer.highlightCells[player_id][curShape[2]][index];
 
                 var lPos = liftPoint(curShape[0] + drop.position.x, curShape[1] + drop.position.y);
-                cell.x = lPos.x + curShape[2] * gCellSize / 2 + colorTheme.piece.dividing_line_width[mobile_version];
-                cell.y = lPos.y + colorTheme.piece.dividing_line_width[mobile_version];
+                cell.x = lPos.x + curShape[2] * gCellSize / 2 + colorTheme.piece.dividing_line_width[mobile_version] * Math.sqrt(3) * 1.285;
+                cell.y = lPos.y + colorTheme.piece.dividing_line_width[mobile_version] * (1.25 + 1.25 * curShape[2]);
                 cell.visible = true;
             }
         }
