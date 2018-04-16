@@ -1129,8 +1129,15 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
         else board.x = board.y = 3 * gCellSize;
     }
     else {
-        board.x = gCellSize * 2
-        board.y = gCellSize * Math.sqrt(3);
+        if (mobile_version) {
+            board.x = gCellSize * 1
+            board.y = gCellSize * Math.sqrt(3);
+        }
+        else
+        {
+            board.x = gCellSize * 3
+            board.y = gCellSize * Math.sqrt(3);
+        } 
     }
 
     board.addChild(boardShape);
@@ -1335,8 +1342,8 @@ function generateBoard(canvas, mPlayerId, boardData, colorTheme, mobile_version)
             [18, 29]
         ],
         "trigon_trio": [
-            [15, 15 / trigon_height],
-            [15, 15 / trigon_height]
+            [20, 16 / trigon_height],
+            [18, 20 / trigon_height]
         ]
     }
 
@@ -1367,7 +1374,5 @@ function generateBoard(canvas, mPlayerId, boardData, colorTheme, mobile_version)
     var board = BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobile_version ? 1 : 0)
     app.stage.addChild(board);
 
-    //test only
-    //board.update_player(0)
     return board;
 }
