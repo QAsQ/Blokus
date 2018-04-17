@@ -1139,7 +1139,17 @@ Vue.component("battle-creater", {
     },
     computed: {
         expect_time: function () {
-            second = (this.parameter.accuracy_time + this.parameter.additional_time * 21) * 4
+            var player_num = {
+                "square_standard": 4,
+                "square_duo": 2,
+                "trigon_trio": 3
+            }[this.parameter.board_type]
+            var piece_num = {
+                "square_standard": 21,
+                "square_duo": 21,
+                "trigon_trio": 22
+            }[this.parameter.board_type]
+            second = (this.parameter.accuracy_time + this.parameter.additional_time * piece_num) * player_num
             var minute = Math.ceil(second / 60)
             if (minute < 60)
                 return minute + "分钟"
