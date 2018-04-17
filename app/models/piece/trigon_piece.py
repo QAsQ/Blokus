@@ -1,5 +1,25 @@
 #this code need to be fix
-from .square_piece import Position
+class Position:
+    def __init__(self, state=-1, x=-1, y=-1):
+        self.state = state
+        self.x = x
+        self.y = y
+
+    @staticmethod
+    def from_dict(data):
+        ret = Position()
+        ret.state = data["state"]
+        ret.x = data["x"]
+        ret.y = data["y"]
+        return ret
+
+    def to_dict(self):
+        return {
+            "state": self.state,
+            "x": self.x,
+            "y": self.y
+        }
+
 
 # 0-lack of corner
 # 1-can be placed
@@ -196,7 +216,6 @@ PieceShape = [
     [[0, 2], [1], [2, 1]],#16
     [[1, 2, 1, 0, 2]],#17
     [[1, 2], [0, 2], [2]],#18
-    #TODO need fix: 19 with one same cell
     [[0], [1], [2, 1], [2, 0]],#19
     [[1, 2, 0, 2, 1]],#20
     [[1, 2], [2, 0, 2]],#21
@@ -227,7 +246,9 @@ def piece_shape_set_generate():
                 y = min(y, cell[1])
             new_cell = []
             for cell in cell_list:
-                new_cell.append((cell[0] - x, cell[1] - y, cell[2]))
+                nc = (cell[0] - x, cell[1] - y, cell[2])
+                if nc not in new_cell:
+                    new_cell.append(nc)
             return new_cell
 
         start = [0, 0, raw_data[0]]

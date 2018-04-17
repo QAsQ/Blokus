@@ -868,7 +868,6 @@ Vue.component("battle-condition", {
                 <option value="">对局类型</option>
                 <option value="square_standard">正方形(四人)</option>
                 <option value="square_duo">正方形(双人)</option>
-                <option value="trigon_standard">三角形(四人)</option>
                 <option value="trigon_trio">三角形(三人)</option>
             </select>
         </div>
@@ -968,7 +967,6 @@ Vue.component("battle-creater", {
                                 <option value="">对局类型</option>
                                 <option value="square_standard">正方形(四人)</option>
                                 <option value="square_duo">正方形(双人)</option>
-                                <option value="trigon_standard">三角形(四人)</option>
                                 <option value="trigon_trio">三角形(三人)</option>
                             </select>
                         </div>

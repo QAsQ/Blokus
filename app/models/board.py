@@ -95,9 +95,11 @@ from .piece.square_piece import piece_shape_set_generate as square_piece_shape_g
 from .piece.square_standard_initial_state import square_standard_initial_possible_position  
 from .piece.square_standard_initial_pos import square_standard_init_locate, square_standard_init_state, square_standard_progress_bar_end_point
 from .piece.square_duo_initial_pos import square_duo_init_locate, square_duo_init_state, square_duo_progress_bar_end_point
+from .piece.square_duo_initial_state import square_duo_initial_possible_position  
 from .piece.trigon_piece import Piece as Trigon_piece
 from .piece.trigon_piece import piece_shape_set_generate as trigon_piece_shape_generate
 from .piece.trigon_trio_initial_pos import trigon_trio_init_locate, trigon_trio_init_state, trigon_trio_progress_bar_end_point
+from .piece.trigon_trio_initial_state import trigon_trio_initial_possible_position  
 
 class BoardFactory:
     @staticmethod
@@ -115,14 +117,14 @@ class BoardFactory:
                 square_piece_shape_generate(),
                 [(4, 4), (9, 9)], 
                 14,
-                None
+                square_duo_initial_possible_position
             ),
             "trigon_trio": (
                 Trigon_piece, 
                 trigon_piece_shape_generate(),
                 [(10, 2, 1), (2, 10, 1), (10, 10, 1)],
                 8,
-                None
+                trigon_trio_initial_possible_position
             )
         }
         if board_type in args:

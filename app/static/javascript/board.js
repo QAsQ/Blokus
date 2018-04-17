@@ -722,8 +722,8 @@ function PieceFactory(
     if (pieceType === 'square'){
         pieces.SetPosition = function (position) {
             var piece = this.piece[this.state];
-            this.x = position.x * gCellSize + piece.offset.x;
-            this.y = position.y * gCellSize + piece.offset.y;
+            this.x = position.x * gCellSize + piece.offset.x + colorTheme.piece.dividing_line_width[mobile_version] / 2;
+            this.y = position.y * gCellSize + piece.offset.y + colorTheme.piece.dividing_line_width[mobile_version] / 2;
         }
     }
     else{
@@ -1133,7 +1133,7 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
     var board = new PIXI.Container();
     if (boardData.board_type.split("_")[0] === 'square'){
         if (mobile_version) board.x = board.y = 2 * gCellSize;
-        else board.x = board.y = 3 * gCellSize;
+        else board.x = board.y = 4 * gCellSize;
     }
     else {
         if (mobile_version) {
@@ -1167,6 +1167,17 @@ function BoardFactory(app, mPlayerId, colorTheme, TryDropPiece, boardData, mobil
             position: position
         }
         TryDropPiece(data)
+
+        /*
+        var stateStr = '', posStr = '';
+        for(var i = 0 ; i < 22; i ++){
+            var st = board.pieceLists[mPlayerId][i].State();
+            stateStr += st.state + " ,"
+            posStr += "[" + st.x + ", " + st.y + "], "
+        }
+        console.log(stateStr);
+        console.log(posStr);
+        */
     }
 
     board.progressBars = []
