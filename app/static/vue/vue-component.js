@@ -310,7 +310,7 @@ Vue.component("battle-item", {
         </div>`,
     methods: {
         goto_battle: function () {
-            window.location.href="/battle?battle_id=" + this.battle_data.battle_id
+            window.location.href = "/battle?battle_id=" + this.battle_data.battle_id
         }
     },
     computed: {
@@ -373,7 +373,7 @@ Vue.component("playerinfo-table", {
         }
     },
     computed: {
-        table_typesetting: function(){
+        table_typesetting: function () {
             var typesetting = []
             typesetting[2] = [[0, 1]]
             typesetting[3] = [[0], [1, 2]]
@@ -438,7 +438,7 @@ Vue.component("chat-box", {
             this.roll_to_bottom()
     },
     computed: {
-        height: function(){
+        height: function () {
             if (this.mobile_version)
                 return "100px"
             else
@@ -565,20 +565,20 @@ Vue.component("control-panel", {
     },
     watch: {
         "battle_data.battle_info.ended": function () {
-            $("#result_modal").modal("show"),
+            $("#result_modal").modal("show")
             this.show_next = true
         }
     },
     methods: {
-        go_next: function(){
-            $.get("/api/battles/" + this.battle_data.battle_id + "/next_battle", {}, function(data){
+        go_next: function () {
+            $.get("/api/battles/" + this.battle_data.battle_id + "/next_battle", {}, function (data) {
                 if (data.message != "success")
                     show_message(data.message)
                 else
-                    window.location.href="/battle?battle_id=" + data.result.next_battle
+                    window.location.href = "/battle?battle_id=" + data.result.next_battle
             });
         },
-        head_image: function(player_id){
+        head_image: function (player_id) {
             return 'static/images/' + this.battle_data.board_info.board_type + '/player/' + (1 << player_id) + '.jpg'
         },
         update_hosting: function () {
@@ -603,8 +603,8 @@ Vue.component("control-panel", {
             })
         },
         leave: function () {
-            var back = function(){
-                window.location.href="/battles"
+            var back = function () {
+                window.location.href = "/battles"
             }
             if (this.player_id !== -1)
                 try_leave(this.player_id, back)
@@ -655,6 +655,7 @@ Vue.component("control-panel", {
                     head_char = "+"
                 return rating + "(" + head_char + delta + ")"
             }
+
             var result = []
             for (var player_id = 0; player_id < player_num; player_id++) {
                 var current_player = this.battle_data.players_info[player_id]
@@ -787,7 +788,7 @@ Vue.component("battle-interface", {
             var width = document.body.clientWidth
             if (width > 767)
                 return 646
-            else{
+            else {
                 return document.body.clientHeight * 0.8
             }
         },
@@ -799,7 +800,7 @@ Vue.component("battle-interface", {
                     return id
             return -1
         },
-        mobile_version: function(){
+        mobile_version: function () {
             return document.body.clientWidth < 767
         }
     }
@@ -935,7 +936,7 @@ Vue.component("battle-condition", {
                 var res = load_battles()
                 if (res === "user not exist") {
                     $("#username_condition").addClass("error")
-                } 
+                }
                 else if (res !== "success") {
                     show_message(res)
                 }
@@ -1083,8 +1084,8 @@ Vue.component("battle-creater", {
                         if (data.message == "success") {
                             form.removeClass("loading")
                             $("#create_modal").modal("hide");
-                            window.location.href="/battle?battle_id=" + data.result.id
-                        } 
+                            window.location.href = "/battle?battle_id=" + data.result.id
+                        }
                         else {
                             form
                                 .removeClass("success")
@@ -1165,6 +1166,19 @@ Vue.component("battle-creater", {
 Vue.component("rank-list", {
     props: ['users_data'],
     template: `
+        <div class="ui container">
+        <div class="ui left aligned container">
+            <div class="ui search">
+                <div class="ui icon input">
+                    <input class="prompt" type="text" @input="search" list="search_result"
+                           placeholder="Search users...">
+                    <i class="search icon"></i>
+                </div>
+                <datalist id="search_result">
+                    <option v-cloak v-for="item in search_list" :value="item"></option>
+                </datalist>
+            </div>
+        </div>
         <table class="ui basic selectable large table">
         <thead>
             <tr>
@@ -1177,20 +1191,128 @@ Vue.component("rank-list", {
             </tr>
         </thead>
         <tbody>
-            <tr class="tr-link" v-for="(user_data, index) in users_data" @click="jump_to(user_data.user_id)">
-                <td><h1>{{index + 1}}                                                     </h1></td>
-                <td><h1>{{user_data.username}}                                            </h1></td>
+            <tr class="tr-link" v-for="(user_data, index) in selected_users_data.slice((page_index-1)*page_size,page_index*page_size)" @click="jump_to(user_data.user_id)">
+                <td><h1>{{user_data.rank}}                                                     </h1></td>
+                <td><h1 :class="getUserRankColor(user_data.user_info.rating)">{{user_data.username}}                                            </h1></td>
                 <td><h1>{{user_data.user_info.rating}}                                    </h1></td>
                 <td><h1>{{ (user_data.user_info.rate_of_victory * 100).toFixed(2) + "%" }}</h1></td>
                 <td><h1>{{user_data.user_info.number_of_victory}}                         </h1></td>
                 <td><h1>{{user_data.user_info.number_of_battles}}                         </h1></td>
             </tr>
         </tbody>
+        <tfoot class="full-width">
+            <tr><th colspan="8">
+                <div class="ui left floated pagination menu">
+                        <a :class="(page_index == 1 ? 'disabled' : '') + ' icon item'" @click="leftPage" :disabled="page_index == 1">
+                            <i class="left chevron icon"></i>
+                        </a>
+                        <a @click="if (item_index != '...') page_index=item_index" :class="(page_index == item_index ? 'active' : '') + ' item'" v-for="item_index in changePageList">{{ item_index | showPage }}</a>
+                        <a :class="(page_index == page_length ? 'disabled' : '') + ' icon item'" @click="rightPage" :disabled="page_index == page_length">
+                            <i class="right chevron icon"></i>
+                        </a>
+                </div>
+            </th></tr>
+        </tfoot>
         </table>
+        </div>
     `,
+    data: function () {
+        return {
+            isActive: false,
+            selected_list: {},
+            selected_users_data: [],
+            search_list: [],
+            page_size: 100,
+            page_index: 1,
+            users_data: [],
+            page_length: 0,
+        }
+    },
+    created() {
+        this.setSelectedList(this.users_data);
+        this.page_length = Math.floor((this.selected_users_data.length + this.page_size - 1) / this.page_size);
+    },
     methods: {
+        // 获取需要渲染到页面中的数据
+        "setSelectedList": function(arr) {
+            this.selected_users_data = JSON.parse(JSON.stringify(arr));
+            this.page_length = Math.floor((this.selected_users_data.length + this.page_size - 1) / this.page_size);
+        },
+        // 搜索
+        "search": function(e) {
+            let v = e.target.value,
+                self = this;
+            self.search_list = [];
+            if (v) {
+                let ss = [];
+                // 过滤需要的数据
+                this.users_data.forEach(function (item) {
+                    if (item['username'].indexOf(v) > -1) {
+                        if (self.search_list.indexOf(item.username) == -1) {
+                            self.search_list.push(item.username);
+                        }
+                        ss.push(item);
+                    }
+                });
+                this.setSelectedList(ss); // 将过滤后的数据给selected_users_data
+            } else {
+                // 没有搜索内容，则展示全部数据
+                this.setSelectedList(this.users_data);
+            }
+        },
         "jump_to": function (user_id) {
             location.href = "/users?user_id=" + user_id
+        },
+
+        "leftPage": function () {
+            if (this.page_index > 1)
+                --this.page_index
+        },
+
+        "rightPage": function () {
+            if (this.page_index < Math.floor((this.selected_users_data.length + this.page_size - 1) / this.page_size))
+                ++this.page_index
+        },
+
+        "getUserRankColor": function (rating) {
+            const RATING_COLOR_MAP = {
+                1200: 'user-gray',
+                1400: 'user-green',
+                1600: 'user-cyan',
+                1900: 'user-blue',
+                2200: 'user-violet',
+                2400: 'user-orange',
+                9999: 'user-red',
+            };
+            for (let rate of Object.keys(RATING_COLOR_MAP)) {
+                if (rating < rate){
+                    return RATING_COLOR_MAP[rate]
+                }
+            }
+        }
+    },
+    computed: {
+        "changePageList": function () {
+            var val = this.page_index;
+            var list = [];
+            if (this.page_length < 10) {
+                list = [...Array(this.page_length + 1).keys()].slice(1)
+            } else {
+                var min_page = Math.max(1, val - 2);
+                var max_page = Math.min(this.page_length - 2, val + 2);
+                if (min_page > 3) {
+                    list = [1, 2, '...']
+                }
+                for (var i = min_page; i <= max_page; i++) {
+                    list.push(i)
+                }
+                if (max_page < this.page_length - 2) {
+                    list.push('...')
+                }
+                list.push(this.page_length - 1);
+                list.push(this.page_length);
+            }
+            return list
         }
     }
 });
