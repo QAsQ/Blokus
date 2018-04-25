@@ -3,10 +3,14 @@
 {% block head %}
 <script>
 $(document).ready(function() {
+    let users_data = {{ users|tojson|safe }}
+    for (var [index, user_data] of users_data.entries()) {
+        user_data.rank = index + 1;
+    }
     var rank_list = new Vue({
         "el": "#rank_list",
         "data":{
-            "users_data": {{ users|tojson|safe }}
+            "users_data": users_data
         }
     });
 });
