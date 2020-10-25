@@ -28,7 +28,7 @@ def send_mail(target_address, message_head, message_body, config):
     msg.attach(texthtml)
     # 发送邮件
     try:
-        client = smtplib.SMTP_SSL()
+        client = smtplib.SMTP_SSL(host='smtpdm.aliyun.com')
         client.connect('smtpdm.aliyun.com', 465)
         client.set_debuglevel(0)
         client.login(username, password)
